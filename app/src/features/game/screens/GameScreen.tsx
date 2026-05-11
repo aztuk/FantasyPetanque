@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, Alert,
 } from 'react-native';
@@ -9,6 +9,7 @@ import { ScoreBlock } from '../../../shared/components/ScoreBlock';
 import { TeamButton } from '../../../shared/components/TeamButton';
 import { PrimaryButton } from '../../../shared/components/PrimaryButton';
 import { RuleUI } from '../components/RuleUI';
+import { DebugRulePicker } from '../components/DebugRulePicker';
 import { BACKGROUND, TEXT_PRIMARY, TEXT_SECONDARY, SURFACE, ACCENT, TEAM_COLORS, TEAM_LABELS } from '../../../shared/constants';
 import { RootStackParamList } from '../../../app/navigation/types';
 import { shouldSkipNormalScore } from '../../../domain/game/engine';
@@ -17,8 +18,9 @@ type Nav = NativeStackNavigationProp<RootStackParamList, 'Game'>;
 
 export function GameScreen() {
   const navigation = useNavigation<Nav>();
+  const [debugPickerVisible, setDebugPickerVisible] = useState(false);
   const {
-    mode, scores, currentRound, rounds, vetos, phase,
+    mode, scores, currentRound, rounds, vetos, phase, debugMode,
     addNormalPoint, undoNormalPoint, finishRound, startNewRound, useVeto, resetGame,
   } = useGameStore();
 
@@ -123,7 +125,17 @@ export function GameScreen() {
         {/* Rule display (fantasy mode) */}
         {mode === 'fantasy' && round.rule && (
           <View style={styles.ruleCard}>
-            <Text style={styles.ruleName}>{round.rule.name}</Text>
+            <View style={styles.ruleCardHeader}>
+              <Text style={styles.ruleName}>{round.rule.name}</Text>
+              {debugMode && (
+                <TouchableOpacity
+                  style={styles.debugChangeBtn}
+                  onPress={() => setDebugPickerVisible(true)}
+                >
+                  <Text style={styles.debugChangeBtnLabel}>🛠 Changer</Text>
+                </TouchableOpacity>
+              )}
+            </View>
             <Text style={styles.ruleDesc}>{round.rule.description}</Text>
 
             {/* Immune team banner */}
@@ -214,6 +226,11 @@ export function GameScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
+
+      <DebugRulePicker
+        visible={debugPickerVisible}
+        onClose={() => setDebugPickerVisible(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -242,11 +259,31 @@ const styles = StyleSheet.create({
     padding: 16,
     marginVertical: 6,
   },
+  ruleCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
   ruleName: {
     color: ACCENT,
     fontSize: 22,
     fontWeight: '800',
-    marginBottom: 8,
+    flex: 1,
+  },
+  debugChangeBtn: {
+    backgroundColor: '#2A2A2A',
+    borderWidth: 1,
+    borderColor: '#555',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginLeft: 8,
+  },
+  debugChangeBtnLabel: {
+    color: '#AAA',
+    fontSize: 13,
+    fontWeight: '600',
   },
   ruleDesc: {
     color: TEXT_PRIMARY,

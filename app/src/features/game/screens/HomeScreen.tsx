@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useGameStore } from '../state/gameStore';
@@ -11,7 +11,7 @@ type Nav = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
 export function HomeScreen() {
   const navigation = useNavigation<Nav>();
-  const { startGame, resetGame } = useGameStore();
+  const { startGame, resetGame, debugMode, toggleDebugMode } = useGameStore();
 
   const handleStartSimple = () => {
     resetGame();
@@ -49,7 +49,14 @@ export function HomeScreen() {
           />
         </View>
 
-        <Text style={styles.footer}>Score cible : 13 points</Text>
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Score cible : 13 points</Text>
+          <TouchableOpacity style={styles.debugToggle} onPress={toggleDebugMode}>
+            <Text style={[styles.debugToggleLabel, debugMode && styles.debugActive]}>
+              {debugMode ? '🛠 Debug ON' : '🛠 Debug'}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -91,9 +98,26 @@ const styles = StyleSheet.create({
     marginHorizontal: 0,
   },
   footer: {
-    color: TEXT_SECONDARY,
-    textAlign: 'center',
-    fontSize: 13,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginTop: 16,
+  },
+  footerText: {
+    color: TEXT_SECONDARY,
+    fontSize: 13,
+  },
+  debugToggle: {
+    padding: 8,
+    backgroundColor: '#1E1E1E',
+    borderRadius: 8,
+  },
+  debugToggleLabel: {
+    color: '#666',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  debugActive: {
+    color: ACCENT,
   },
 });

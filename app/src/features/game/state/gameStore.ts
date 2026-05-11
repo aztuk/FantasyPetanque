@@ -30,6 +30,10 @@ function makeInitialState(): GameState {
 }
 
 interface GameStore extends GameState {
+  debugMode: boolean;
+  toggleDebugMode: () => void;
+  forceRule: (rule: Rule) => void;
+
   // Setup actions
   startGame: (mode: GameMode) => void;
   resetGame: () => void;
@@ -79,6 +83,26 @@ interface GameStore extends GameState {
 
 export const useGameStore = create<GameStore>((set, get) => ({
   ...makeInitialState(),
+  debugMode: false,
+
+  toggleDebugMode: () => set((s) => ({ debugMode: !s.debugMode })),
+
+  forceRule: (rule) => {
+    const state = get();
+    if (!state.currentRound) return;
+    let newPlayedRuleIds = [...state.playedRuleIds];
+    if (!newPlayedRuleIds.includes(rule.id)) {
+      newPlayedRuleIds = [...newPlayedRuleIds, rule.id];
+    }
+    let newPendingNextRule = state.pendingNextRule;
+    const newRound = createRound(state.currentRound.number, rule);
+    if (rule.id === 'totem-immunite') {
+      const nextRule = drawTotemRule({ playedRuleIds: newPlayedRuleIds, scores: state.scores }, rule.id);
+      newRound.totemNextRule = nextRule;
+      newPendingNextRule = nextRule;
+    }
+    set({ currentRound: newRound, playedRuleIds: newPlayedRuleIds, pendingNextRule: newPendingNextRule });
+  },
 
   startGame: (mode) => {
     const state = get();
