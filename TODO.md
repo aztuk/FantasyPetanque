@@ -33,4 +33,3 @@
 
 <!-- Dépose ici tes instructions dans n'importe quel ordre. L'agent les traitera au prochain démarrage. -->
 
-- Créer un design system tokénisé et en profiter pour créer une identité visuelle à l'application
