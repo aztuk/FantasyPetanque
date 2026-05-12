@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useGameStore } from '../state/gameStore';
 import { PrimaryButton } from '../../../shared/components/PrimaryButton';
-import { BACKGROUND, TEXT_PRIMARY, TEXT_SECONDARY, ACCENT } from '../../../shared/constants';
+import { colors, typography } from '../../../shared/constants';
 import { RootStackParamList } from '../../../app/navigation/types';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'Home'>;
@@ -31,10 +31,11 @@ export function HomeScreen() {
           onPress={handleLogoTap}
           activeOpacity={1}
         >
-          <Text style={styles.title}>🎯 Fantasy</Text>
-          <Text style={styles.titleSub}>Pétanque</Text>
+          <Text style={styles.eyebrow}>🎯 Le jeu</Text>
+          <Text style={styles.title}>Fantasy</Text>
+          <Text style={styles.titleAccent}>Pétanque</Text>
           <Text style={styles.tagline}>Dignité optionnelle.</Text>
-          {debugMode && <Text style={styles.debugBadge}>🛠 Debug</Text>}
+          {debugMode && <Text style={styles.debugBadge}>MODE DEBUG</Text>}
         </TouchableOpacity>
 
         <PrimaryButton
@@ -47,41 +48,51 @@ export function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: BACKGROUND },
+  safe: { flex: 1, backgroundColor: colors.background },
   container: {
     flex: 1,
-    padding: 24,
-    justifyContent: 'space-between',
+    paddingHorizontal: 28,
     paddingBottom: 40,
+    paddingTop: 16,
+    justifyContent: 'space-between',
   },
   header: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+  },
+  eyebrow: {
+    color: colors.textSecondary,
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.semibold,
+    textTransform: 'uppercase',
+    letterSpacing: 3,
+    marginBottom: 16,
   },
   title: {
-    color: TEXT_PRIMARY,
-    fontSize: 48,
-    fontWeight: '800',
-    textAlign: 'center',
+    color: colors.textPrimary,
+    fontSize: typography.size.hero,
+    fontWeight: typography.weight.extrabold,
+    lineHeight: 68,
   },
-  titleSub: {
-    color: ACCENT,
-    fontSize: 36,
-    fontWeight: '800',
-    textAlign: 'center',
-    marginTop: -8,
+  titleAccent: {
+    color: colors.accent,
+    fontSize: typography.size.hero,
+    fontWeight: typography.weight.extrabold,
+    lineHeight: 68,
+    marginBottom: 24,
   },
   tagline: {
-    color: TEXT_SECONDARY,
-    fontSize: 16,
-    marginTop: 16,
+    color: colors.textSecondary,
+    fontSize: typography.size.md,
     fontStyle: 'italic',
   },
   debugBadge: {
-    marginTop: 12,
-    color: ACCENT,
-    fontSize: 13,
-    fontWeight: '600',
+    marginTop: 20,
+    color: colors.accent,
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.bold,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
   },
 });

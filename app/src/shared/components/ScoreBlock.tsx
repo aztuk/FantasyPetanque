@@ -3,15 +3,17 @@ import {
   View, Text, StyleSheet, TouchableOpacity,
 } from 'react-native';
 import { Team } from '../../domain/game/models';
-import { TEAM_COLORS, TEAM_LABELS } from '../constants';
+import { TEAM_LABELS, colors, typography, radius, opacity } from '../constants';
 
 interface Props {
   team: Team;
   score: number;
   delta?: number;
   showLabel?: boolean;
+  actionLabel?: string;
   onPress?: () => void;
   disabled?: boolean;
+  square?: boolean;
   testID?: string;
 }
 
@@ -20,11 +22,13 @@ export function ScoreBlock({
   score,
   delta,
   showLabel = true,
+  actionLabel,
   onPress,
   disabled = false,
+  square = false,
   testID,
 }: Props) {
-  const bg = team === 'blue' ? TEAM_COLORS.blue : TEAM_COLORS.red;
+  const bg = colors.team[team];
   const content = (
     <>
       {showLabel && <Text style={styles.label}>{TEAM_LABELS[team]}</Text>}
@@ -34,11 +38,13 @@ export function ScoreBlock({
           {delta > 0 ? `+${delta}` : `${delta}`}
         </Text>
       )}
+      {actionLabel && <Text style={styles.actionLabel}>{actionLabel}</Text>}
     </>
   );
 
   const blockStyle = [
     styles.block,
+    square && styles.square,
     { backgroundColor: bg },
     disabled && styles.disabled,
   ];
@@ -49,7 +55,7 @@ export function ScoreBlock({
         style={blockStyle}
         onPress={onPress}
         disabled={disabled}
-        activeOpacity={0.8}
+        activeOpacity={0.85}
         accessibilityRole="button"
         accessibilityLabel={`${TEAM_LABELS[team]} score ${score}`}
         accessibilityState={{ disabled }}
@@ -72,31 +78,49 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 20,
+    paddingVertical: 24,
     marginHorizontal: 4,
-    borderRadius: 12,
-    minHeight: 100,
+    borderRadius: radius.xl,
+    minHeight: 130,
+    position: 'relative',
+  },
+  square: {
+    aspectRatio: 1,
+    minHeight: 156,
+    paddingVertical: 16,
   },
   disabled: {
-    opacity: 0.45,
+    opacity: opacity.disabled,
   },
   label: {
-    color: 'rgba(255,255,255,0.8)',
-    fontSize: 16,
-    fontWeight: '600',
+    color: 'rgba(240,238,248,0.65)',
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.semibold,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: 2,
   },
   score: {
-    color: '#FFFFFF',
-    fontSize: 56,
-    fontWeight: '800',
-    lineHeight: 64,
+    color: colors.textPrimary,
+    fontSize: typography.size.score,
+    fontWeight: typography.weight.extrabold,
+    lineHeight: 88,
   },
   delta: {
-    fontSize: 20,
-    fontWeight: '700',
+    position: 'absolute',
+    bottom: 16,
+    fontSize: typography.size.lg,
+    fontWeight: typography.weight.bold,
   },
-  pos: { color: '#AEFFAE' },
-  neg: { color: '#FFAEAE' },
+  actionLabel: {
+    position: 'absolute',
+    bottom: 16,
+    left: 10,
+    right: 10,
+    color: colors.textPrimary,
+    fontSize: typography.size.md,
+    fontWeight: typography.weight.bold,
+    textAlign: 'center',
+  },
+  pos: { color: colors.positive },
+  neg: { color: colors.negative },
 });

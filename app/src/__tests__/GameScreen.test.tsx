@@ -45,18 +45,17 @@ describe('GameScreen normal scoring interaction', () => {
     fireEvent.press(screen.getByTestId('score-block-blue'));
 
     expect(screen.getByText('+1')).toBeTruthy();
+    expect(screen.getByText('Tapez pour annuler')).toBeTruthy();
+    expect(screen.queryByText(/Annuler dernier point/)).toBeNull();
     expect(useGameStore.getState().currentRound?.normalPoints.blue).toBe(1);
     expect(screen.getByTestId('end-round-button').props.accessibilityState.disabled).toBe(false);
 
     fireEvent.press(screen.getByTestId('score-block-red'));
 
-    expect(useGameStore.getState().currentRound?.normalPoints.blue).toBe(1);
-    expect(useGameStore.getState().currentRound?.normalPoints.red).toBe(0);
-
-    fireEvent.press(screen.getByText(/Annuler dernier point/));
-
     expect(useGameStore.getState().currentRound?.normalPoints.blue).toBe(0);
+    expect(useGameStore.getState().currentRound?.normalPoints.red).toBe(0);
     expect(screen.queryByText('+1')).toBeNull();
+    expect(screen.queryByText('Tapez pour annuler')).toBeNull();
     expect(screen.getByTestId('end-round-button').props.accessibilityState.disabled).toBe(true);
   });
 });

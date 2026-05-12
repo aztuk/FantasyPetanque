@@ -8,7 +8,7 @@ import { useGameStore } from '../state/gameStore';
 import { ScoreBlock } from '../../../shared/components/ScoreBlock';
 import { PrimaryButton } from '../../../shared/components/PrimaryButton';
 import { RuleUI } from '../components/RuleUI';
-import { BACKGROUND, TEXT_PRIMARY, TEXT_SECONDARY, SURFACE, ACCENT, TEAM_COLORS, TEAM_LABELS } from '../../../shared/constants';
+import { colors, typography, radius, TEAM_COLORS, TEAM_LABELS } from '../../../shared/constants';
 import { RootStackParamList } from '../../../app/navigation/types';
 import { shouldSkipNormalScore } from '../../../domain/game/engine';
 
@@ -28,10 +28,18 @@ export function GameScreen() {
   const blueActive = bluePoints > 0;
   const redActive = redPoints > 0;
   const hasNormalPoints = blueActive || redActive;
+  const scoringTeam: 'blue' | 'red' | null =
+    blueActive ? 'blue' :
+    redActive ? 'red' : null;
 
-  const scoreTeamDisabled = (team: 'blue' | 'red') => {
-    if (team === 'blue') return redActive;
-    return blueActive;
+  const getScoreBlockPress = (team: 'blue' | 'red') => {
+    const otherTeam = team === 'blue' ? 'red' : 'blue';
+    return scoringTeam === otherTeam ? undoNormalPoint : () => addNormalPoint(team);
+  };
+
+  const getScoreBlockActionLabel = (team: 'blue' | 'red') => {
+    if (scoringTeam !== null && scoringTeam !== team) return 'Tapez pour annuler';
+    return undefined;
   };
 
   const skipNormal = round ? shouldSkipNormalScore(round) : false;
@@ -53,7 +61,7 @@ export function GameScreen() {
             <ScoreBlock team="blue" score={scores.blue} />
             <ScoreBlock team="red" score={scores.red} />
           </View>
-          <Text style={styles.gameOver}>Partie terminée !</Text>
+          <Text style={styles.gameOver}>Partie terminée.</Text>
           <PrimaryButton
             label="Voir le résumé"
             onPress={() => navigation.navigate('Summary')}
@@ -88,24 +96,23 @@ export function GameScreen() {
           </View>
 
           {lastRound?.rule && (
-            <View style={styles.roundSummaryCard}>
-              <Text style={styles.roundLabel}>{lastRound.rule.name}</Text>
-              {deltaBlue !== 0 && <Text style={[styles.deltaText, { color: TEAM_COLORS.blue }]}>Bleu : {deltaBlue > 0 ? `+${deltaBlue}` : deltaBlue}</Text>}
-              {deltaRed !== 0 && <Text style={[styles.deltaText, { color: TEAM_COLORS.red }]}>Rouge : {deltaRed > 0 ? `+${deltaRed}` : deltaRed}</Text>}
+            <View style={styles.roundSummary}>
+              <Text style={styles.roundSummaryLabel}>{lastRound.rule.name}</Text>
+              {deltaBlue !== 0 && (
+                <Text style={[styles.roundSummaryDelta, { color: TEAM_COLORS.blue }]}>
+                  Bleu {deltaBlue > 0 ? `+${deltaBlue}` : deltaBlue}
+                </Text>
+              )}
+              {deltaRed !== 0 && (
+                <Text style={[styles.roundSummaryDelta, { color: TEAM_COLORS.red }]}>
+                  Rouge {deltaRed > 0 ? `+${deltaRed}` : deltaRed}
+                </Text>
+              )}
             </View>
           )}
 
-          <PrimaryButton
-            label="Nouvelle mène"
-            onPress={handleStartNewRound}
-            style={styles.fullBtn}
-          />
-          <PrimaryButton
-            label="Terminer la partie"
-            onPress={() => navigation.navigate('Summary')}
-            style={styles.fullBtn}
-            variant="secondary"
-          />
+          <PrimaryButton label="Nouvelle mène" onPress={handleStartNewRound} style={styles.fullBtn} />
+          <PrimaryButton label="Terminer la partie" onPress={() => navigation.navigate('Summary')} style={styles.fullBtn} variant="secondary" />
         </View>
       </SafeAreaView>
     );
@@ -117,13 +124,12 @@ export function GameScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      {/* Veto bar — pinned to top */}
       {canShowVeto && (
         <View style={styles.vetoBar}>
           {(['blue', 'red'] as const).map((team) => (
             <TouchableOpacity
               key={team}
-              style={[styles.vetoBtn, !vetos[team] && styles.vetoUsed, { borderColor: TEAM_COLORS[team] }]}
+              style={[styles.vetoBtn, { borderColor: vetos[team] ? TEAM_COLORS[team] : colors.surface2 }]}
               onPress={() => {
                 Alert.alert(
                   'Véto',
@@ -136,17 +142,15 @@ export function GameScreen() {
               }}
               disabled={!vetos[team]}
             >
-              <Text style={[styles.vetoBtnLabel, { color: vetos[team] ? TEAM_COLORS[team] : '#666' }]}>
-                {vetos[team] ? `Véto ${team === 'blue' ? '🔵' : '🔴'}` : `Véto utilisé`}
+              <Text style={[styles.vetoBtnLabel, { color: vetos[team] ? TEAM_COLORS[team] : colors.textSecondary }]}>
+                {vetos[team] ? `Véto ${team === 'blue' ? '🔵' : '🔴'}` : 'Véto utilisé'}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
       )}
 
-      {/* Scrollable content */}
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        {/* Scores */}
         {skipNormal && (
           <View style={styles.scoresRow}>
             <ScoreBlock team="blue" score={scores.blue} />
@@ -154,38 +158,33 @@ export function GameScreen() {
           </View>
         )}
 
-        {/* Rule display (fantasy mode) */}
+        {/* Règle — affichage éditorial sans conteneur */}
         {mode === 'fantasy' && round.rule && (
-          <View style={styles.ruleCard}>
+          <View style={styles.ruleSection}>
             <Text style={styles.ruleName}>{round.rule.name}</Text>
             <Text style={styles.ruleDesc}>{round.rule.description}</Text>
-
             {round.totemImmuneTeam && (
-              <View style={[styles.immuneBanner, { borderColor: TEAM_COLORS[round.totemImmuneTeam] }]}>
-                <Text style={[styles.immuneText, { color: TEAM_COLORS[round.totemImmuneTeam] }]}>
-                  {TEAM_LABELS[round.totemImmuneTeam]} est immunisé — joue normalement
-                </Text>
-              </View>
+              <Text style={[styles.immuneText, { color: TEAM_COLORS[round.totemImmuneTeam] }]}>
+                {TEAM_LABELS[round.totemImmuneTeam]} est immunisé — joue normalement
+              </Text>
             )}
           </View>
         )}
 
-        {/* Rule-specific UI */}
         {mode === 'fantasy' && <RuleUI round={round} />}
 
-        {/* Scoring section */}
         {!skipNormal && (
           <View style={styles.scoringSection}>
             <Text style={styles.scoringPrompt}>Tapez le nombre de points marqués</Text>
-
             <View style={styles.interactiveScoresRow}>
               <ScoreBlock
                 team="blue"
                 score={scores.blue}
                 delta={bluePoints}
                 showLabel={false}
-                onPress={() => addNormalPoint('blue')}
-                disabled={scoreTeamDisabled('blue')}
+                actionLabel={getScoreBlockActionLabel('blue')}
+                onPress={getScoreBlockPress('blue')}
+                square
                 testID="score-block-blue"
               />
               <ScoreBlock
@@ -193,24 +192,18 @@ export function GameScreen() {
                 score={scores.red}
                 delta={redPoints}
                 showLabel={false}
-                onPress={() => addNormalPoint('red')}
-                disabled={scoreTeamDisabled('red')}
+                actionLabel={getScoreBlockActionLabel('red')}
+                onPress={getScoreBlockPress('red')}
+                square
                 testID="score-block-red"
               />
             </View>
-
-            {hasNormalPoints && (
-              <TouchableOpacity style={styles.undoBtn} onPress={undoNormalPoint}>
-                <Text style={styles.undoBtnLabel}>↩ Annuler dernier point</Text>
-              </TouchableOpacity>
-            )}
           </View>
         )}
 
-        <View style={{ height: 16 }} />
+        <View style={{ height: 24 }} />
       </ScrollView>
 
-      {/* End round button — pinned to bottom */}
       <View style={styles.bottomBar}>
         <PrimaryButton
           label="Mène terminée"
@@ -220,130 +213,99 @@ export function GameScreen() {
           testID="end-round-button"
         />
       </View>
-
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: BACKGROUND },
+  safe: { flex: 1, backgroundColor: colors.background },
   scroll: { flex: 1 },
-  scrollContent: { padding: 16 },
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-  scoresRow: {
-    flexDirection: 'row',
-    marginBottom: 16,
-  },
-  ruleCard: {
-    backgroundColor: SURFACE,
-    borderRadius: 16,
-    padding: 24,
-    marginBottom: 12,
-    alignItems: 'center',
+  scrollContent: { paddingHorizontal: 20, paddingTop: 16 },
+  container: { flex: 1, paddingHorizontal: 20, paddingTop: 16 },
+
+  scoresRow: { flexDirection: 'row', marginBottom: 24 },
+
+  // Règle — éditorial, pas de carte
+  ruleSection: {
+    paddingVertical: 8,
+    marginBottom: 20,
   },
   ruleName: {
-    color: ACCENT,
-    fontSize: 30,
-    fontWeight: '800',
+    color: colors.accent,
+    fontSize: typography.size.xxl,
+    fontWeight: typography.weight.extrabold,
     textAlign: 'center',
     marginBottom: 12,
+    lineHeight: 50,
   },
   ruleDesc: {
-    color: TEXT_PRIMARY,
-    fontSize: 17,
-    lineHeight: 25,
+    color: colors.textPrimary,
+    fontSize: typography.size.md,
+    lineHeight: 30,
     textAlign: 'center',
-  },
-  immuneBanner: {
-    borderWidth: 2,
-    borderRadius: 8,
-    padding: 8,
-    marginTop: 14,
-    alignItems: 'center',
-    width: '100%',
   },
   immuneText: {
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.bold,
     textAlign: 'center',
+    marginTop: 16,
+    lineHeight: 24,
   },
-  vetoBar: {
-    flexDirection: 'row',
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 8,
-  },
+
+  // Veto
+  vetoBar: { flexDirection: 'row', gap: 8, paddingHorizontal: 20, paddingTop: 10, paddingBottom: 6 },
   vetoBtn: {
     flex: 1,
-    padding: 10,
-    borderRadius: 8,
+    paddingVertical: 12,
+    borderRadius: radius.md,
     borderWidth: 1.5,
     alignItems: 'center',
   },
-  vetoUsed: { borderColor: '#444' },
-  vetoBtnLabel: { fontSize: 13, fontWeight: '600' },
-  scoringSection: {
-    paddingVertical: 28,
-    marginVertical: 8,
-  },
+  vetoBtnLabel: { fontSize: typography.size.base, fontWeight: typography.weight.semibold },
+
+  // Score interactif
+  scoringSection: { paddingVertical: 16 },
   scoringPrompt: {
-    color: TEXT_PRIMARY,
-    fontSize: 18,
-    fontWeight: '700',
+    color: colors.textSecondary,
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.semibold,
     textAlign: 'center',
-    marginBottom: 14,
+    marginBottom: 16,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
-  interactiveScoresRow: {
-    flexDirection: 'row',
+  interactiveScoresRow: { flexDirection: 'row' },
+  // Résumé de mène — sans carte
+  roundSummary: { paddingVertical: 20, marginBottom: 8 },
+  roundSummaryLabel: {
+    color: colors.accent,
+    fontSize: typography.size.lg,
+    fontWeight: typography.weight.extrabold,
+    marginBottom: 12,
+    textAlign: 'center',
   },
-  undoBtn: {
-    marginTop: 10,
-    padding: 10,
-    backgroundColor: '#2A2A2A',
-    borderRadius: 8,
-    alignItems: 'center',
+  roundSummaryDelta: {
+    fontSize: typography.size.md,
+    fontWeight: typography.weight.bold,
+    textAlign: 'center',
+    marginVertical: 2,
   },
-  undoBtnLabel: { color: TEXT_SECONDARY, fontSize: 14 },
+
   bottomBar: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     paddingTop: 8,
     paddingBottom: 8,
-    backgroundColor: BACKGROUND,
+    backgroundColor: colors.background,
   },
-  endRoundBtn: {
-    marginHorizontal: 0,
-  },
-  fullBtn: {
-    marginTop: 12,
-    marginHorizontal: 0,
-  },
+  endRoundBtn: { marginHorizontal: 0 },
+  fullBtn: { marginTop: 12, marginHorizontal: 0 },
+
   gameOver: {
-    color: ACCENT,
-    fontSize: 32,
-    fontWeight: '800',
+    color: colors.accent,
+    fontSize: typography.size.xxl,
+    fontWeight: typography.weight.extrabold,
     textAlign: 'center',
     marginVertical: 40,
-  },
-  roundSummaryCard: {
-    backgroundColor: SURFACE,
-    borderRadius: 12,
-    padding: 16,
-    marginVertical: 12,
-  },
-  roundLabel: {
-    color: ACCENT,
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  deltaText: {
-    fontSize: 18,
-    fontWeight: '700',
-    marginVertical: 2,
+    lineHeight: 52,
   },
 });

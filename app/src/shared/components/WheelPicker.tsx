@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
-import { BACKGROUND, TEXT_PRIMARY, TEXT_SECONDARY, ACCENT } from '../constants';
+import { colors, typography } from '../constants';
 
 const ITEM_HEIGHT = 64;
 const VISIBLE = 3;
@@ -27,12 +27,9 @@ export function WheelPicker({ min, max, value, onChange }: WheelPickerProps) {
 
   return (
     <View style={styles.container}>
-      {/* Top fade */}
       <View style={styles.fadeTop} pointerEvents="none" />
-      {/* Center selection lines */}
       <View style={[styles.line, { top: ITEM_HEIGHT }]} pointerEvents="none" />
       <View style={[styles.line, { top: ITEM_HEIGHT * 2 }]} pointerEvents="none" />
-      {/* Bottom fade */}
       <View style={styles.fadeBottom} pointerEvents="none" />
 
       <ScrollView
@@ -72,9 +69,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   itemText: {
-    color: TEXT_PRIMARY,
-    fontSize: 32,
-    fontWeight: '700',
+    color: colors.textPrimary,
+    fontSize: typography.size.xl,
+    fontWeight: typography.weight.bold,
     letterSpacing: -0.5,
   },
   line: {
@@ -82,7 +79,7 @@ const styles = StyleSheet.create({
     left: 8,
     right: 8,
     height: 1,
-    backgroundColor: ACCENT,
+    backgroundColor: colors.accent,
     zIndex: 2,
   },
   fadeTop: {
@@ -91,7 +88,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: ITEM_HEIGHT,
-    backgroundColor: `${BACKGROUND}CC`,
+    backgroundColor: `${colors.background}CC`,
     zIndex: 1,
   },
   fadeBottom: {
@@ -100,7 +97,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: ITEM_HEIGHT,
-    backgroundColor: `${BACKGROUND}CC`,
+    backgroundColor: `${colors.background}CC`,
     zIndex: 1,
   },
 });

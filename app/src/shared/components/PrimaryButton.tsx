@@ -1,5 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
+import { colors, typography, radius } from '../constants';
 
 interface Props {
   label: string;
@@ -19,19 +20,19 @@ export function PrimaryButton({
   testID,
 }: Props) {
   const bg =
-    disabled ? '#444' :
-    variant === 'secondary' ? '#333' :
-    variant === 'danger' ? '#A02020' :
-    '#F5C518';
+    disabled ? colors.surface2 :
+    variant === 'secondary' ? colors.surface2 :
+    variant === 'danger' ? colors.team.redDark :
+    colors.accent;
 
-  const textColor = variant === 'primary' ? '#121212' : '#FFF';
+  const textColor = (!disabled && variant === 'primary') ? colors.background : colors.textPrimary;
 
   return (
     <TouchableOpacity
       style={[styles.btn, { backgroundColor: bg }, style]}
       onPress={onPress}
       disabled={disabled}
-      activeOpacity={0.7}
+      activeOpacity={0.75}
       accessibilityRole="button"
       accessibilityState={{ disabled: !!disabled }}
       testID={testID}
@@ -43,15 +44,16 @@ export function PrimaryButton({
 
 const styles = StyleSheet.create({
   btn: {
-    paddingVertical: 18,
-    borderRadius: 12,
+    paddingVertical: 20,
+    borderRadius: radius.lg,
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: 4,
   },
   label: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.bold,
     textAlign: 'center',
+    letterSpacing: 0.3,
   },
 });

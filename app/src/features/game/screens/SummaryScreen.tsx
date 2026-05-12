@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useGameStore } from '../state/gameStore';
 import { PrimaryButton } from '../../../shared/components/PrimaryButton';
-import { BACKGROUND, TEXT_PRIMARY, TEXT_SECONDARY, SURFACE, ACCENT, TEAM_COLORS } from '../../../shared/constants';
+import { colors, typography, radius, TEAM_COLORS } from '../../../shared/constants';
 import { RootStackParamList } from '../../../app/navigation/types';
 import { RoundState, Team } from '../../../domain/game/models';
 
@@ -17,23 +17,16 @@ function getRuleStat(rounds: RoundState[]): { mostProfitable: string | null; mos
   for (const round of rounds) {
     if (!round.rule) continue;
     const name = round.rule.name;
-
-    const totalGain = (round.bonuses ?? [])
-      .filter((b) => b.value > 0)
-      .reduce((s, b) => s + b.value, 0);
-
-    const totalLoss = (round.bonuses ?? [])
-      .filter((b) => b.value < 0)
-      .reduce((s, b) => s + Math.abs(b.value), 0);
-
+    const totalGain = (round.bonuses ?? []).filter((b) => b.value > 0).reduce((s, b) => s + b.value, 0);
+    const totalLoss = (round.bonuses ?? []).filter((b) => b.value < 0).reduce((s, b) => s + Math.abs(b.value), 0);
     ruleGains[name] = (ruleGains[name] ?? 0) + totalGain;
     ruleLosses[name] = (ruleLosses[name] ?? 0) + totalLoss;
   }
 
-  const mostProfitable = Object.keys(ruleGains).sort((a, b) => ruleGains[b] - ruleGains[a])[0] ?? null;
-  const mostPunishing = Object.keys(ruleLosses).sort((a, b) => ruleLosses[b] - ruleLosses[a])[0] ?? null;
-
-  return { mostProfitable, mostPunishing };
+  return {
+    mostProfitable: Object.keys(ruleGains).sort((a, b) => ruleGains[b] - ruleGains[a])[0] ?? null,
+    mostPunishing: Object.keys(ruleLosses).sort((a, b) => ruleLosses[b] - ruleLosses[a])[0] ?? null,
+  };
 }
 
 export function SummaryScreen() {
@@ -46,65 +39,68 @@ export function SummaryScreen() {
   const vetosUsed = { blue: !vetos.blue, red: !vetos.red };
   const { mostProfitable, mostPunishing } = getRuleStat(rounds);
 
+  const winnerColor = winner ? TEAM_COLORS[winner] : colors.surface2;
+
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.content}>
-        {/* Winner */}
-        <View style={[styles.winnerBlock, { backgroundColor: winner ? TEAM_COLORS[winner] : '#555' }]}>
+
+        {/* Bloc vainqueur — seul élément avec un vrai fond coloré */}
+        <View style={[styles.winnerBlock, { backgroundColor: winnerColor }]}>
           <Text style={styles.winnerLabel}>
-            {winner ? `${winner === 'blue' ? 'Bleu' : 'Rouge'} gagne !` : 'Match nul'}
+            {winner ? `${winner === 'blue' ? 'Bleu' : 'Rouge'} gagne` : 'Match nul'}
           </Text>
           <Text style={styles.finalScore}>{scores.blue} — {scores.red}</Text>
         </View>
 
-        {/* Stats */}
-        <View style={styles.statsCard}>
-          <StatRow label="Mènes jouées" value={String(rounds.length)} />
-          <StatRow label="Points normaux Bleu" value={String(totalNormalBlue)} />
-          <StatRow label="Points normaux Rouge" value={String(totalNormalRed)} />
-          <StatRow label="Véto Bleu" value={vetosUsed.blue ? 'Utilisé' : 'Non utilisé'} />
-          <StatRow label="Véto Rouge" value={vetosUsed.red ? 'Utilisé' : 'Non utilisé'} />
-          {mostProfitable && <StatRow label="Règle la plus rentable" value={mostProfitable} />}
-          {mostPunishing && <StatRow label="Règle la plus punitive" value={mostPunishing} />}
-        </View>
+        {/* Stats — liste flottante sans carte */}
+        <Text style={styles.sectionTitle}>Statistiques</Text>
 
-        {/* Round history */}
-        <Text style={styles.sectionTitle}>Historique des mènes</Text>
+        <StatRow label="Mènes jouées" value={String(rounds.length)} />
+        <StatRow label="Points Bleu" value={String(totalNormalBlue)} />
+        <StatRow label="Points Rouge" value={String(totalNormalRed)} />
+        <StatRow label="Véto Bleu" value={vetosUsed.blue ? 'Utilisé' : 'Non utilisé'} />
+        <StatRow label="Véto Rouge" value={vetosUsed.red ? 'Utilisé' : 'Non utilisé'} />
+        {mostProfitable && <StatRow label="Règle la plus rentable" value={mostProfitable} />}
+        {mostPunishing && <StatRow label="Règle la plus punitive" value={mostPunishing} />}
+
+        {/* Historique — liste sans cartes */}
+        <Text style={[styles.sectionTitle, { marginTop: 32 }]}>Historique</Text>
+
         {rounds.map((round) => {
           const prevScores = rounds[round.number - 2]?.scoreAfter ?? { blue: 0, red: 0 };
           const dBlue = round.scoreAfter.blue - prevScores.blue;
           const dRed = round.scoreAfter.red - prevScores.red;
 
           return (
-            <View key={round.number} style={styles.roundCard}>
-              <Text style={styles.roundTitle}>
-                Mène {round.number}{round.rule ? ` — ${round.rule.name}` : ''}
-                {round.vetoUsed ? ` (véto ${round.vetoUsed === 'blue' ? 'Bleu' : 'Rouge'})` : ''}
-              </Text>
+            <View key={round.number} style={styles.roundRow}>
+              <View style={styles.roundHeader}>
+                <Text style={styles.roundTitle}>
+                  Mène {round.number}{round.rule ? ` — ${round.rule.name}` : ''}
+                </Text>
+                {round.vetoUsed && (
+                  <Text style={styles.vetoTag}>Véto {round.vetoUsed === 'blue' ? 'Bleu' : 'Rouge'}</Text>
+                )}
+              </View>
 
-              <View style={styles.roundDetails}>
+              <View style={styles.roundDeltas}>
                 <Text style={[styles.teamDelta, { color: TEAM_COLORS.blue }]}>
-                  Bleu : {dBlue >= 0 ? `+${dBlue}` : dBlue} → {round.scoreAfter.blue}
+                  Bleu {dBlue >= 0 ? `+${dBlue}` : dBlue} → {round.scoreAfter.blue}
                 </Text>
                 <Text style={[styles.teamDelta, { color: TEAM_COLORS.red }]}>
-                  Rouge : {dRed >= 0 ? `+${dRed}` : dRed} → {round.scoreAfter.red}
+                  Rouge {dRed >= 0 ? `+${dRed}` : dRed} → {round.scoreAfter.red}
                 </Text>
               </View>
 
-              {(round.bonuses ?? []).length > 0 && (
-                <View style={styles.bonusSection}>
-                  {round.bonuses.map((b, i) => (
-                    <Text key={i} style={[styles.bonusText, { color: b.value >= 0 ? '#AEFFAE' : '#FFAEAE' }]}>
-                      {b.team === 'blue' ? '🔵' : '🔴'} {b.reason} : {b.value >= 0 ? `+${b.value}` : b.value}
-                    </Text>
-                  ))}
-                </View>
-              )}
+              {(round.bonuses ?? []).map((b, i) => (
+                <Text key={i} style={[styles.bonusText, { color: b.value >= 0 ? colors.positive : colors.negative }]}>
+                  {b.team === 'blue' ? '🔵' : '🔴'} {b.reason} : {b.value >= 0 ? `+${b.value}` : b.value}
+                </Text>
+              ))}
             </View>
           );
         })}
 
-        {/* Actions */}
         <PrimaryButton
           label="Nouvelle partie"
           onPress={() => { resetGame(); navigation.navigate('Home'); }}
@@ -126,69 +122,60 @@ function StatRow({ label, value }: { label: string; value: string }) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: BACKGROUND },
-  content: { padding: 16 },
+  safe: { flex: 1, backgroundColor: colors.background },
+  content: { paddingHorizontal: 24, paddingTop: 16 },
+
   winnerBlock: {
-    borderRadius: 16,
-    padding: 24,
+    borderRadius: radius.xl,
+    paddingVertical: 32,
+    paddingHorizontal: 24,
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 36,
   },
   winnerLabel: {
-    color: '#FFF',
-    fontSize: 28,
-    fontWeight: '800',
+    color: colors.textPrimary,
+    fontSize: typography.size.xxl,
+    fontWeight: typography.weight.extrabold,
+    lineHeight: 50,
   },
   finalScore: {
-    color: 'rgba(255,255,255,0.9)',
-    fontSize: 22,
-    fontWeight: '700',
-    marginTop: 4,
+    color: 'rgba(240,238,248,0.85)',
+    fontSize: typography.size.lg,
+    fontWeight: typography.weight.bold,
+    marginTop: 8,
   },
-  statsCard: {
-    backgroundColor: SURFACE,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
+
+  sectionTitle: {
+    color: colors.accent,
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.bold,
+    textTransform: 'uppercase',
+    letterSpacing: 2,
+    marginBottom: 12,
   },
+
   statRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 6,
+    alignItems: 'center',
+    paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#2A2A2A',
+    borderBottomColor: colors.surface2,
   },
-  statLabel: { color: TEXT_SECONDARY, fontSize: 14 },
-  statValue: { color: TEXT_PRIMARY, fontSize: 14, fontWeight: '600' },
-  sectionTitle: {
-    color: ACCENT,
-    fontSize: 16,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: 8,
+  statLabel: { color: colors.textSecondary, fontSize: typography.size.base },
+  statValue: { color: colors.textPrimary, fontSize: typography.size.base, fontWeight: typography.weight.semibold },
+
+  roundRow: {
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.surface2,
   },
-  roundCard: {
-    backgroundColor: SURFACE,
-    borderRadius: 10,
-    padding: 14,
-    marginBottom: 8,
-  },
-  roundTitle: {
-    color: TEXT_PRIMARY,
-    fontSize: 15,
-    fontWeight: '700',
-    marginBottom: 6,
-  },
-  roundDetails: {
-    flexDirection: 'row',
-    gap: 16,
-  },
-  teamDelta: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  bonusSection: { marginTop: 6 },
-  bonusText: { fontSize: 13, marginVertical: 1 },
-  btn: { marginTop: 16, marginHorizontal: 0 },
+  roundHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+  roundTitle: { color: colors.textPrimary, fontSize: typography.size.base, fontWeight: typography.weight.bold, flex: 1 },
+  vetoTag: { color: colors.textSecondary, fontSize: typography.size.base, marginLeft: 8 },
+  roundDeltas: { flexDirection: 'row', gap: 20, marginBottom: 4 },
+  teamDelta: { fontSize: typography.size.base, fontWeight: typography.weight.semibold },
+  bonusText: { fontSize: typography.size.base, marginTop: 4, lineHeight: 22 },
+
+  btn: { marginTop: 28, marginHorizontal: 0 },
 });

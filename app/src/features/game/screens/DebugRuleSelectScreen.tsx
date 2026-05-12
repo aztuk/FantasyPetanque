@@ -1,12 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import {
-  FlatList,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+  FlatList, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -14,13 +8,7 @@ import { ALL_RULES } from '../../../data/rules/rules';
 import { Rule } from '../../../domain/game/models';
 import { RootStackParamList } from '../../../app/navigation/types';
 import { PrimaryButton } from '../../../shared/components/PrimaryButton';
-import {
-  ACCENT,
-  BACKGROUND,
-  SURFACE,
-  TEXT_PRIMARY,
-  TEXT_SECONDARY,
-} from '../../../shared/constants';
+import { colors, typography, radius } from '../../../shared/constants';
 import { useGameStore } from '../state/gameStore';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'DebugRuleSelect'>;
@@ -31,25 +19,17 @@ export function DebugRuleSelectScreen() {
   const { currentRound, forceRule, resetGame } = useGameStore();
 
   const filteredRules = useMemo(() => {
-    const normalizedSearch = search.trim().toLowerCase();
-    if (!normalizedSearch) return ALL_RULES;
-
+    const s = search.trim().toLowerCase();
+    if (!s) return ALL_RULES;
     return ALL_RULES.filter((rule) =>
-      rule.name.toLowerCase().includes(normalizedSearch) ||
-      rule.id.toLowerCase().includes(normalizedSearch) ||
-      rule.shortDescription.toLowerCase().includes(normalizedSearch),
+      rule.name.toLowerCase().includes(s) ||
+      rule.id.toLowerCase().includes(s) ||
+      rule.shortDescription.toLowerCase().includes(s),
     );
   }, [search]);
 
-  const handleSelectRule = (rule: Rule) => {
-    forceRule(rule);
-    navigation.replace('Game');
-  };
-
-  const handleCancel = () => {
-    resetGame();
-    navigation.replace('Home');
-  };
+  const handleSelectRule = (rule: Rule) => { forceRule(rule); navigation.replace('Game'); };
+  const handleCancel = () => { resetGame(); navigation.replace('Home'); };
 
   if (!currentRound) {
     return (
@@ -66,17 +46,14 @@ export function DebugRuleSelectScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
-        <Text style={styles.eyebrow}>Mene {currentRound.number}</Text>
-        <Text style={styles.title}>Choisir la regle</Text>
-        <Text style={styles.subtitle}>
-          Selectionne la regle debug avant de lancer la mene.
-        </Text>
+        <Text style={styles.eyebrow}>Mène {currentRound.number}</Text>
+        <Text style={styles.title}>Choisir la règle</Text>
       </View>
 
       <TextInput
         style={styles.searchInput}
-        placeholder="Rechercher une regle..."
-        placeholderTextColor={TEXT_SECONDARY}
+        placeholder="Rechercher..."
+        placeholderTextColor={colors.textSecondary}
         value={search}
         onChangeText={setSearch}
         autoCapitalize="none"
@@ -86,144 +63,67 @@ export function DebugRuleSelectScreen() {
       <FlatList
         data={filteredRules}
         keyExtractor={(rule) => rule.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={[
-              styles.ruleItem,
-              currentRound.rule?.id === item.id && styles.ruleItemActive,
-            ]}
-            onPress={() => handleSelectRule(item)}
-            activeOpacity={0.72}
-          >
-            <View style={styles.ruleText}>
-              <Text style={styles.ruleName}>{item.name}</Text>
-              <Text style={styles.ruleDesc} numberOfLines={2}>
-                {item.shortDescription}
-              </Text>
-            </View>
-            {currentRound.rule?.id === item.id && (
-              <Text style={styles.activeIndicator}>Actuelle</Text>
-            )}
-          </TouchableOpacity>
-        )}
+        renderItem={({ item }) => {
+          const active = currentRound.rule?.id === item.id;
+          return (
+            <TouchableOpacity style={styles.ruleItem} onPress={() => handleSelectRule(item)} activeOpacity={0.7}>
+              <View style={[styles.ruleBar, active && styles.ruleBarActive]} />
+              <View style={styles.ruleText}>
+                <Text style={[styles.ruleName, active && styles.ruleNameActive]}>{item.name}</Text>
+                <Text style={styles.ruleDesc} numberOfLines={2}>{item.shortDescription}</Text>
+              </View>
+            </TouchableOpacity>
+          );
+        }}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
-        ListEmptyComponent={<Text style={styles.emptyText}>Aucune regle trouvee.</Text>}
+        ListEmptyComponent={<Text style={styles.emptyText}>Aucune règle trouvée.</Text>}
         contentContainerStyle={styles.listContent}
       />
 
       <View style={styles.bottomBar}>
-        <PrimaryButton
-          label="Annuler la partie"
-          onPress={handleCancel}
-          variant="secondary"
-          style={styles.fullButton}
-        />
+        <PrimaryButton label="Annuler la partie" onPress={handleCancel} variant="secondary" style={styles.fullButton} />
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: BACKGROUND,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 12,
-  },
+  safe: { flex: 1, backgroundColor: colors.background },
+  header: { paddingHorizontal: 24, paddingTop: 20, paddingBottom: 16 },
   eyebrow: {
-    color: TEXT_SECONDARY,
-    fontSize: 13,
-    fontWeight: '700',
+    color: colors.textSecondary,
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.bold,
     textTransform: 'uppercase',
-  },
-  title: {
-    color: ACCENT,
-    fontSize: 30,
-    fontWeight: '800',
-    marginTop: 4,
-  },
-  subtitle: {
-    color: TEXT_PRIMARY,
-    fontSize: 15,
-    lineHeight: 21,
-    marginTop: 8,
-  },
-  searchInput: {
-    backgroundColor: SURFACE,
-    color: TEXT_PRIMARY,
-    fontSize: 16,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    marginHorizontal: 20,
-    marginBottom: 12,
-    borderRadius: 8,
-  },
-  listContent: {
-    paddingHorizontal: 12,
-    paddingBottom: 96,
-  },
-  ruleItem: {
-    backgroundColor: SURFACE,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: 'transparent',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-  },
-  ruleItemActive: {
-    borderColor: ACCENT,
-  },
-  ruleText: {
-    flex: 1,
-  },
-  ruleName: {
-    color: TEXT_PRIMARY,
-    fontSize: 17,
-    fontWeight: '800',
+    letterSpacing: 2,
     marginBottom: 4,
   },
-  ruleDesc: {
-    color: TEXT_SECONDARY,
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  activeIndicator: {
-    color: ACCENT,
-    fontSize: 12,
-    fontWeight: '800',
-    marginLeft: 10,
-    textTransform: 'uppercase',
-  },
-  separator: {
-    height: 8,
-  },
-  bottomBar: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
+  title: { color: colors.accent, fontSize: typography.size.xl, fontWeight: typography.weight.extrabold },
+  searchInput: {
+    backgroundColor: colors.surface,
+    color: colors.textPrimary,
+    fontSize: typography.size.base,
     paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 8,
-    backgroundColor: BACKGROUND,
+    paddingVertical: 14,
+    marginHorizontal: 24,
+    marginBottom: 12,
+    borderRadius: radius.md,
   },
-  fullButton: {
-    marginHorizontal: 0,
+  listContent: { paddingHorizontal: 24, paddingBottom: 100 },
+  ruleItem: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 16 },
+  ruleBar: { width: 3, alignSelf: 'stretch', borderRadius: 2, backgroundColor: colors.surface2, marginRight: 16, marginTop: 3 },
+  ruleBarActive: { backgroundColor: colors.accent },
+  ruleText: { flex: 1 },
+  ruleName: { color: colors.textPrimary, fontSize: typography.size.base, fontWeight: typography.weight.extrabold, marginBottom: 4 },
+  ruleNameActive: { color: colors.accent },
+  ruleDesc: { color: colors.textSecondary, fontSize: typography.size.base, lineHeight: 24 },
+  separator: { height: 1, backgroundColor: colors.surface2 },
+  bottomBar: {
+    position: 'absolute', left: 0, right: 0, bottom: 0,
+    paddingHorizontal: 20, paddingTop: 8, paddingBottom: 8,
+    backgroundColor: colors.background,
   },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 24,
-  },
-  emptyText: {
-    color: TEXT_SECONDARY,
-    fontSize: 15,
-    textAlign: 'center',
-    marginTop: 12,
-  },
+  fullButton: { marginHorizontal: 0 },
+  emptyContainer: { flex: 1, justifyContent: 'center', paddingHorizontal: 24 },
+  emptyText: { color: colors.textSecondary, fontSize: typography.size.base, textAlign: 'center', marginTop: 16 },
 });
