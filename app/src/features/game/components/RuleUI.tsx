@@ -134,7 +134,7 @@ function MalusButtonsUI({ round }: Props) {
 function SortieDePorc({ round }: Props) {
   const { setSortieDePorc } = useGameStore();
   return (
-    <Section title="Sortie de porc">
+    <Section title="Action">
       <View style={styles.row}>
         {(['blue', 'red'] as const).map((team) => (
           <TeamButton
@@ -157,7 +157,7 @@ function ContratUI({ round }: Props) {
   const bothSelected = round.contratMission.blue !== null && round.contratMission.red !== null;
 
   return (
-    <Section title="Contrat — Choisir une mission">
+    <Section title="Mission">
       {CONTRAT_MISSIONS.map((mission, idx) => (
         <View key={idx} style={styles.missionRow}>
           <TouchableOpacity
@@ -189,7 +189,7 @@ function ContratUI({ round }: Props) {
 function AssuranceVieUI({ round }: Props) {
   const { toggleAssurance } = useGameStore();
   return (
-    <Section title="Assurance vie">
+    <Section title="Configuration">
       <Text style={styles.note}>Perdre = +1, gagner = -1 sur les points normaux.</Text>
       <View style={styles.row}>
         {(['blue', 'red'] as const).map((team) => (
@@ -205,7 +205,7 @@ function FrontiereUI({ round }: Props) {
   const bothChosen = round.frontiereChoice.blue !== null && round.frontiereChoice.red !== null;
 
   return (
-    <Section title="Frontière — Choisir un côté">
+    <Section title="Côté">
       {(['blue', 'red'] as const).map((team) => (
         <View key={team} style={styles.teamRow}>
           <Text style={[styles.teamLabel, { color: TEAM_COLORS[team] }]}>{team === 'blue' ? 'Bleu' : 'Rouge'} :</Text>
@@ -235,7 +235,7 @@ function CasinoUI({ round }: Props) {
 
   if (!round.casinoWinner) {
     return (
-      <Section title="Casino — Mise">
+      <Section title="Mise">
         {(['blue', 'red'] as const).map((team) => (
           <View key={team} style={styles.teamRow}>
             <Text style={[styles.teamLabel, { color: TEAM_COLORS[team] }]}>{team === 'blue' ? 'Bleu' : 'Rouge'} (max {scores[team]}) :</Text>
@@ -253,7 +253,7 @@ function CasinoUI({ round }: Props) {
   }
 
   return (
-    <Section title="Casino — Résultat">
+    <Section title="Résultat">
       <Text style={styles.note}>
         {round.casinoWinner === 'blue' ? 'Bleu' : 'Rouge'} gagne !{'\n'}
         Bleu mise : {round.casinoBets.blue} — Rouge mise : {round.casinoBets.red}
@@ -265,7 +265,7 @@ function CasinoUI({ round }: Props) {
 function PredictionUI({ round }: Props) {
   const { setPrediction } = useGameStore();
   return (
-    <Section title="Prédiction">
+    <Section title="Valeurs">
       <Text style={styles.note}>Prédire de combien de points vous allez gagner (1 à 6). Si réussi, l'adversaire perd ce nombre de points.</Text>
       {(['blue', 'red'] as const).map((team) => (
         <View key={team} style={styles.teamRow}>
@@ -283,7 +283,7 @@ function PredictionUI({ round }: Props) {
 
 function TotemUI({ round }: Props) {
   return (
-    <Section title="Totem d'immunité">
+    <Section title="Immunité">
       <Text style={styles.note}>
         Cette mène est jouée normalement.{'\n\n'}
         Le perdant de cette mène sera immunisé contre la prochaine règle.
@@ -301,7 +301,7 @@ function TotemUI({ round }: Props) {
 
 function ImpairUI() {
   return (
-    <Section title="L'impair contre-attaque">
+    <Section title="Résolution auto">
       <Text style={styles.note}>
         L'équipe gagnante doit gagner avec un nombre impair de points.{'\n'}
         Sinon : 0 point pour le gagnant, 1 point de consolation pour le perdant.{'\n'}
