@@ -318,7 +318,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
           [team]: round.normalPoints[team] + 1,
         },
       },
-      phase: 'scoring',
     });
   },
 

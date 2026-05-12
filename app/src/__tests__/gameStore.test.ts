@@ -147,15 +147,16 @@ describe('useVeto', () => {
     expect(useGameStore.getState().currentRound?.rule?.id).toBe(ruleAfterFirst);
   });
 
-  it('cannot use veto after scoring started, even if points are undone', () => {
+  it('keeps veto available while normal points are edited before the round is finished', () => {
     const ruleBeforeScoring = useGameStore.getState().currentRound?.rule?.id;
 
     useGameStore.getState().addNormalPoint('blue');
+    expect(useGameStore.getState().phase).toBe('rule-display');
+
     useGameStore.getState().undoNormalPoint();
-    useGameStore.getState().useVeto('blue');
 
     const state = useGameStore.getState();
-    expect(state.phase).toBe('scoring');
+    expect(state.phase).toBe('rule-display');
     expect(state.vetos.blue).toBe(true);
     expect(state.currentRound?.vetoUsed).toBeNull();
     expect(state.currentRound?.rule?.id).toBe(ruleBeforeScoring);
