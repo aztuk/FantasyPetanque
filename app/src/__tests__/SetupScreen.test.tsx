@@ -4,15 +4,18 @@ import { SetupScreen } from '../features/game/screens/SetupScreen';
 import { useGameStore } from '../features/game/state/gameStore';
 
 const mockNavigate = jest.fn();
+const mockGoBack = jest.fn();
 
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
     navigate: mockNavigate,
+    goBack: mockGoBack,
   }),
 }));
 
 beforeEach(() => {
   mockNavigate.mockClear();
+  mockGoBack.mockClear();
   useGameStore.setState({
     mode: 'simple',
     rounds: [],
@@ -35,23 +38,80 @@ describe('SetupScreen', () => {
   it('defaults fantasy games to a 13-point score condition', () => {
     render(<SetupScreen />);
 
-    fireEvent.press(screen.getByText('Fantasy'));
-    fireEvent.press(screen.getByText('Continuer'));
+    fireEvent.press(screen.getByText('Pétanque Fantasy'));
 
-    expect(screen.getByText('Condition de fin')).toBeTruthy();
+    expect(screen.getByText('Et la fin?')).toBeTruthy();
 
-    fireEvent.press(screen.getByText('Continuer'));
+    fireEvent.press(screen.getByText('Score à atteindre'));
 
-    expect(screen.getByText(/Score/)).toBeTruthy();
-    expect(screen.queryByText(/Nombre/)).toBeNull();
+    expect(screen.getByText('Combien?')).toBeTruthy();
+    expect(screen.getAllByText('13').length).toBeGreaterThan(0);
 
-    fireEvent.press(screen.getByText('Continuer'));
-    fireEvent.press(screen.getByText('Jouer'));
+    fireEvent.press(screen.getByText('Valider'));
+    fireEvent.press(screen.getByText('Oui'));
 
     const state = useGameStore.getState();
     expect(state.mode).toBe('fantasy');
     expect(state.winningScore).toBe(13);
     expect(state.maxRounds).toBeNull();
+    expect(state.vetosEnabled).toBe(true);
     expect(mockNavigate).toHaveBeenCalledWith('Game');
+  });
+
+  it('starts a simple game after validating the target value', () => {
+    render(<SetupScreen />);
+
+    fireEvent.press(screen.getByText('Pétanque normale'));
+    fireEvent.press(screen.getByText('Nombre de mènes'));
+
+    expect(screen.getAllByText('8').length).toBeGreaterThan(0);
+
+    fireEvent.press(screen.getByText('Valider'));
+
+    const state = useGameStore.getState();
+    expect(state.mode).toBe('simple');
+    expect(state.winningScore).toBe(999);
+    expect(state.maxRounds).toBe(8);
+    expect(state.vetosEnabled).toBe(false);
+    expect(mockNavigate).toHaveBeenCalledWith('Game');
+  });
+
+  it('updates the target value when the picker is scrolled', () => {
+    render(<SetupScreen />);
+
+    fireEvent.press(screen.getByText('Pétanque normale'));
+    fireEvent.press(screen.getByText('Nombre de mènes'));
+    fireEvent(screen.getByTestId('setup-value-picker'), 'momentumScrollEnd', {
+      nativeEvent: { contentOffset: { y: 400 } },
+    });
+    fireEvent.press(screen.getByText('Valider'));
+
+    expect(useGameStore.getState().maxRounds).toBe(10);
+  });
+
+  it('can disable vetos for fantasy games', () => {
+    render(<SetupScreen />);
+
+    fireEvent.press(screen.getByText('Pétanque Fantasy'));
+    fireEvent.press(screen.getByText('Score à atteindre'));
+    fireEvent.press(screen.getByText('Valider'));
+    fireEvent.press(screen.getByText('Non'));
+
+    const state = useGameStore.getState();
+    expect(state.mode).toBe('fantasy');
+    expect(state.vetosEnabled).toBe(false);
+    expect(state.vetos).toEqual({ blue: false, red: false });
+  });
+
+  it('uses the header back button to move to the previous setup step', () => {
+    render(<SetupScreen />);
+
+    fireEvent.press(screen.getByText('Pétanque Fantasy'));
+    expect(screen.getByText('Et la fin?')).toBeTruthy();
+
+    fireEvent.press(screen.getByTestId('setup-back-button'));
+
+    expect(screen.getByText('On joue à quoi?')).toBeTruthy();
+    expect(mockGoBack).not.toHaveBeenCalled();
   });
 });

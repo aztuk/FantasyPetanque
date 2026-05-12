@@ -13,6 +13,7 @@ export default function App() {
   const [fontsLoaded, fontError] = useFonts({
     GoogleSansFlex_400Regular: require('./node_modules/@expo-google-fonts/google-sans-flex/400Regular/GoogleSansFlex_400Regular.ttf'),
     GoogleSansFlex_600SemiBold: require('./node_modules/@expo-google-fonts/google-sans-flex/600SemiBold/GoogleSansFlex_600SemiBold.ttf'),
+    GoogleSansFlex_700Bold: require('./node_modules/@expo-google-fonts/google-sans-flex/700Bold/GoogleSansFlex_700Bold.ttf'),
     RoadRage_400Regular: require('./node_modules/@expo-google-fonts/road-rage/400Regular/RoadRage_400Regular.ttf'),
   });
 

@@ -1,24 +1,56 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  View,
-  Text,
+  Animated,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  Pressable,
+  ScrollView,
   StyleSheet,
-  TouchableOpacity,
-  Switch,
+  Text,
+  View,
+  ViewStyle,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { ArrowLeftIcon } from 'phosphor-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useGameStore } from '../state/gameStore';
 import { GameMode } from '../../../domain/game/models';
-import { WheelPicker } from '../../../shared/components/WheelPicker';
-import { PrimaryButton } from '../../../shared/components/PrimaryButton';
-import { colors, typography, radius } from '../../../shared/constants';
 import { RootStackParamList } from '../../../app/navigation/types';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'Setup'>;
 type Step = 1 | 2 | 3 | 4;
 type EndCondition = 'score' | 'rounds';
+type ChoiceTone = 'primary' | 'secondary' | 'dark' | 'gradient';
+
+const MIN_VALUE = 6;
+const MAX_VALUE = 20;
+const PICKER_ITEM_HEIGHT = 100;
+const PICKER_HEIGHT = 480;
+const PICKER_SELECTED_HEIGHT = 120;
+const PICKER_VERTICAL_PADDING = (PICKER_HEIGHT - PICKER_ITEM_HEIGHT) / 2;
+const PICKER_LINE_TOP = (PICKER_HEIGHT - PICKER_SELECTED_HEIGHT) / 2;
+const PICKER_SELECTED_ROW_TOP = (PICKER_HEIGHT - PICKER_ITEM_HEIGHT) / 2;
+const PICKER_UNIT_TOP = PICKER_SELECTED_ROW_TOP + 43;
+const PICKER_UNIT_LEFT = 168;
+const PICKER_VALUES = Array.from(
+  { length: MAX_VALUE - MIN_VALUE + 1 },
+  (_, index) => MIN_VALUE + index,
+);
+const SETUP_COLORS = {
+  dark: '#28261F',
+  darkSmooth: '#3B382E',
+  primary: '#E7C241',
+  secondary: '#41E79A',
+  white: '#ECEBE8',
+  textSmooth: '#949084',
+} as const;
+const SETUP_FONTS = {
+  regular: 'GoogleSansFlex_400Regular',
+  semibold: 'GoogleSansFlex_600SemiBold',
+  bold: 'GoogleSansFlex_700Bold',
+} as const;
 
 export function SetupScreen() {
   const navigation = useNavigation<Nav>();
@@ -30,241 +62,491 @@ export function SetupScreen() {
   const [value, setValue] = useState(13);
   const [vetosEnabled, setVetosEnabled] = useState(true);
 
-  const goBack = () => setStep((s) => (s - 1) as Step);
-
-  const handleStep1Next = () => setStep(2);
-
-  const handleStep2Next = () => {
-    setValue(endCondition === 'rounds' ? 8 : 13);
-    setStep(3);
-  };
-
-  const handleEndConditionSelect = (c: EndCondition) => {
-    setEndCondition(c);
-    setValue(c === 'rounds' ? 8 : 13);
-  };
-
-  const handleStep3Next = () => {
-    if (mode === 'fantasy') {
-      setStep(4);
-    } else {
-      launch();
+  const title = useMemo(() => {
+    switch (step) {
+      case 1:
+        return 'On joue à quoi?';
+      case 2:
+        return 'Et la fin?';
+      case 3:
+        return 'Combien?';
+      case 4:
+        return 'Vétos activés?';
     }
+  }, [step]);
+
+  const goBack = () => {
+    if (step === 1) {
+      navigation.goBack();
+      return;
+    }
+    setStep((current) => (current - 1) as Step);
   };
 
-  const launch = () => {
+  const launch = (vetoOverride = vetosEnabled) => {
+    if (!mode) return;
     resetGame();
     startGame({
-      mode: mode!,
+      mode,
       winningScore: endCondition === 'score' ? value : 999,
       maxRounds: endCondition === 'rounds' ? value : null,
-      vetosEnabled: mode === 'fantasy' ? vetosEnabled : false,
+      vetosEnabled: mode === 'fantasy' ? vetoOverride : false,
     });
     navigation.navigate(debugMode && mode === 'fantasy' ? 'DebugRuleSelect' : 'Game');
   };
 
+  const selectMode = (selectedMode: GameMode) => {
+    setMode(selectedMode);
+    setStep(2);
+  };
+
+  const selectEndCondition = (selectedEndCondition: EndCondition) => {
+    setEndCondition(selectedEndCondition);
+    setValue(selectedEndCondition === 'rounds' ? 8 : 13);
+    setStep(3);
+  };
+
+  const confirmValue = () => {
+    if (mode === 'fantasy') {
+      setStep(4);
+      return;
+    }
+    launch();
+  };
+
+  const selectVetos = (enabled: boolean) => {
+    setVetosEnabled(enabled);
+    launch(enabled);
+  };
+
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-      <View style={styles.container}>
-        {step > 1 && (
-          <TouchableOpacity style={styles.back} onPress={goBack}>
-            <Text style={styles.backText}>← Retour</Text>
-          </TouchableOpacity>
-        )}
+    <SafeAreaView style={styles.safe} edges={['top']}>
+      <SetupHeader title={title} onBack={goBack} />
 
-        <View style={styles.content}>
-          {step === 1 && <StepMode selected={mode} onSelect={setMode} />}
-          {step === 2 && <StepCondition selected={endCondition} onSelect={handleEndConditionSelect} />}
-          {step === 3 && <StepValue endCondition={endCondition} value={value} onChange={setValue} />}
-          {step === 4 && <StepVeto enabled={vetosEnabled} onToggle={setVetosEnabled} />}
+      {step === 1 && (
+        <View style={styles.choiceContent}>
+          <ChoiceButton
+            label="Pétanque normale"
+            tone="dark"
+            textTone="light"
+            onPress={() => selectMode('simple')}
+          />
+          <ChoiceButton
+            label="Pétanque Fantasy"
+            tone="gradient"
+            textTone="dark"
+            onPress={() => selectMode('fantasy')}
+          />
         </View>
+      )}
 
-        <View style={styles.bottomBar}>
-          {step === 1 && (
-            <PrimaryButton label="Continuer" onPress={handleStep1Next} disabled={mode === null} />
-          )}
-          {step === 2 && (
-            <PrimaryButton label="Continuer" onPress={handleStep2Next} />
-          )}
-          {step === 3 && (
-            <PrimaryButton label={mode === 'fantasy' ? 'Continuer' : 'Jouer'} onPress={handleStep3Next} />
-          )}
-          {step === 4 && <PrimaryButton label="Jouer" onPress={launch} />}
+      {step === 2 && (
+        <View style={styles.choiceContent}>
+          <ChoiceButton
+            label="Score à atteindre"
+            tone="primary"
+            textTone="dark"
+            onPress={() => selectEndCondition('score')}
+          />
+          <ChoiceButton
+            label="Nombre de mènes"
+            tone="secondary"
+            textTone="dark"
+            onPress={() => selectEndCondition('rounds')}
+          />
         </View>
-      </View>
+      )}
+
+      {step === 3 && (
+        <>
+          <View style={styles.valueContent}>
+            <SetupValuePicker
+              value={value}
+              unit={endCondition === 'score' ? 'points' : 'mènes'}
+              onChange={setValue}
+            />
+          </View>
+          <BottomButton label="Valider" onPress={confirmValue} />
+        </>
+      )}
+
+      {step === 4 && (
+        <View style={styles.choiceContent}>
+          <ChoiceButton
+            label="Oui"
+            tone="primary"
+            textTone="dark"
+            onPress={() => selectVetos(true)}
+          />
+          <ChoiceButton
+            label="Non"
+            tone="dark"
+            textTone="light"
+            onPress={() => selectVetos(false)}
+          />
+        </View>
+      )}
     </SafeAreaView>
   );
 }
 
-/* ─── Option row — sélection sans carte ─────────────────────────────────────── */
+function SetupHeader({ title, onBack }: { title: string; onBack: () => void }) {
+  return (
+    <View style={styles.header}>
+      <Pressable
+        style={styles.backButton}
+        onPress={onBack}
+        accessibilityRole="button"
+        accessibilityLabel="Retour"
+        testID="setup-back-button"
+      >
+        <ArrowLeftIcon color={SETUP_COLORS.textSmooth} size={32} weight="regular" />
+      </Pressable>
+      <Text style={styles.headerTitle}>{title}</Text>
+    </View>
+  );
+}
 
-function OptionRow({
-  title,
-  description,
-  selected,
+function ChoiceButton({
+  label,
+  tone,
+  textTone,
   onPress,
 }: {
-  title: string;
-  description: string;
-  selected: boolean;
+  label: string;
+  tone: ChoiceTone;
+  textTone: 'dark' | 'light';
   onPress: () => void;
 }) {
+  const content = (
+    <Text style={[styles.choiceLabel, textTone === 'light' && styles.choiceLabelLight]}>
+      {label}
+    </Text>
+  );
+
+  if (tone === 'gradient') {
+    return (
+      <Pressable
+        style={styles.choiceGradientButton}
+        onPress={onPress}
+        accessibilityRole="button"
+      >
+        <LinearGradient
+          colors={[SETUP_COLORS.primary, SETUP_COLORS.secondary]}
+          start={{ x: 0, y: 0.5 }}
+          end={{ x: 1, y: 0.5 }}
+          style={styles.choiceButton}
+        >
+          {content}
+        </LinearGradient>
+      </Pressable>
+    );
+  }
+
   return (
-    <TouchableOpacity style={styles.option} onPress={onPress} activeOpacity={0.7}>
-      <View style={[styles.optionBar, selected && styles.optionBarActive]} />
-      <View style={styles.optionBody}>
-        <Text style={[styles.optionTitle, selected && styles.optionTitleActive]}>{title}</Text>
-        <Text style={styles.optionDesc}>{description}</Text>
+    <Pressable
+      style={[styles.choiceButton, choiceToneStyles[tone]]}
+      onPress={onPress}
+      accessibilityRole="button"
+    >
+      {content}
+    </Pressable>
+  );
+}
+
+function BottomButton({ label, onPress }: { label: string; onPress: () => void }) {
+  return (
+    <Pressable
+      style={styles.bottomButton}
+      onPress={onPress}
+      accessibilityRole="button"
+    >
+      <Text style={styles.bottomButtonLabel}>{label}</Text>
+    </Pressable>
+  );
+}
+
+function SetupValuePicker({
+  value,
+  unit,
+  onChange,
+}: {
+  value: number;
+  unit: string;
+  onChange: (nextValue: number) => void;
+}) {
+  const scrollRef = useRef<ScrollView>(null);
+  const scrollY = useRef(new Animated.Value((value - MIN_VALUE) * PICKER_ITEM_HEIGHT)).current;
+
+  useEffect(() => {
+    const offsetY = (value - MIN_VALUE) * PICKER_ITEM_HEIGHT;
+    const timer = setTimeout(() => {
+      scrollRef.current?.scrollTo({ y: offsetY, animated: false });
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const rawIndex = Math.round(event.nativeEvent.contentOffset.y / PICKER_ITEM_HEIGHT);
+    const index = Math.max(0, Math.min(rawIndex, PICKER_VALUES.length - 1));
+    const nextValue = PICKER_VALUES[index];
+    if (nextValue !== value) {
+      onChange(nextValue);
+    }
+  };
+
+  return (
+    <View style={styles.picker}>
+      <View style={[styles.pickerLine, styles.pickerTopLine]} pointerEvents="none" />
+      <View style={[styles.pickerLine, styles.pickerBottomLine]} pointerEvents="none" />
+      <View
+        style={styles.pickerUnitOverlay}
+        pointerEvents="none"
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+      >
+        <Text style={styles.pickerUnit}>{unit}</Text>
       </View>
-    </TouchableOpacity>
+      <Animated.ScrollView
+        ref={scrollRef}
+        testID="setup-value-picker"
+        style={styles.pickerScroll}
+        contentContainerStyle={styles.pickerContent}
+        showsVerticalScrollIndicator={false}
+        snapToInterval={PICKER_ITEM_HEIGHT}
+        decelerationRate="fast"
+        scrollEventThrottle={16}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false },
+        )}
+        onMomentumScrollEnd={handleScrollEnd}
+      >
+        {PICKER_VALUES.map((itemValue) => {
+          const itemOffset = (itemValue - MIN_VALUE) * PICKER_ITEM_HEIGHT;
+          const inputRange = [
+            itemOffset - PICKER_ITEM_HEIGHT * 2,
+            itemOffset - PICKER_ITEM_HEIGHT,
+            itemOffset,
+            itemOffset + PICKER_ITEM_HEIGHT,
+            itemOffset + PICKER_ITEM_HEIGHT * 2,
+          ];
+          const color = scrollY.interpolate({
+            inputRange,
+            outputRange: [
+              SETUP_COLORS.textSmooth,
+              SETUP_COLORS.textSmooth,
+              SETUP_COLORS.white,
+              SETUP_COLORS.textSmooth,
+              SETUP_COLORS.textSmooth,
+            ],
+            extrapolate: 'clamp',
+          });
+          const fontSize = scrollY.interpolate({
+            inputRange,
+            outputRange: [40, 48, 60, 48, 40],
+            extrapolate: 'clamp',
+          });
+          const lineHeight = scrollY.interpolate({
+            inputRange,
+            outputRange: [68, 82, 102, 82, 68],
+            extrapolate: 'clamp',
+          });
+          const opacity = scrollY.interpolate({
+            inputRange,
+            outputRange: [0.5, 1, 1, 1, 0.5],
+            extrapolate: 'clamp',
+          });
+          const letterSpacing = scrollY.interpolate({
+            inputRange,
+            outputRange: [-1.6, -1.92, -2.4, -1.92, -1.6],
+            extrapolate: 'clamp',
+          });
+
+          return (
+            <View
+              key={itemValue}
+              style={styles.pickerOption}
+            >
+              <View style={styles.pickerSelectedRow}>
+                <Animated.Text
+                  style={[
+                    styles.pickerText,
+                    { color, fontSize, lineHeight, letterSpacing, opacity },
+                  ]}
+                >
+                  {itemValue}
+                </Animated.Text>
+              </View>
+            </View>
+          );
+        })}
+      </Animated.ScrollView>
+    </View>
   );
 }
 
-/* ─── Steps ──────────────────────────────────────────────────────────────────── */
-
-function StepMode({ selected, onSelect }: { selected: GameMode | null; onSelect: (m: GameMode) => void }) {
-  return (
-    <>
-      <Text style={styles.stepTitle}>Quel mode ?</Text>
-      <OptionRow
-        title="Simple"
-        description="Score classique — la première équipe à atteindre le score cible gagne."
-        selected={selected === 'simple'}
-        onPress={() => onSelect('simple')}
-      />
-      <View style={styles.separator} />
-      <OptionRow
-        title="Fantasy"
-        description="Une règle spéciale est tirée à chaque mène — bonus, malus, chaos garanti."
-        selected={selected === 'fantasy'}
-        onPress={() => onSelect('fantasy')}
-      />
-    </>
-  );
-}
-
-function StepCondition({ selected, onSelect }: { selected: EndCondition; onSelect: (c: EndCondition) => void }) {
-  return (
-    <>
-      <Text style={styles.stepTitle}>Condition de fin</Text>
-      <OptionRow
-        title="Score à atteindre"
-        description="La première équipe à atteindre le score cible remporte la partie."
-        selected={selected === 'score'}
-        onPress={() => onSelect('score')}
-      />
-      <View style={styles.separator} />
-      <OptionRow
-        title="Nombre de mènes"
-        description="La partie se termine après un nombre fixe de mènes. Le plus de points gagne."
-        selected={selected === 'rounds'}
-        onPress={() => onSelect('rounds')}
-      />
-    </>
-  );
-}
-
-function StepValue({ endCondition, value, onChange }: { endCondition: EndCondition; value: number; onChange: (v: number) => void }) {
-  const isScore = endCondition === 'score';
-  return (
-    <>
-      <Text style={styles.stepTitle}>{isScore ? 'Score cible' : 'Nombre de mènes'}</Text>
-      <Text style={styles.stepSubtitle}>
-        {isScore ? 'La première équipe à ce score remporte la partie.' : 'La partie dure ce nombre de mènes.'}
-      </Text>
-      <View style={styles.pickerRow}>
-        <WheelPicker min={6} max={20} value={value} onChange={onChange} />
-        <Text style={styles.pickerUnit}>{isScore ? 'points' : 'mènes'}</Text>
-      </View>
-    </>
-  );
-}
-
-function StepVeto({ enabled, onToggle }: { enabled: boolean; onToggle: (v: boolean) => void }) {
-  return (
-    <>
-      <Text style={styles.stepTitle}>Véto</Text>
-      <Text style={styles.stepSubtitle}>
-        Chaque équipe peut refuser une règle tirée, une seule fois par partie.
-      </Text>
-      <TouchableOpacity style={styles.toggleRow} onPress={() => onToggle(!enabled)} activeOpacity={0.7}>
-        <View style={[styles.optionBar, enabled && styles.optionBarActive]} />
-        <View style={styles.optionBody}>
-          <Text style={[styles.optionTitle, enabled && styles.optionTitleActive]}>
-            {enabled ? 'Activé' : 'Désactivé'}
-          </Text>
-        </View>
-        <Switch
-          value={enabled}
-          onValueChange={onToggle}
-          trackColor={{ false: colors.surface2, true: colors.accent }}
-          thumbColor={colors.textPrimary}
-        />
-      </TouchableOpacity>
-    </>
-  );
-}
-
-/* ─── Styles ─────────────────────────────────────────────────────────────────── */
+const choiceToneStyles: Record<Exclude<ChoiceTone, 'gradient'>, ViewStyle> = {
+  primary: { backgroundColor: SETUP_COLORS.primary },
+  secondary: { backgroundColor: SETUP_COLORS.secondary },
+  dark: { backgroundColor: SETUP_COLORS.darkSmooth },
+};
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  container: { flex: 1, paddingHorizontal: 28, paddingBottom: 32, paddingTop: 16 },
-  back: { marginBottom: 32 },
-  backText: { color: colors.textSecondary, fontSize: typography.size.base, fontWeight: typography.weight.semibold },
-  content: { flex: 1, justifyContent: 'center' },
-  bottomBar: { paddingTop: 16 },
-
-  stepTitle: {
-    color: colors.textPrimary,
-    fontSize: typography.size.xl,
-    fontWeight: typography.weight.extrabold,
-    marginBottom: 36,
-    lineHeight: 42,
+  safe: {
+    flex: 1,
+    backgroundColor: SETUP_COLORS.dark,
   },
-  stepSubtitle: {
-    color: colors.textSecondary,
-    fontSize: typography.size.base,
-    lineHeight: 27,
-    marginBottom: 40,
-    marginTop: -20,
-  },
-
-  // Option row (no card)
-  option: {
+  header: {
+    height: 80,
+    width: '100%',
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingVertical: 20,
+    alignItems: 'center',
+    backgroundColor: SETUP_COLORS.dark,
   },
-  optionBar: {
-    width: 3,
-    alignSelf: 'stretch',
-    borderRadius: 2,
-    backgroundColor: colors.surface2,
-    marginRight: 20,
-    marginTop: 4,
+  backButton: {
+    width: 80,
+    height: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  optionBarActive: { backgroundColor: colors.accent },
-  optionBody: { flex: 1 },
-  optionTitle: {
-    color: colors.textPrimary,
-    fontSize: typography.size.lg,
-    fontWeight: typography.weight.extrabold,
-    marginBottom: 6,
+  headerTitle: {
+    flex: 1,
+    color: SETUP_COLORS.white,
+    fontFamily: SETUP_FONTS.bold,
+    fontSize: 32,
+    lineHeight: 54,
+    letterSpacing: -1.28,
+    includeFontPadding: false,
   },
-  optionTitleActive: { color: colors.accent },
-  optionDesc: {
-    color: colors.textSecondary,
-    fontSize: typography.size.base,
-    lineHeight: 26,
+  choiceContent: {
+    flex: 1,
+    width: '100%',
   },
-
-  separator: { height: 1, backgroundColor: colors.surface2, marginLeft: 23 },
-
-  // Picker
-  pickerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 24, marginTop: 8 },
-  pickerUnit: { color: colors.textSecondary, fontSize: typography.size.base, fontWeight: typography.weight.semibold },
-
-  // Toggle veto
-  toggleRow: { flexDirection: 'row', alignItems: 'center' },
+  choiceButton: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 24,
+  },
+  choiceGradientButton: {
+    flex: 1,
+    width: '100%',
+  },
+  choiceLabel: {
+    color: SETUP_COLORS.dark,
+    fontFamily: SETUP_FONTS.semibold,
+    fontSize: 32,
+    lineHeight: 54,
+    letterSpacing: -1.28,
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    includeFontPadding: false,
+  },
+  choiceLabelLight: {
+    color: SETUP_COLORS.white,
+  },
+  valueContent: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingBottom: 32,
+  },
+  picker: {
+    height: PICKER_HEIGHT,
+    width: 260,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  pickerScroll: {
+    height: PICKER_HEIGHT,
+    width: '100%',
+  },
+  pickerContent: {
+    paddingVertical: PICKER_VERTICAL_PADDING,
+  },
+  pickerOption: {
+    width: '100%',
+    height: PICKER_ITEM_HEIGHT,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  pickerText: {
+    color: SETUP_COLORS.textSmooth,
+    fontFamily: SETUP_FONTS.bold,
+    fontSize: 48,
+    lineHeight: 82,
+    letterSpacing: -1.92,
+    textAlign: 'center',
+    includeFontPadding: false,
+  },
+  pickerLine: {
+    position: 'absolute',
+    left: 70,
+    width: 121,
+    height: 2,
+    backgroundColor: SETUP_COLORS.primary,
+    zIndex: 2,
+  },
+  pickerTopLine: {
+    top: PICKER_LINE_TOP,
+  },
+  pickerBottomLine: {
+    top: PICKER_LINE_TOP + PICKER_SELECTED_HEIGHT,
+  },
+  pickerSelectedRow: {
+    height: PICKER_ITEM_HEIGHT,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 24,
+  },
+  pickerSelectedText: {
+    color: SETUP_COLORS.white,
+    fontFamily: SETUP_FONTS.bold,
+    fontSize: 60,
+    lineHeight: 102,
+    letterSpacing: -2.4,
+    textAlign: 'center',
+    includeFontPadding: false,
+  },
+  pickerUnitOverlay: {
+    position: 'absolute',
+    top: PICKER_UNIT_TOP,
+    left: PICKER_UNIT_LEFT,
+    zIndex: 3,
+  },
+  pickerUnit: {
+    color: SETUP_COLORS.textSmooth,
+    fontFamily: SETUP_FONTS.regular,
+    fontSize: 24,
+    lineHeight: 41,
+    letterSpacing: -0.96,
+    includeFontPadding: false,
+  },
+  bottomButton: {
+    width: '100%',
+    height: 102,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 24,
+    backgroundColor: SETUP_COLORS.primary,
+  },
+  bottomButtonLabel: {
+    color: SETUP_COLORS.dark,
+    fontFamily: SETUP_FONTS.semibold,
+    fontSize: 32,
+    lineHeight: 54,
+    letterSpacing: -1.28,
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    includeFontPadding: false,
+  },
 });
