@@ -1,5 +1,18 @@
 # CLAUDE.md — Fantasy Pétanque
 
+## Protocole de synchronisation roadmap
+
+Exécuter ce protocole **uniquement quand l'utilisateur demande la prochaine tâche** — formulations typiques : "quelle est la prochaine tâche ?", "qu'est-ce qu'on fait ?", "on commence quoi ?", ou équivalent. Peut aussi être déclenché via `/start`.
+
+**Ne pas exécuter automatiquement à chaque début de session.**
+
+1. Lire l'inbox de `TODO.md` — si des items sont présents, les fusionner avec `ROADMAP.md` par priorité, puis vider l'inbox.
+2. Sinon, prendre la prochaine tâche `[ ]` de `ROADMAP.md`, analyser (scope, archi, tests), poser les questions nécessaires, puis marquer `[en cours]` avant de coder.
+3. Une fois le développement terminé : **demander à l'utilisateur d'effectuer un test manuel** (décrire précisément le scénario), et attendre sa validation explicite.
+4. Seulement après validation : committer, passer à `[fait]` dans `ROADMAP.md`, et mettre à jour `MEMORY.md` si besoin.
+
+---
+
 ## Contexte du projet
 
 Application mobile iOS/Android permettant de jouer à la pétanque avec des règles "fantasy" tirées aléatoirement à chaque mène. L'app compte les scores, applique automatiquement les bonus/malus/effets spéciaux, et conserve un historique de partie.
@@ -186,12 +199,14 @@ Tests minimum obligatoires :
 - véto
 - historique de mène
 
-### Commit obligatoire
+### Commit obligatoire (après validation manuelle)
 
-À la fin de chaque session cohérente :
+À la fin de chaque session cohérente, et **uniquement après que l'utilisateur a validé le test manuel** :
 - `git add` des fichiers concernés
 - message de commit clair et précis
 - pas de mélange de sujets non liés
+
+**Ne jamais committer ni marquer `[fait]` dans `ROADMAP.md` sans confirmation explicite de l'utilisateur.**
 
 Format de commit recommandé :
 ```
@@ -252,3 +267,5 @@ npm run lint
 - Ne jamais mélanger plusieurs sujets dans un commit
 - Ne jamais inventer silencieusement une décision produit structurante
 - Ne jamais ajouter de `any` TypeScript sans justification explicite
+- **Ne jamais committer sans avoir demandé un test manuel à l'utilisateur et reçu sa validation explicite**
+- **Ne jamais modifier `ROADMAP.md` (passer `[en cours]` → `[fait]`) sans validation manuelle confirmée**

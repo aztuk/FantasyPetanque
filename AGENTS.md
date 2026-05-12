@@ -1,5 +1,62 @@
 # AGENTS.md — Fantasy Pétanque
 
+## Protocole de synchronisation roadmap
+
+Ce protocole s'exécute **uniquement quand l'utilisateur demande la prochaine tâche** — formulations typiques : "quelle est la prochaine tâche ?", "qu'est-ce qu'on fait ?", "on commence quoi ?", "next task", ou équivalent. Il peut aussi être déclenché manuellement via `/start`.
+
+**Ne pas exécuter ce protocole automatiquement à chaque début de session.**
+
+### 1. Vérifier l'inbox de `TODO.md`
+
+**Si `## Inbox` contient des items :**
+- Lire `ROADMAP.md` (tâches existantes).
+- Fusionner en attribuant une priorité à chaque item : **haute** (bloquant), **moyenne** (fonctionnalité), **basse** (polish).
+- Écrire le résultat dans `ROADMAP.md` (écrase la version précédente).
+- Vider l'inbox dans `TODO.md` (remettre le commentaire vide).
+- Présenter la roadmap mise à jour et demander confirmation.
+
+**Si l'inbox est vide :** passer directement au point 2.
+
+### 2. Choisir la prochaine tâche
+
+- Prendre la première tâche `[ ]` dans `ROADMAP.md` (priorité haute en premier).
+- Vérifier qu'aucune tâche `[en cours]` ne la bloque.
+
+### 3. Analyser avant de coder
+
+- **Faisabilité** : ambiguïtés dans `fantasy-petanque.md` ?
+- **Scope** : fichiers touchés, inclus/exclus ?
+- **Architecture** : composants, stores, moteur de jeu impactés ?
+- **Tests** : quels tests ajouter ou modifier ?
+
+Si un aspect de game design, UX ou contrainte technique n'est pas clair → **poser les questions à l'utilisateur avant de commencer**.
+
+### 4. Démarrer
+
+1. Mettre la tâche à `[en cours]` dans `ROADMAP.md`.
+2. Présenter le plan d'implémentation.
+3. Attendre validation avant de coder.
+
+### 5. Demander un test manuel avant de terminer
+
+Avant tout commit ou modification de `ROADMAP.md`, l'agent **doit** :
+
+1. Décrire précisément le scénario de test manuel à effectuer (écran, actions, résultat attendu).
+2. Demander explicitement à l'utilisateur de l'exécuter et de confirmer le résultat.
+3. **Attendre la validation** — ne pas committer ni toucher `ROADMAP.md` avant la réponse.
+
+Formulation attendue (exemple) :
+> "Avant de committer, merci de tester manuellement : lance l'app, joue une mène avec la règle Casino, vérifie que [comportement X]. Dis-moi si c'est ok."
+
+### 6. Terminer (après validation manuelle confirmée)
+
+Seulement après confirmation explicite de l'utilisateur :
+1. Committer les changements Git.
+2. Passer la tâche à `[fait]` dans `ROADMAP.md`.
+3. Mettre à jour `MEMORY.md` si des décisions produit ou architecturales notables ont été prises.
+
+---
+
 ## Contexte du projet
 
 Application mobile iOS/Android — Fantasy Pétanque.
@@ -88,9 +145,9 @@ Tests minimum requis (voir `CLAUDE.md` pour la liste complète) :
 - Tirage sans répétition + véto
 - Historique de mène
 
-### Commit obligatoire
+### Commit obligatoire (après validation manuelle)
 
-En fin de session cohérente :
+En fin de session cohérente, et **uniquement après que l'utilisateur a validé le test manuel** :
 - `git add` des fichiers concernés
 - message de commit explicite et ciblé
 - pas de mélange de sujets non liés dans un commit
@@ -101,6 +158,8 @@ feat(rules): implement Casino rule
 fix(scoring): clamp score at zero
 test(engine): cover veto and round draw
 ```
+
+**Ne jamais committer ni marquer `[fait]` dans `ROADMAP.md` sans avoir reçu la confirmation explicite de l'utilisateur.**
 
 ### Questions produit/design
 
