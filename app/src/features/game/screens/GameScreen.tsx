@@ -18,8 +18,60 @@ import { GameTopBar } from '../components/GameTopBar';
 import { colors, typography, radius, TEAM_COLORS, TEAM_LABELS } from '../../../shared/constants';
 import { RootStackParamList } from '../../../app/navigation/types';
 import { shouldSkipNormalScore } from '../../../domain/game/engine';
+import { RoundState } from '../../../domain/game/models';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'Game'>;
+
+function SimpleHistoryRow({ round, rounds }: { round: RoundState; rounds: RoundState[] }) {
+  const prevScores = rounds[round.number - 2]?.scoreAfter ?? { blue: 0, red: 0 };
+  const dBlue = round.scoreAfter.blue - prevScores.blue;
+  const dRed = round.scoreAfter.red - prevScores.red;
+
+  const scoringTeam = dBlue > 0 ? 'blue' : dRed > 0 ? 'red' : null;
+  const delta = scoringTeam ? (scoringTeam === 'blue' ? dBlue : dRed) : 0;
+  const label = scoringTeam
+    ? `${TEAM_LABELS[scoringTeam]} +${delta}`
+    : 'Mène nulle';
+  const labelColor = scoringTeam ? TEAM_COLORS[scoringTeam] : colors.textSecondary;
+
+  return (
+    <View style={historyStyles.row}>
+      <Text style={historyStyles.meneLabel}>Mène {round.number}</Text>
+      <Text style={[historyStyles.delta, { color: labelColor }]}>{label}</Text>
+      <Text style={historyStyles.score}>
+        {round.scoreAfter.blue} — {round.scoreAfter.red}
+      </Text>
+    </View>
+  );
+}
+
+const historyStyles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.surface2,
+  },
+  meneLabel: {
+    color: colors.textSecondary,
+    fontSize: typography.size.base,
+    width: 72,
+  },
+  delta: {
+    flex: 1,
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.semibold,
+    textAlign: 'center',
+  },
+  score: {
+    color: colors.textPrimary,
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.bold,
+    width: 64,
+    textAlign: 'right',
+  },
+});
 
 export function GameScreen() {
   const navigation = useNavigation<Nav>();
@@ -58,6 +110,14 @@ export function GameScreen() {
     startNewRound();
     if (mode === 'fantasy' && debugMode) {
       navigation.replace('DebugRuleSelect');
+    }
+  };
+
+  const handleFinishRound = () => {
+    finishRound();
+    if (mode === 'simple') {
+      const { isGameOver: over } = useGameStore.getState();
+      if (!over) startNewRound();
     }
   };
 
@@ -129,7 +189,8 @@ export function GameScreen() {
     );
   }
 
-  if (isRoundSummary) {
+  // Inter-mène summary — fantasy mode only
+  if (isRoundSummary && mode === 'fantasy') {
     const lastRound = rounds[rounds.length - 1];
     const prevScores = rounds.length >= 2
       ? rounds[rounds.length - 2].scoreAfter
@@ -172,6 +233,61 @@ export function GameScreen() {
 
   if (!round) return null;
 
+  // Simple mode — history grows upward above score blocks, blocks anchored at bottom
+  if (mode === 'simple') {
+    return (
+      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+        {renderTopBar()}
+
+        <ScrollView
+          style={styles.simpleScroll}
+          contentContainerStyle={styles.simpleScrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
+          {rounds.map((r) => (
+            <SimpleHistoryRow key={r.number} round={r} rounds={rounds} />
+          ))}
+
+          <View style={styles.simpleScoreArea}>
+            <View style={styles.interactiveScoresRow}>
+              <ScoreBlock
+                team="blue"
+                score={scores.blue}
+                delta={bluePoints}
+                showLabel={false}
+                actionLabel={getScoreBlockActionLabel('blue')}
+                onPress={getScoreBlockPress('blue')}
+                square
+                testID="score-block-blue"
+              />
+              <ScoreBlock
+                team="red"
+                score={scores.red}
+                delta={redPoints}
+                showLabel={false}
+                actionLabel={getScoreBlockActionLabel('red')}
+                onPress={getScoreBlockPress('red')}
+                square
+                testID="score-block-red"
+              />
+            </View>
+          </View>
+        </ScrollView>
+
+        <View style={styles.bottomBar}>
+          <PrimaryButton
+            label="Mène terminée"
+            onPress={handleFinishRound}
+            disabled={!hasNormalPoints}
+            style={styles.endRoundBtn}
+            testID="end-round-button"
+          />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Fantasy mode
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       {renderTopBar()}
@@ -184,8 +300,7 @@ export function GameScreen() {
           </View>
         )}
 
-        {/* Règle — affichage éditorial sans conteneur */}
-        {mode === 'fantasy' && round.rule && (
+        {round.rule && (
           <View style={styles.ruleSection}>
             <Text style={styles.ruleName}>{round.rule.name}</Text>
             <Text style={styles.ruleDesc}>{round.rule.description}</Text>
@@ -197,7 +312,7 @@ export function GameScreen() {
           </View>
         )}
 
-        {mode === 'fantasy' && <RuleUI round={round} />}
+        <RuleUI round={round} />
 
         {!skipNormal && (
           <View style={styles.scoringSection}>
@@ -233,7 +348,7 @@ export function GameScreen() {
       <View style={styles.bottomBar}>
         <PrimaryButton
           label="Mène terminée"
-          onPress={finishRound}
+          onPress={handleFinishRound}
           disabled={!skipNormal && !hasNormalPoints}
           style={styles.endRoundBtn}
           testID="end-round-button"
@@ -250,6 +365,11 @@ const styles = StyleSheet.create({
   container: { flex: 1, paddingHorizontal: 20, paddingTop: 16 },
 
   scoresRow: { flexDirection: 'row', marginBottom: 24 },
+
+  // Simple mode layout — content sticks to bottom, history grows upward
+  simpleScroll: { flex: 1, paddingHorizontal: 20 },
+  simpleScrollContent: { flexGrow: 1, justifyContent: 'flex-end', paddingTop: 12 },
+  simpleScoreArea: { paddingVertical: 24 },
 
   // Règle — éditorial, pas de carte
   ruleSection: {
@@ -300,7 +420,8 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   interactiveScoresRow: { flexDirection: 'row' },
-  // Résumé de mène — sans carte
+
+  // Résumé de mène — sans carte (fantasy inter-mène)
   roundSummary: { paddingVertical: 20, marginBottom: 8 },
   roundSummaryLabel: {
     color: colors.accent,

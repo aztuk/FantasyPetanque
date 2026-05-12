@@ -86,13 +86,67 @@ describe('GameScreen cancel top bar', () => {
   });
 });
 
+describe('GameScreen simple mode — skip inter-mène', () => {
+  it('starts new round immediately after finishing a round without round-summary', () => {
+    useGameStore.getState().startGame({ mode: 'simple' });
+
+    render(<GameScreen />);
+
+    fireEvent.press(screen.getByTestId('score-block-blue'));
+    fireEvent.press(screen.getByTestId('end-round-button'));
+
+    const state = useGameStore.getState();
+    expect(state.phase).toBe('rule-display');
+    expect(state.rounds).toHaveLength(1);
+    expect(state.currentRound?.number).toBe(2);
+    expect(state.scores.blue).toBe(1);
+  });
+
+  it('shows history after first round', () => {
+    useGameStore.getState().startGame({ mode: 'simple' });
+
+    render(<GameScreen />);
+
+    fireEvent.press(screen.getByTestId('score-block-red'));
+    fireEvent.press(screen.getByTestId('end-round-button'));
+
+    expect(screen.getByText('Mène 1')).toBeTruthy();
+    expect(screen.getByText(/Rouge \+1/)).toBeTruthy();
+    expect(screen.getByText('0 — 1')).toBeTruthy();
+  });
+
+  it('does not navigate to round-summary for simple mode', () => {
+    useGameStore.getState().startGame({ mode: 'simple' });
+
+    render(<GameScreen />);
+
+    fireEvent.press(screen.getByTestId('score-block-blue'));
+    fireEvent.press(screen.getByTestId('end-round-button'));
+
+    expect(screen.queryByText('Nouvelle mène')).toBeNull();
+    expect(screen.queryByText('Terminer la partie')).toBeNull();
+  });
+
+  it('shows game-over screen when winning score is reached', () => {
+    useGameStore.getState().startGame({ mode: 'simple', winningScore: 1 });
+
+    render(<GameScreen />);
+
+    fireEvent.press(screen.getByTestId('score-block-blue'));
+    fireEvent.press(screen.getByTestId('end-round-button'));
+
+    expect(useGameStore.getState().isGameOver).toBe(true);
+    expect(screen.getByText('Partie terminée.')).toBeTruthy();
+  });
+});
+
 describe('GameScreen normal scoring interaction', () => {
   it('adds normal points from score blocks before enabling round completion', () => {
     useGameStore.getState().startGame({ mode: 'simple' });
 
     render(<GameScreen />);
 
-    expect(screen.getByText('Tapez le nombre de points marqués')).toBeTruthy();
+    expect(screen.queryByText('Tapez le nombre de points marqués')).toBeNull();
     expect(screen.queryByText(/Bleu marque/)).toBeNull();
     expect(screen.queryByText(/Rouge marque/)).toBeNull();
     expect(screen.queryByText('Bleu')).toBeNull();
