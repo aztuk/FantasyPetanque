@@ -103,6 +103,8 @@ export interface GameState {
   immuneTeam: Team | null;       // immune next round (from Totem)
   isGameOver: boolean;
   winningScore: number;
+  maxRounds: number | null;      // null = score-based win condition
+  vetosEnabled: boolean;
   phase: GamePhase;
 }
 

@@ -38,6 +38,8 @@ export function drawRule(
     immuneTeam: null,
     isGameOver: false,
     winningScore: 13,
+    maxRounds: null,
+    vetosEnabled: true,
     phase: 'rule-display',
   };
 
@@ -80,6 +82,8 @@ export function drawTotemRule(
     immuneTeam: null,
     isGameOver: false,
     winningScore: 13,
+    maxRounds: null,
+    vetosEnabled: true,
     phase: 'rule-display',
   };
 

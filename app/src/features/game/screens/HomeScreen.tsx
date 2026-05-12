@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -11,52 +11,36 @@ type Nav = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
 export function HomeScreen() {
   const navigation = useNavigation<Nav>();
-  const { startGame, resetGame, debugMode, toggleDebugMode } = useGameStore();
+  const { debugMode, toggleDebugMode } = useGameStore();
+  const [tapCount, setTapCount] = useState(0);
 
-  const handleStartSimple = () => {
-    resetGame();
-    startGame('simple');
-    navigation.navigate('Game');
-  };
-
-  const handleStartFantasy = () => {
-    resetGame();
-    startGame('fantasy');
-    navigation.navigate('Game');
+  const handleLogoTap = () => {
+    const next = tapCount + 1;
+    setTapCount(next);
+    if (next >= 5) {
+      toggleDebugMode();
+      setTapCount(0);
+    }
   };
 
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
-        <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.header}
+          onPress={handleLogoTap}
+          activeOpacity={1}
+        >
           <Text style={styles.title}>🎯 Fantasy</Text>
           <Text style={styles.titleSub}>Pétanque</Text>
           <Text style={styles.tagline}>Dignité optionnelle.</Text>
-        </View>
+          {debugMode && <Text style={styles.debugBadge}>🛠 Debug</Text>}
+        </TouchableOpacity>
 
-        <View style={styles.buttons}>
-          <PrimaryButton
-            label="Mode simple"
-            onPress={handleStartSimple}
-            style={styles.btn}
-          />
-          <View style={{ height: 12 }} />
-          <PrimaryButton
-            label="Mode fantasy"
-            onPress={handleStartFantasy}
-            style={styles.btn}
-            variant="secondary"
-          />
-        </View>
-
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Score cible : 13 points</Text>
-          <TouchableOpacity style={styles.debugToggle} onPress={toggleDebugMode}>
-            <Text style={[styles.debugToggleLabel, debugMode && styles.debugActive]}>
-              {debugMode ? '🛠 Debug ON' : '🛠 Debug'}
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <PrimaryButton
+          label="Jouer"
+          onPress={() => navigation.navigate('Setup')}
+        />
       </View>
     </SafeAreaView>
   );
@@ -68,6 +52,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 24,
     justifyContent: 'space-between',
+    paddingBottom: 40,
   },
   header: {
     flex: 1,
@@ -93,31 +78,10 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontStyle: 'italic',
   },
-  buttons: {},
-  btn: {
-    marginHorizontal: 0,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  footerText: {
-    color: TEXT_SECONDARY,
-    fontSize: 13,
-  },
-  debugToggle: {
-    padding: 8,
-    backgroundColor: '#1E1E1E',
-    borderRadius: 8,
-  },
-  debugToggleLabel: {
-    color: '#666',
+  debugBadge: {
+    marginTop: 12,
+    color: ACCENT,
     fontSize: 13,
     fontWeight: '600',
-  },
-  debugActive: {
-    color: ACCENT,
   },
 });

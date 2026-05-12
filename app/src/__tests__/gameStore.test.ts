@@ -1,4 +1,5 @@
 import { useGameStore } from '../features/game/state/gameStore';
+import { ALL_RULES } from '../data/rules/rules';
 
 // Reset store before each test
 beforeEach(() => {
@@ -13,13 +14,16 @@ beforeEach(() => {
     immuneTeam: null,
     isGameOver: false,
     winningScore: 13,
+    maxRounds: null,
+    vetosEnabled: true,
     phase: 'setup',
+    debugMode: false,
   });
 });
 
 describe('startGame', () => {
   it('starts a simple game', () => {
-    useGameStore.getState().startGame('simple');
+    useGameStore.getState().startGame({ mode: 'simple' });
     const state = useGameStore.getState();
     expect(state.mode).toBe('simple');
     expect(state.currentRound).not.toBeNull();
@@ -27,7 +31,7 @@ describe('startGame', () => {
   });
 
   it('starts a fantasy game with a rule drawn', () => {
-    useGameStore.getState().startGame('fantasy');
+    useGameStore.getState().startGame({ mode: 'fantasy' });
     const state = useGameStore.getState();
     expect(state.mode).toBe('fantasy');
     expect(state.currentRound).not.toBeNull();
@@ -37,7 +41,7 @@ describe('startGame', () => {
 
 describe('addNormalPoint', () => {
   beforeEach(() => {
-    useGameStore.getState().startGame('simple');
+    useGameStore.getState().startGame({ mode: 'simple' });
   });
 
   it('adds a point to blue', () => {
@@ -66,7 +70,7 @@ describe('addNormalPoint', () => {
 
 describe('undoNormalPoint', () => {
   beforeEach(() => {
-    useGameStore.getState().startGame('simple');
+    useGameStore.getState().startGame({ mode: 'simple' });
   });
 
   it('removes last point added', () => {
@@ -95,7 +99,7 @@ describe('undoNormalPoint', () => {
 
 describe('finishRound - simple mode', () => {
   beforeEach(() => {
-    useGameStore.getState().startGame('simple');
+    useGameStore.getState().startGame({ mode: 'simple' });
   });
 
   it('adds normal points to scores and stores round', () => {
@@ -128,7 +132,7 @@ describe('finishRound - simple mode', () => {
 
 describe('useVeto', () => {
   beforeEach(() => {
-    useGameStore.getState().startGame('fantasy');
+    useGameStore.getState().startGame({ mode: 'fantasy' });
   });
 
   it('uses blue veto and draws new rule', () => {
@@ -160,6 +164,60 @@ describe('useVeto', () => {
     expect(state.vetos.blue).toBe(true);
     expect(state.currentRound?.vetoUsed).toBeNull();
     expect(state.currentRound?.rule?.id).toBe(ruleBeforeScoring);
+  });
+});
+
+describe('debug rule selection', () => {
+  it('replaces the automatically drawn first-round rule with the selected rule', () => {
+    useGameStore.getState().startGame({ mode: 'fantasy' });
+    const initialRuleId = useGameStore.getState().currentRound!.rule!.id;
+    const selectedRule = ALL_RULES.find((rule) => rule.id !== initialRuleId)!;
+
+    useGameStore.getState().forceRule(selectedRule);
+
+    const state = useGameStore.getState();
+    expect(state.currentRound?.number).toBe(1);
+    expect(state.currentRound?.rule?.id).toBe(selectedRule.id);
+    expect(state.playedRuleIds).toContain(selectedRule.id);
+    expect(state.playedRuleIds).not.toContain(initialRuleId);
+  });
+
+  it('replaces the automatically drawn rule before a later round starts', () => {
+    useGameStore.getState().startGame({ mode: 'fantasy' });
+    const firstRuleId = useGameStore.getState().currentRound!.rule!.id;
+    useGameStore.getState().addNormalPoint('blue');
+    useGameStore.getState().finishRound();
+    useGameStore.getState().startNewRound();
+
+    const placeholderRuleId = useGameStore.getState().currentRound!.rule!.id;
+    const selectedRule = ALL_RULES.find(
+      (rule) => rule.id !== firstRuleId && rule.id !== placeholderRuleId,
+    )!;
+
+    useGameStore.getState().forceRule(selectedRule);
+
+    const state = useGameStore.getState();
+    expect(state.currentRound?.number).toBe(2);
+    expect(state.currentRound?.rule?.id).toBe(selectedRule.id);
+    expect(state.playedRuleIds).toContain(firstRuleId);
+    expect(state.playedRuleIds).toContain(selectedRule.id);
+    expect(state.playedRuleIds).not.toContain(placeholderRuleId);
+  });
+
+  it('clears a stale totem pre-draw when selecting a non-totem rule', () => {
+    useGameStore.getState().startGame({ mode: 'fantasy' });
+    const totemRule = ALL_RULES.find((rule) => rule.id === 'totem-immunite')!;
+    const nonTotemRule = ALL_RULES.find((rule) => rule.id !== 'totem-immunite')!;
+
+    useGameStore.getState().forceRule(totemRule);
+    expect(useGameStore.getState().pendingNextRule).not.toBeNull();
+
+    useGameStore.getState().forceRule(nonTotemRule);
+
+    const state = useGameStore.getState();
+    expect(state.currentRound?.rule?.id).toBe(nonTotemRule.id);
+    expect(state.currentRound?.totemNextRule).toBeNull();
+    expect(state.pendingNextRule).toBeNull();
   });
 });
 
@@ -213,7 +271,7 @@ describe('Casino', () => {
 
 describe('Sortie de porc', () => {
   it('skips normal score when cochonnet exited', () => {
-    useGameStore.getState().startGame('fantasy');
+    useGameStore.getState().startGame({ mode: 'fantasy' });
     // Force sortie de porc rule
     useGameStore.setState((s) => ({
       currentRound: s.currentRound
@@ -230,7 +288,7 @@ describe('Sortie de porc', () => {
 
 describe('Assurance vie', () => {
   it('toggles assurance for each team', () => {
-    useGameStore.getState().startGame('simple');
+    useGameStore.getState().startGame({ mode: 'simple' });
     useGameStore.getState().toggleAssurance('blue');
     expect(useGameStore.getState().currentRound?.assurance.blue).toBe(true);
     expect(useGameStore.getState().currentRound?.assurance.red).toBe(false);
@@ -241,7 +299,7 @@ describe('Assurance vie', () => {
 
 describe('Frontière', () => {
   it('sets frontier choice', () => {
-    useGameStore.getState().startGame('simple');
+    useGameStore.getState().startGame({ mode: 'simple' });
     useGameStore.getState().setFrontiereChoice('blue', 'left');
     useGameStore.getState().setFrontiereChoice('red', 'right');
     const round = useGameStore.getState().currentRound!;
@@ -252,7 +310,7 @@ describe('Frontière', () => {
 
 describe('History', () => {
   it('stores round in history after finishRound', () => {
-    useGameStore.getState().startGame('simple');
+    useGameStore.getState().startGame({ mode: 'simple' });
     useGameStore.getState().addNormalPoint('blue');
     useGameStore.getState().finishRound();
 
@@ -263,7 +321,7 @@ describe('History', () => {
   });
 
   it('accumulates history across multiple rounds', () => {
-    useGameStore.getState().startGame('simple');
+    useGameStore.getState().startGame({ mode: 'simple' });
 
     useGameStore.getState().addNormalPoint('blue');
     useGameStore.getState().finishRound();
@@ -282,7 +340,7 @@ describe('History', () => {
 
 describe('Game over', () => {
   it('detects game over when team reaches winning score', () => {
-    useGameStore.getState().startGame('simple');
+    useGameStore.getState().startGame({ mode: 'simple' });
     // Set score to 12 AFTER startGame (which resets it)
     useGameStore.setState((s) => ({ scores: { blue: 12, red: 5 } }));
     useGameStore.getState().addNormalPoint('blue');

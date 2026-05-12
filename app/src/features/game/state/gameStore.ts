@@ -13,6 +13,13 @@ import { CONTRAT_MISSIONS } from '../../../data/rules/rules';
 
 const WINNING_SCORE = 13;
 
+export interface GameStartOptions {
+  mode: GameMode;
+  winningScore?: number;
+  maxRounds?: number | null;
+  vetosEnabled?: boolean;
+}
+
 function makeInitialState(): GameState {
   return {
     mode: 'simple',
@@ -25,6 +32,8 @@ function makeInitialState(): GameState {
     immuneTeam: null,
     isGameOver: false,
     winningScore: WINNING_SCORE,
+    maxRounds: null,
+    vetosEnabled: true,
     phase: 'setup',
   };
 }
@@ -35,7 +44,7 @@ interface GameStore extends GameState {
   forceRule: (rule: Rule) => void;
 
   // Setup actions
-  startGame: (mode: GameMode) => void;
+  startGame: (options: GameStartOptions) => void;
   resetGame: () => void;
 
   // Round lifecycle
@@ -90,12 +99,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
   forceRule: (rule) => {
     const state = get();
     if (!state.currentRound) return;
-    let newPlayedRuleIds = [...state.playedRuleIds];
+    const previousRuleId = state.currentRound.rule?.id;
+    const finishedRuleIds = state.rounds
+      .map((round) => round.rule?.id)
+      .filter((id): id is string => id !== undefined);
+    let newPlayedRuleIds = state.playedRuleIds.filter(
+      (id) => id !== previousRuleId || id === rule.id || finishedRuleIds.includes(id),
+    );
     if (!newPlayedRuleIds.includes(rule.id)) {
       newPlayedRuleIds = [...newPlayedRuleIds, rule.id];
     }
-    let newPendingNextRule = state.pendingNextRule;
+    let newPendingNextRule: Rule | null = null;
     const newRound = createRound(state.currentRound.number, rule);
+    newRound.totemImmuneTeam = state.currentRound.totemImmuneTeam;
     if (rule.id === 'totem-immunite') {
       const nextRule = drawTotemRule({ playedRuleIds: newPlayedRuleIds, scores: state.scores }, rule.id);
       newRound.totemNextRule = nextRule;
@@ -104,17 +120,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ currentRound: newRound, playedRuleIds: newPlayedRuleIds, pendingNextRule: newPendingNextRule });
   },
 
-  startGame: (mode) => {
-    const state = get();
+  startGame: ({ mode, winningScore, maxRounds = null, vetosEnabled = true }) => {
     const initial = makeInitialState();
     initial.mode = mode;
     initial.phase = 'rule-display';
+    if (winningScore !== undefined) initial.winningScore = winningScore;
+    initial.maxRounds = maxRounds;
+    initial.vetosEnabled = vetosEnabled;
+    initial.vetos = { blue: vetosEnabled, red: vetosEnabled };
 
     if (mode === 'fantasy') {
       const rule = drawRule({ playedRuleIds: [], scores: initial.scores });
       const round = createRound(1, rule);
 
-      // Handle Totem immediately
       if (rule.id === 'totem-immunite') {
         const nextRule = drawTotemRule({ playedRuleIds: [rule.id], scores: initial.scores }, rule.id);
         round.totemNextRule = nextRule;
@@ -289,11 +307,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       scoreAfter: newScores,
     };
 
-    const gameOver = isGameOver(newScores, state.winningScore);
+    const finishedRounds = [...state.rounds, finishedRound];
+    const gameOver =
+      isGameOver(newScores, state.winningScore) ||
+      (state.maxRounds !== null && finishedRounds.length >= state.maxRounds);
 
     set({
       scores: newScores,
-      rounds: [...state.rounds, finishedRound],
+      rounds: finishedRounds,
       currentRound: null,
       immuneTeam: newImmuneTeam,
       isGameOver: gameOver,

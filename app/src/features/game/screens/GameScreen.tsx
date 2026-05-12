@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, Alert,
 } from 'react-native';
@@ -9,7 +9,6 @@ import { ScoreBlock } from '../../../shared/components/ScoreBlock';
 import { TeamButton } from '../../../shared/components/TeamButton';
 import { PrimaryButton } from '../../../shared/components/PrimaryButton';
 import { RuleUI } from '../components/RuleUI';
-import { DebugRulePicker } from '../components/DebugRulePicker';
 import { BACKGROUND, TEXT_PRIMARY, TEXT_SECONDARY, SURFACE, ACCENT, TEAM_COLORS, TEAM_LABELS } from '../../../shared/constants';
 import { RootStackParamList } from '../../../app/navigation/types';
 import { shouldSkipNormalScore } from '../../../domain/game/engine';
@@ -18,9 +17,8 @@ type Nav = NativeStackNavigationProp<RootStackParamList, 'Game'>;
 
 export function GameScreen() {
   const navigation = useNavigation<Nav>();
-  const [debugPickerVisible, setDebugPickerVisible] = useState(false);
   const {
-    mode, scores, currentRound, rounds, vetos, phase, debugMode,
+    mode, scores, currentRound, rounds, vetos, vetosEnabled, phase, debugMode,
     addNormalPoint, undoNormalPoint, finishRound, startNewRound, useVeto, resetGame,
   } = useGameStore();
 
@@ -39,6 +37,13 @@ export function GameScreen() {
   const skipNormal = round ? shouldSkipNormalScore(round) : false;
   const isRoundSummary = phase === 'round-summary';
   const isGameOver = useGameStore((s) => s.isGameOver);
+
+  const handleStartNewRound = () => {
+    startNewRound();
+    if (mode === 'fantasy' && debugMode) {
+      navigation.replace('DebugRuleSelect');
+    }
+  };
 
   if (isGameOver) {
     return (
@@ -92,7 +97,7 @@ export function GameScreen() {
 
           <PrimaryButton
             label="Nouvelle mène"
-            onPress={startNewRound}
+            onPress={handleStartNewRound}
             style={styles.fullBtn}
           />
           <PrimaryButton
@@ -108,7 +113,7 @@ export function GameScreen() {
 
   if (!round) return null;
 
-  const canShowVeto = mode === 'fantasy' && phase === 'rule-display';
+  const canShowVeto = mode === 'fantasy' && phase === 'rule-display' && vetosEnabled;
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -150,14 +155,6 @@ export function GameScreen() {
         {/* Rule display (fantasy mode) */}
         {mode === 'fantasy' && round.rule && (
           <View style={styles.ruleCard}>
-            {debugMode && (
-              <TouchableOpacity
-                style={styles.debugChangeBtn}
-                onPress={() => setDebugPickerVisible(true)}
-              >
-                <Text style={styles.debugChangeBtnLabel}>🛠 Changer</Text>
-              </TouchableOpacity>
-            )}
             <Text style={styles.ruleName}>{round.rule.name}</Text>
             <Text style={styles.ruleDesc}>{round.rule.description}</Text>
 
@@ -224,10 +221,6 @@ export function GameScreen() {
         />
       </View>
 
-      <DebugRulePicker
-        visible={debugPickerVisible}
-        onClose={() => setDebugPickerVisible(false)}
-      />
     </SafeAreaView>
   );
 }
@@ -250,23 +243,6 @@ const styles = StyleSheet.create({
     padding: 24,
     marginBottom: 12,
     alignItems: 'center',
-  },
-  debugChangeBtn: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
-    backgroundColor: '#2A2A2A',
-    borderWidth: 1,
-    borderColor: '#555',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    zIndex: 1,
-  },
-  debugChangeBtnLabel: {
-    color: '#AAA',
-    fontSize: 13,
-    fontWeight: '600',
   },
   ruleName: {
     color: ACCENT,
