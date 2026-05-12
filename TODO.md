@@ -33,3 +33,8 @@
 
 <!-- Dépose ici tes instructions dans n'importe quel ordre. L'agent les traitera au prochain démarrage. -->
 
+- En mode simple: Centrer verticalement les blocs.
+- En mode simple: Afficher l'historique au dessus des blocs de score
+- En mode simple: Cliquer sur "nouvelle mène" lance directement une nouvelle mène sans passer par un écran de score
+- Tous les modes: En haut à gauche, un bouton retour permet d'annuler la partie. Une alerte prévient l'utilisateur que toute partie sera perdue s'il dit oui.
+- Potentiel bug: Sur la partie "Totem d'immunité", la règle s'affiche 2 fois. C'est peut etre le cas sur d'autres règles.
