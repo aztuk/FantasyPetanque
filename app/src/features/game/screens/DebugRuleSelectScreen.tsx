@@ -1,13 +1,15 @@
 import React, { useMemo, useState } from 'react';
 import {
-  FlatList, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View,
+  Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ALL_RULES } from '../../../data/rules/rules';
 import { Rule } from '../../../domain/game/models';
 import { RootStackParamList } from '../../../app/navigation/types';
 import { PrimaryButton } from '../../../shared/components/PrimaryButton';
+import { GameTopBar } from '../components/GameTopBar';
 import { colors, typography, radius } from '../../../shared/constants';
 import { useGameStore } from '../state/gameStore';
 
@@ -30,10 +32,20 @@ export function DebugRuleSelectScreen() {
 
   const handleSelectRule = (rule: Rule) => { forceRule(rule); navigation.replace('Game'); };
   const handleCancel = () => { resetGame(); navigation.replace('Home'); };
+  const handleCancelPress = () => {
+    Alert.alert(
+      'Annuler la partie ?',
+      'La partie en cours sera perdue si tu confirmes.',
+      [
+        { text: 'Continuer', style: 'cancel' },
+        { text: 'Annuler la partie', style: 'destructive', onPress: handleCancel },
+      ],
+    );
+  };
 
   if (!currentRound) {
     return (
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <View style={styles.emptyContainer}>
           <Text style={styles.title}>Debug</Text>
           <Text style={styles.emptyText}>Aucune mene en attente.</Text>
@@ -44,7 +56,9 @@ export function DebugRuleSelectScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+      <GameTopBar onCancel={handleCancelPress} />
+
       <View style={styles.header}>
         <Text style={styles.eyebrow}>Mène {currentRound.number}</Text>
         <Text style={styles.title}>Choisir la règle</Text>
@@ -81,7 +95,7 @@ export function DebugRuleSelectScreen() {
       />
 
       <View style={styles.bottomBar}>
-        <PrimaryButton label="Annuler la partie" onPress={handleCancel} variant="secondary" style={styles.fullButton} />
+        <PrimaryButton label="Annuler la partie" onPress={handleCancelPress} variant="secondary" style={styles.fullButton} />
       </View>
     </SafeAreaView>
   );

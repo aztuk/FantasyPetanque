@@ -1,16 +1,21 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { Alert } from 'react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { GameScreen } from '../features/game/screens/GameScreen';
 import { useGameStore } from '../features/game/state/gameStore';
 
+const mockNavigate = jest.fn();
+const mockReplace = jest.fn();
+
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
-    navigate: jest.fn(),
-    replace: jest.fn(),
+    navigate: mockNavigate,
+    replace: mockReplace,
   }),
 }));
 
 beforeEach(() => {
+  jest.clearAllMocks();
   useGameStore.setState({
     mode: 'simple',
     rounds: [],
@@ -26,6 +31,58 @@ beforeEach(() => {
     vetosEnabled: true,
     phase: 'setup',
     debugMode: false,
+  });
+});
+
+describe('GameScreen cancel top bar', () => {
+  it('shows cancel button during active game', () => {
+    useGameStore.getState().startGame({ mode: 'simple' });
+    render(<GameScreen />);
+    expect(screen.getByTestId('cancel-game-button')).toBeTruthy();
+  });
+
+  it('shows confirmation alert when cancel is pressed', () => {
+    const alertSpy = jest.spyOn(Alert, 'alert');
+    useGameStore.getState().startGame({ mode: 'simple' });
+    render(<GameScreen />);
+
+    fireEvent.press(screen.getByTestId('cancel-game-button'));
+
+    expect(alertSpy).toHaveBeenCalledWith(
+      'Annuler la partie ?',
+      'La partie en cours sera perdue si tu confirmes.',
+      expect.arrayContaining([
+        expect.objectContaining({ text: 'Continuer' }),
+        expect.objectContaining({ text: 'Annuler la partie', style: 'destructive' }),
+      ]),
+    );
+  });
+
+  it('resets game and navigates home on confirm', () => {
+    const alertSpy = jest.spyOn(Alert, 'alert');
+    useGameStore.getState().startGame({ mode: 'simple' });
+    useGameStore.getState().addNormalPoint('blue');
+    render(<GameScreen />);
+
+    fireEvent.press(screen.getByTestId('cancel-game-button'));
+
+    const confirmBtn = (alertSpy.mock.calls[0][2] as { text: string; onPress?: () => void }[])
+      .find((b) => b.text === 'Annuler la partie');
+    act(() => {
+      confirmBtn?.onPress?.();
+    });
+
+    expect(useGameStore.getState().phase).toBe('setup');
+    expect(mockReplace).toHaveBeenCalledWith('Home');
+    expect(mockNavigate).not.toHaveBeenCalledWith('Home');
+  });
+
+  it('keeps veto actions in the safe top bar for fantasy games', () => {
+    useGameStore.getState().startGame({ mode: 'fantasy', vetosEnabled: true });
+    render(<GameScreen />);
+
+    expect(screen.getByTestId('cancel-game-button')).toBeTruthy();
+    expect(screen.getAllByText(/Véto/)).toHaveLength(2);
   });
 });
 

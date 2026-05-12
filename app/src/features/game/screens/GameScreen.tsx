@@ -1,13 +1,20 @@
 import React from 'react';
 import {
-  View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, Alert,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useGameStore } from '../state/gameStore';
 import { ScoreBlock } from '../../../shared/components/ScoreBlock';
 import { PrimaryButton } from '../../../shared/components/PrimaryButton';
 import { RuleUI } from '../components/RuleUI';
+import { GameTopBar } from '../components/GameTopBar';
 import { colors, typography, radius, TEAM_COLORS, TEAM_LABELS } from '../../../shared/constants';
 import { RootStackParamList } from '../../../app/navigation/types';
 import { shouldSkipNormalScore } from '../../../domain/game/engine';
@@ -45,6 +52,7 @@ export function GameScreen() {
   const skipNormal = round ? shouldSkipNormalScore(round) : false;
   const isRoundSummary = phase === 'round-summary';
   const isGameOver = useGameStore((s) => s.isGameOver);
+  const canShowVeto = mode === 'fantasy' && phase === 'rule-display' && vetosEnabled;
 
   const handleStartNewRound = () => {
     startNewRound();
@@ -53,9 +61,52 @@ export function GameScreen() {
     }
   };
 
+  const handleCancelGame = () => {
+    Alert.alert(
+      'Annuler la partie ?',
+      'La partie en cours sera perdue si tu confirmes.',
+      [
+        { text: 'Continuer', style: 'cancel' },
+        {
+          text: 'Annuler la partie',
+          style: 'destructive',
+          onPress: () => { resetGame(); navigation.replace('Home'); },
+        },
+      ],
+    );
+  };
+
+  const renderTopBar = () => (
+    <GameTopBar onCancel={handleCancelGame}>
+      {canShowVeto && (['blue', 'red'] as const).map((team) => (
+        <TouchableOpacity
+          key={team}
+          style={[styles.vetoBtn, { borderColor: vetos[team] ? TEAM_COLORS[team] : colors.surface2 }]}
+          onPress={() => {
+            Alert.alert(
+              'Véto',
+              `${TEAM_LABELS[team]} utilise son véto. La règle sera rechangée.`,
+              [
+                { text: 'Annuler', style: 'cancel' },
+                { text: 'Confirmer', onPress: () => useVeto(team) },
+              ],
+            );
+          }}
+          disabled={!vetos[team]}
+          accessibilityRole="button"
+          accessibilityState={{ disabled: !vetos[team] }}
+        >
+          <Text style={[styles.vetoBtnLabel, { color: vetos[team] ? TEAM_COLORS[team] : colors.textSecondary }]}>
+            {vetos[team] ? `Véto ${team === 'blue' ? '🔵' : '🔴'}` : 'Véto utilisé'}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </GameTopBar>
+  );
+
   if (isGameOver) {
     return (
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <View style={styles.container}>
           <View style={styles.scoresRow}>
             <ScoreBlock team="blue" score={scores.blue} />
@@ -88,7 +139,8 @@ export function GameScreen() {
     const deltaRed = lastRound ? lastRound.scoreAfter.red - prevScores.red : 0;
 
     return (
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+        {renderTopBar()}
         <View style={styles.container}>
           <View style={styles.scoresRow}>
             <ScoreBlock team="blue" score={scores.blue} delta={deltaBlue} />
@@ -120,35 +172,9 @@ export function GameScreen() {
 
   if (!round) return null;
 
-  const canShowVeto = mode === 'fantasy' && phase === 'rule-display' && vetosEnabled;
-
   return (
-    <SafeAreaView style={styles.safe}>
-      {canShowVeto && (
-        <View style={styles.vetoBar}>
-          {(['blue', 'red'] as const).map((team) => (
-            <TouchableOpacity
-              key={team}
-              style={[styles.vetoBtn, { borderColor: vetos[team] ? TEAM_COLORS[team] : colors.surface2 }]}
-              onPress={() => {
-                Alert.alert(
-                  'Véto',
-                  `${TEAM_LABELS[team]} utilise son véto. La règle sera rechangée.`,
-                  [
-                    { text: 'Annuler', style: 'cancel' },
-                    { text: 'Confirmer', onPress: () => useVeto(team) },
-                  ],
-                );
-              }}
-              disabled={!vetos[team]}
-            >
-              <Text style={[styles.vetoBtnLabel, { color: vetos[team] ? TEAM_COLORS[team] : colors.textSecondary }]}>
-                {vetos[team] ? `Véto ${team === 'blue' ? '🔵' : '🔴'}` : 'Véto utilisé'}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+      {renderTopBar()}
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         {skipNormal && (
@@ -253,7 +279,6 @@ const styles = StyleSheet.create({
   },
 
   // Veto
-  vetoBar: { flexDirection: 'row', gap: 8, paddingHorizontal: 20, paddingTop: 10, paddingBottom: 6 },
   vetoBtn: {
     flex: 1,
     paddingVertical: 12,
