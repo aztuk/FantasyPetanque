@@ -6,7 +6,6 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useGameStore } from '../state/gameStore';
 import { ScoreBlock } from '../../../shared/components/ScoreBlock';
-import { TeamButton } from '../../../shared/components/TeamButton';
 import { PrimaryButton } from '../../../shared/components/PrimaryButton';
 import { RuleUI } from '../components/RuleUI';
 import { BACKGROUND, TEXT_PRIMARY, TEXT_SECONDARY, SURFACE, ACCENT, TEAM_COLORS, TEAM_LABELS } from '../../../shared/constants';
@@ -28,6 +27,7 @@ export function GameScreen() {
   const redPoints = round?.normalPoints.red ?? 0;
   const blueActive = bluePoints > 0;
   const redActive = redPoints > 0;
+  const hasNormalPoints = blueActive || redActive;
 
   const scoreTeamDisabled = (team: 'blue' | 'red') => {
     if (team === 'blue') return redActive;
@@ -147,10 +147,12 @@ export function GameScreen() {
       {/* Scrollable content */}
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         {/* Scores */}
-        <View style={styles.scoresRow}>
-          <ScoreBlock team="blue" score={scores.blue} />
-          <ScoreBlock team="red" score={scores.red} />
-        </View>
+        {skipNormal && (
+          <View style={styles.scoresRow}>
+            <ScoreBlock team="blue" score={scores.blue} />
+            <ScoreBlock team="red" score={scores.red} />
+          </View>
+        )}
 
         {/* Rule display (fantasy mode) */}
         {mode === 'fantasy' && round.rule && (
@@ -171,37 +173,33 @@ export function GameScreen() {
         {/* Rule-specific UI */}
         {mode === 'fantasy' && <RuleUI round={round} />}
 
-        {/* Simple mode reminder */}
-        {mode === 'simple' && (
-          <View style={styles.ruleCard}>
-            <Text style={styles.ruleName}>Mode simple</Text>
-            <Text style={styles.ruleDesc}>Comptez les points normalement.</Text>
-          </View>
-        )}
-
         {/* Scoring section */}
         {!skipNormal && (
           <View style={styles.scoringSection}>
-            <Text style={styles.scoringSectionTitle}>
-              {bluePoints > 0 || redPoints > 0 ? 'Points normaux' : 'Qui marque ?'}
-            </Text>
+            <Text style={styles.scoringPrompt}>Tapez le nombre de points marqués</Text>
 
-            <View style={styles.scoreButtons}>
-              <TeamButton
+            <View style={styles.interactiveScoresRow}>
+              <ScoreBlock
                 team="blue"
-                label={`Bleu marque${bluePoints > 0 ? ` (${bluePoints})` : ''}`}
+                score={scores.blue}
+                delta={bluePoints}
+                showLabel={false}
                 onPress={() => addNormalPoint('blue')}
                 disabled={scoreTeamDisabled('blue')}
+                testID="score-block-blue"
               />
-              <TeamButton
+              <ScoreBlock
                 team="red"
-                label={`Rouge marque${redPoints > 0 ? ` (${redPoints})` : ''}`}
+                score={scores.red}
+                delta={redPoints}
+                showLabel={false}
                 onPress={() => addNormalPoint('red')}
                 disabled={scoreTeamDisabled('red')}
+                testID="score-block-red"
               />
             </View>
 
-            {(bluePoints > 0 || redPoints > 0) && (
+            {hasNormalPoints && (
               <TouchableOpacity style={styles.undoBtn} onPress={undoNormalPoint}>
                 <Text style={styles.undoBtnLabel}>↩ Annuler dernier point</Text>
               </TouchableOpacity>
@@ -217,7 +215,9 @@ export function GameScreen() {
         <PrimaryButton
           label="Mène terminée"
           onPress={finishRound}
+          disabled={!skipNormal && !hasNormalPoints}
           style={styles.endRoundBtn}
+          testID="end-round-button"
         />
       </View>
 
@@ -287,20 +287,17 @@ const styles = StyleSheet.create({
   vetoUsed: { borderColor: '#444' },
   vetoBtnLabel: { fontSize: 13, fontWeight: '600' },
   scoringSection: {
-    backgroundColor: SURFACE,
-    borderRadius: 12,
-    padding: 16,
+    paddingVertical: 28,
     marginVertical: 8,
   },
-  scoringSectionTitle: {
-    color: TEXT_SECONDARY,
-    fontSize: 13,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: 12,
+  scoringPrompt: {
+    color: TEXT_PRIMARY,
+    fontSize: 18,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 14,
   },
-  scoreButtons: {
+  interactiveScoresRow: {
     flexDirection: 'row',
   },
   undoBtn: {

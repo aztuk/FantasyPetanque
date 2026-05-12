@@ -7,9 +7,17 @@ interface Props {
   disabled?: boolean;
   style?: ViewStyle;
   variant?: 'primary' | 'secondary' | 'danger';
+  testID?: string;
 }
 
-export function PrimaryButton({ label, onPress, disabled, style, variant = 'primary' }: Props) {
+export function PrimaryButton({
+  label,
+  onPress,
+  disabled,
+  style,
+  variant = 'primary',
+  testID,
+}: Props) {
   const bg =
     disabled ? '#444' :
     variant === 'secondary' ? '#333' :
@@ -24,6 +32,9 @@ export function PrimaryButton({ label, onPress, disabled, style, variant = 'prim
       onPress={onPress}
       disabled={disabled}
       activeOpacity={0.7}
+      accessibilityRole="button"
+      accessibilityState={{ disabled: !!disabled }}
+      testID={testID}
     >
       <Text style={[styles.label, { color: textColor }]}>{label}</Text>
     </TouchableOpacity>
