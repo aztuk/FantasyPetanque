@@ -182,8 +182,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   useVeto: (team) => {
     const state = get();
     if (!state.vetos[team] || !state.currentRound) return;
-
-    const vetoedRuleId = state.currentRound.rule?.id;
+    if (state.phase !== 'rule-display') return;
 
     // Draw a new rule (veto'd rule can reappear later, so we don't add it to playedRuleIds)
     const newRule = drawRule({ playedRuleIds: state.playedRuleIds, scores: state.scores });

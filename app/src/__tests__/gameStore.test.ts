@@ -146,6 +146,20 @@ describe('useVeto', () => {
     useGameStore.getState().useVeto('blue'); // should not change anything
     expect(useGameStore.getState().currentRound?.rule?.id).toBe(ruleAfterFirst);
   });
+
+  it('cannot use veto after scoring started, even if points are undone', () => {
+    const ruleBeforeScoring = useGameStore.getState().currentRound?.rule?.id;
+
+    useGameStore.getState().addNormalPoint('blue');
+    useGameStore.getState().undoNormalPoint();
+    useGameStore.getState().useVeto('blue');
+
+    const state = useGameStore.getState();
+    expect(state.phase).toBe('scoring');
+    expect(state.vetos.blue).toBe(true);
+    expect(state.currentRound?.vetoUsed).toBeNull();
+    expect(state.currentRound?.rule?.id).toBe(ruleBeforeScoring);
+  });
 });
 
 describe('Casino', () => {

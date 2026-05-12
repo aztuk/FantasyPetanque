@@ -108,7 +108,7 @@ export function GameScreen() {
 
   if (!round) return null;
 
-  const isScoringPhase = phase === 'scoring' || (phase === 'playing' && (bluePoints > 0 || redPoints > 0));
+  const canShowVeto = mode === 'fantasy' && phase === 'rule-display';
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -150,7 +150,7 @@ export function GameScreen() {
         )}
 
         {/* Veto buttons (only before scoring starts) */}
-        {mode === 'fantasy' && bluePoints === 0 && redPoints === 0 && phase !== 'scoring' && (
+        {canShowVeto && (
           <View style={styles.vetoRow}>
             {(['blue', 'red'] as const).map((team) => (
               <TouchableOpacity
