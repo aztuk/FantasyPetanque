@@ -84,7 +84,7 @@ export function GameScreen() {
 
           {lastRound?.rule && (
             <View style={styles.roundSummaryCard}>
-              <Text style={styles.roundLabel}>Mène {lastRound.number} — {lastRound.rule.name}</Text>
+              <Text style={styles.roundLabel}>{lastRound.rule.name}</Text>
               {deltaBlue !== 0 && <Text style={[styles.deltaText, { color: TEAM_COLORS.blue }]}>Bleu : {deltaBlue > 0 ? `+${deltaBlue}` : deltaBlue}</Text>}
               {deltaRed !== 0 && <Text style={[styles.deltaText, { color: TEAM_COLORS.red }]}>Rouge : {deltaRed > 0 ? `+${deltaRed}` : deltaRed}</Text>}
             </View>
@@ -112,6 +112,34 @@ export function GameScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
+      {/* Veto bar — pinned to top */}
+      {canShowVeto && (
+        <View style={styles.vetoBar}>
+          {(['blue', 'red'] as const).map((team) => (
+            <TouchableOpacity
+              key={team}
+              style={[styles.vetoBtn, !vetos[team] && styles.vetoUsed, { borderColor: TEAM_COLORS[team] }]}
+              onPress={() => {
+                Alert.alert(
+                  'Véto',
+                  `${TEAM_LABELS[team]} utilise son véto. La règle sera rechangée.`,
+                  [
+                    { text: 'Annuler', style: 'cancel' },
+                    { text: 'Confirmer', onPress: () => useVeto(team) },
+                  ],
+                );
+              }}
+              disabled={!vetos[team]}
+            >
+              <Text style={[styles.vetoBtnLabel, { color: vetos[team] ? TEAM_COLORS[team] : '#666' }]}>
+                {vetos[team] ? `Véto ${team === 'blue' ? '🔵' : '🔴'}` : `Véto utilisé`}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+
+      {/* Scrollable content */}
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         {/* Scores */}
         <View style={styles.scoresRow}>
@@ -119,26 +147,20 @@ export function GameScreen() {
           <ScoreBlock team="red" score={scores.red} />
         </View>
 
-        {/* Mène info */}
-        <Text style={styles.roundInfo}>Mène {round.number}</Text>
-
         {/* Rule display (fantasy mode) */}
         {mode === 'fantasy' && round.rule && (
           <View style={styles.ruleCard}>
-            <View style={styles.ruleCardHeader}>
-              <Text style={styles.ruleName}>{round.rule.name}</Text>
-              {debugMode && (
-                <TouchableOpacity
-                  style={styles.debugChangeBtn}
-                  onPress={() => setDebugPickerVisible(true)}
-                >
-                  <Text style={styles.debugChangeBtnLabel}>🛠 Changer</Text>
-                </TouchableOpacity>
-              )}
-            </View>
+            {debugMode && (
+              <TouchableOpacity
+                style={styles.debugChangeBtn}
+                onPress={() => setDebugPickerVisible(true)}
+              >
+                <Text style={styles.debugChangeBtnLabel}>🛠 Changer</Text>
+              </TouchableOpacity>
+            )}
+            <Text style={styles.ruleName}>{round.rule.name}</Text>
             <Text style={styles.ruleDesc}>{round.rule.description}</Text>
 
-            {/* Immune team banner */}
             {round.totemImmuneTeam && (
               <View style={[styles.immuneBanner, { borderColor: TEAM_COLORS[round.totemImmuneTeam] }]}>
                 <Text style={[styles.immuneText, { color: TEAM_COLORS[round.totemImmuneTeam] }]}>
@@ -146,33 +168,6 @@ export function GameScreen() {
                 </Text>
               </View>
             )}
-          </View>
-        )}
-
-        {/* Veto buttons (only before scoring starts) */}
-        {canShowVeto && (
-          <View style={styles.vetoRow}>
-            {(['blue', 'red'] as const).map((team) => (
-              <TouchableOpacity
-                key={team}
-                style={[styles.vetoBtn, !vetos[team] && styles.vetoUsed, { borderColor: TEAM_COLORS[team] }]}
-                onPress={() => {
-                  Alert.alert(
-                    'Véto',
-                    `${TEAM_LABELS[team]} utilise son véto. La règle sera rechangée.`,
-                    [
-                      { text: 'Annuler', style: 'cancel' },
-                      { text: 'Confirmer', onPress: () => useVeto(team) },
-                    ],
-                  );
-                }}
-                disabled={!vetos[team]}
-              >
-                <Text style={[styles.vetoBtnLabel, { color: vetos[team] ? TEAM_COLORS[team] : '#666' }]}>
-                  {vetos[team] ? `Véto ${team === 'blue' ? '🔵' : '🔴'}` : `Véto utilisé`}
-                </Text>
-              </TouchableOpacity>
-            ))}
           </View>
         )}
 
@@ -217,15 +212,17 @@ export function GameScreen() {
           </View>
         )}
 
-        {/* End round button */}
+        <View style={{ height: 16 }} />
+      </ScrollView>
+
+      {/* End round button — pinned to bottom */}
+      <View style={styles.bottomBar}>
         <PrimaryButton
           label="Mène terminée"
           onPress={finishRound}
           style={styles.endRoundBtn}
         />
-
-        <View style={{ height: 40 }} />
-      </ScrollView>
+      </View>
 
       <DebugRulePicker
         visible={debugPickerVisible}
@@ -245,67 +242,64 @@ const styles = StyleSheet.create({
   },
   scoresRow: {
     flexDirection: 'row',
-    marginBottom: 12,
-  },
-  roundInfo: {
-    color: TEXT_SECONDARY,
-    fontSize: 14,
-    textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: 16,
   },
   ruleCard: {
     backgroundColor: SURFACE,
-    borderRadius: 12,
-    padding: 16,
-    marginVertical: 6,
-  },
-  ruleCardHeader: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  ruleName: {
-    color: ACCENT,
-    fontSize: 22,
-    fontWeight: '800',
-    flex: 1,
+    borderRadius: 16,
+    padding: 24,
+    marginBottom: 12,
+    alignItems: 'center',
   },
   debugChangeBtn: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
     backgroundColor: '#2A2A2A',
     borderWidth: 1,
     borderColor: '#555',
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 6,
-    marginLeft: 8,
+    zIndex: 1,
   },
   debugChangeBtnLabel: {
     color: '#AAA',
     fontSize: 13,
     fontWeight: '600',
   },
+  ruleName: {
+    color: ACCENT,
+    fontSize: 30,
+    fontWeight: '800',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
   ruleDesc: {
     color: TEXT_PRIMARY,
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 17,
+    lineHeight: 25,
+    textAlign: 'center',
   },
   immuneBanner: {
     borderWidth: 2,
     borderRadius: 8,
     padding: 8,
-    marginTop: 10,
+    marginTop: 14,
     alignItems: 'center',
+    width: '100%',
   },
   immuneText: {
     fontSize: 13,
     fontWeight: '700',
     textAlign: 'center',
   },
-  vetoRow: {
+  vetoBar: {
     flexDirection: 'row',
-    marginVertical: 8,
     gap: 8,
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 8,
   },
   vetoBtn: {
     flex: 1,
@@ -341,8 +335,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   undoBtnLabel: { color: TEXT_SECONDARY, fontSize: 14 },
+  bottomBar: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 8,
+    backgroundColor: BACKGROUND,
+  },
   endRoundBtn: {
-    marginTop: 12,
     marginHorizontal: 0,
   },
   fullBtn: {
@@ -367,6 +366,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     marginBottom: 8,
+    textAlign: 'center',
   },
   deltaText: {
     fontSize: 18,

@@ -28,7 +28,7 @@ export function AppNavigator() {
         <Stack.Screen
           name="Game"
           component={GameScreen}
-          options={{ title: 'Partie en cours', headerBackVisible: false }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Summary"
