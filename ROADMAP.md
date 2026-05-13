@@ -10,6 +10,7 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 
 <!-- tâches critiques pour le fonctionnement de base -->
 
+- [fait] Vérifier les instructions Claude et Codex (`CLAUDE.md` / `AGENTS.md`) et les harmoniser pour qu'elles appliquent le même protocole. - Difficulté 1/5 - Codex
 - [fait] Fix warnings Expo / edge-to-edge : retirer `newArchEnabled: false` de `app.json` et supprimer ou adapter les appels non supportés `setPositionAsync` / `setBehaviorAsync` quand l'edge-to-edge est activé.
 - [fait] Bug — Totem d'immunité (et potentiellement d'autres règles) : la règle s'affiche deux fois sur l'écran de mène. Identifier la cause et vérifier que le problème ne touche pas d'autres règles. (commit `83bb4a2`)
 - [fait] Top bar / bouton retour en haut à gauche (tous les modes) : ajouter un bouton permettant d'annuler la partie en cours. Une alerte de confirmation prévient que la partie sera perdue si l'utilisateur confirme. Corriger aussi le placement de la top bar pour respecter la barre d'état / safe area du téléphone : aucun élément de l'app ne doit passer sous l'heure, les icônes système ou l'encoche. (commit `2e54068`)

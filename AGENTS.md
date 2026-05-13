@@ -54,7 +54,14 @@ Formulation attendue (exemple) :
 
 Seulement après confirmation explicite de l'utilisateur :
 1. Committer les changements Git.
-2. Passer la tâche à `[fait]` dans `ROADMAP.md`.
+2. Passer la tâche à `[fait]` dans `ROADMAP.md` en indiquant obligatoirement :
+   - la difficulté estimée de la tâche sur 5 ;
+   - l'agent ayant terminé la tâche : `Codex` ou `Claude`.
+
+   Format attendu :
+   ```
+   - [fait] Tâche X - Difficulté 1/5 - Codex
+   ```
 3. Mettre à jour `MEMORY.md` si des décisions produit ou architecturales notables ont été prises.
 
 ---
@@ -143,6 +150,7 @@ Tests minimum requis (voir `CLAUDE.md` pour la liste complète) :
 - score minimum à 0
 - Casino, Prédiction, Totem d'immunité
 - L'impair contre-attaque
+- Sortie de porc
 - Assurance vie, Frontière
 - Tirage sans répétition + véto
 - Historique de mène
@@ -161,7 +169,7 @@ fix(scoring): clamp score at zero
 test(engine): cover veto and round draw
 ```
 
-**Ne jamais committer ni marquer `[fait]` dans `ROADMAP.md` sans avoir reçu la confirmation explicite de l'utilisateur.**
+**Ne jamais committer ni marquer `[fait]` dans `ROADMAP.md` sans avoir reçu la confirmation explicite de l'utilisateur. Toute tâche marquée `[fait]` doit indiquer la difficulté sur 5 et l'agent (`Codex` ou `Claude`).**
 
 ### Questions produit/design
 
@@ -171,7 +179,7 @@ Si une ambiguïté ou incohérence est détectée dans `fantasy-petanque.md` :
 3. Recommander une option
 4. Demander validation si la décision impacte le score, le flow, ou l'architecture
 
-Décisions mineures : les prendre, les documenter dans `CLAUDE.md`, continuer.
+Décisions mineures : les prendre, les documenter dans `MEMORY.md` si elles peuvent influencer une session future, continuer.
 
 ---
 
@@ -234,4 +242,6 @@ npm run lint            # Lint
 - Mélanger plusieurs sujets dans un commit
 - Inventer silencieusement une décision produit structurante
 - Ajouter `any` TypeScript sans justification explicite
-- Modifier `fantasy-petanque.md` (c'est la spec, pas le code)
+- Ne jamais committer sans avoir demandé un test manuel à l'utilisateur et reçu sa validation explicite
+- Ne jamais modifier `ROADMAP.md` (passer `[en cours]` → `[fait]`) sans validation manuelle confirmée, ni oublier la difficulté sur 5 et l'agent (`Codex` ou `Claude`)
+- Ne jamais modifier `fantasy-petanque.md` (c'est la spec, pas le code)

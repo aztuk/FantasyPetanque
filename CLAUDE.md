@@ -2,15 +2,67 @@
 
 ## Protocole de synchronisation roadmap
 
-Exécuter ce protocole **uniquement quand l'utilisateur demande la prochaine tâche** — formulations typiques : "quelle est la prochaine tâche ?", "qu'est-ce qu'on fait ?", "on commence quoi ?", ou équivalent. Peut aussi être déclenché via `/start`.
+Ce protocole s'exécute **uniquement quand l'utilisateur demande la prochaine tâche** — formulations typiques : "quelle est la prochaine tâche ?", "qu'est-ce qu'on fait ?", "on commence quoi ?", "next task", ou équivalent. Il peut aussi être déclenché manuellement via `/start`.
 
-**Ne pas exécuter automatiquement à chaque début de session.**
+**Ne pas exécuter ce protocole automatiquement à chaque début de session.**
 
-1. Lire l'inbox de `TODO.md` — si des items sont présents, les fusionner avec `ROADMAP.md` par priorité, puis vider l'inbox.
-2. Sinon, prendre la prochaine tâche `[ ]` de `ROADMAP.md`. **Les tâches `[en cours]` sont prises par un autre agent — les ignorer complètement, ne pas les analyser, ne pas vérifier les conflits, ne pas les mentionner.** Analyser (scope, archi, tests), poser les questions nécessaires, puis marquer `[en cours]` avant de coder.
-   - Si cette tâche est manifestement petite et sans ambiguïté, l'agent peut proposer de prendre en même temps la prochaine petite tâche compatible, à condition d'analyser les deux scopes, de vérifier l'absence de conflit, puis de marquer les deux tâches `[en cours]` avant de coder.
-3. Une fois le développement terminé : **demander à l'utilisateur d'effectuer un test manuel** (décrire précisément le scénario), et attendre sa validation explicite.
-4. Seulement après validation : committer, passer à `[fait]` dans `ROADMAP.md` en indiquant la difficulté sur 5 et l'agent (`Codex` ou `Claude`), puis mettre à jour `MEMORY.md` si besoin.
+### 1. Vérifier l'inbox de `TODO.md`
+
+**Si `## Inbox` contient des items :**
+- Lire `ROADMAP.md` (tâches existantes).
+- Fusionner en attribuant une priorité à chaque item : **haute** (bloquant), **moyenne** (fonctionnalité), **basse** (polish).
+- Écrire le résultat dans `ROADMAP.md` (écrase la version précédente).
+- Vider l'inbox dans `TODO.md` (remettre le commentaire vide).
+- Présenter la roadmap mise à jour et demander confirmation.
+
+**Si l'inbox est vide :** passer directement au point 2.
+
+### 2. Choisir la prochaine tâche
+
+- Les tâches `[en cours]` **ne sont pas sélectionnables** — elles appartiennent à un agent ou une session en cours.
+- Prendre la première tâche `[ ]` dans `ROADMAP.md` (priorité haute en premier).
+- Vérifier que les tâches `[en cours]` ne créent pas de conflit (fichiers partagés, dépendances) avec la tâche choisie — si oui, le signaler à l'utilisateur avant de continuer.
+- Si la tâche choisie est manifestement petite et sans ambiguïté, l'agent peut proposer de prendre en même temps la prochaine petite tâche compatible, à condition d'analyser les deux scopes, de vérifier l'absence de conflit, puis de marquer les deux tâches `[en cours]` avant de coder.
+
+### 3. Analyser avant de coder
+
+- **Faisabilité** : ambiguïtés dans `fantasy-petanque.md` ?
+- **Scope** : fichiers touchés, inclus/exclus ?
+- **Architecture** : composants, stores, moteur de jeu impactés ?
+- **Tests** : quels tests ajouter ou modifier ?
+
+Si un aspect de game design, UX ou contrainte technique n'est pas clair → **poser les questions à l'utilisateur avant de commencer**.
+
+### 4. Démarrer
+
+1. Mettre la tâche à `[en cours]` dans `ROADMAP.md`.
+2. Présenter le plan d'implémentation.
+3. Attendre validation avant de coder.
+
+### 5. Demander un test manuel avant de terminer
+
+Avant tout commit ou modification de `ROADMAP.md`, l'agent **doit** :
+
+1. Décrire précisément le scénario de test manuel à effectuer (écran, actions, résultat attendu).
+2. Demander explicitement à l'utilisateur de l'exécuter et de confirmer le résultat.
+3. **Attendre la validation** — ne pas committer ni toucher `ROADMAP.md` avant la réponse.
+
+Formulation attendue (exemple) :
+> "Avant de committer, merci de tester manuellement : lance l'app, joue une mène avec la règle Casino, vérifie que [comportement X]. Dis-moi si c'est ok."
+
+### 6. Terminer (après validation manuelle confirmée)
+
+Seulement après confirmation explicite de l'utilisateur :
+1. Committer les changements Git.
+2. Passer la tâche à `[fait]` dans `ROADMAP.md` en indiquant obligatoirement :
+   - la difficulté estimée de la tâche sur 5 ;
+   - l'agent ayant terminé la tâche : `Codex` ou `Claude`.
+
+   Format attendu :
+   ```
+   - [fait] Tâche X - Difficulté 1/5 - Claude
+   ```
+3. Mettre à jour `MEMORY.md` si des décisions produit ou architecturales notables ont été prises.
 
 ---
 
@@ -18,7 +70,7 @@ Exécuter ce protocole **uniquement quand l'utilisateur demande la prochaine tâ
 
 Application mobile iOS/Android permettant de jouer à la pétanque avec des règles "fantasy" tirées aléatoirement à chaque mène. L'app compte les scores, applique automatiquement les bonus/malus/effets spéciaux, et conserve un historique de partie.
 
-**Spec principale** : `fantasy-petanque.md` — c'est la source de vérité absolue.
+**Spec principale** : `fantasy-petanque.md` — source de vérité absolue. En cas de doute, la spec prime sur tout le reste.
 
 ---
 
@@ -229,7 +281,7 @@ Si une incohérence, une ambiguïté ou un problème apparaît :
 3. Recommander une option
 4. **Poser la question** si la décision impacte le flow utilisateur ou le score
 
-Pour les détails mineurs : prendre une décision raisonnable, la documenter ici, et continuer.
+Décisions mineures : les prendre, les documenter dans `MEMORY.md` si elles peuvent influencer une session future, continuer.
 
 ---
 
@@ -275,3 +327,4 @@ npm run lint
 - Ne jamais ajouter de `any` TypeScript sans justification explicite
 - **Ne jamais committer sans avoir demandé un test manuel à l'utilisateur et reçu sa validation explicite**
 - **Ne jamais modifier `ROADMAP.md` (passer `[en cours]` → `[fait]`) sans validation manuelle confirmée, ni oublier la difficulté sur 5 et l'agent (`Codex` ou `Claude`)**
+- Ne jamais modifier `fantasy-petanque.md` (c'est la spec, pas le code)
