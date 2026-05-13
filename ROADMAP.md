@@ -19,6 +19,10 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 
 <!-- fonctionnalités importantes mais non bloquantes -->
 
+- [fait] Écran post-mène : après la fin d'une mène, afficher un écran intermédiaire qui anime l'incrément du score et résume les mini-objectifs/bonus/malus accomplis durant la mène. - Difficulté 3/5 - Claude
+- [ ] BUG — Drawer score en partie en cours : ouvrir le drawer clique accidentellement les boutons bonus/malus en-dessous (les boutons se togglent). Identifier et neutraliser les touch events pendant l'ouverture du drawer.
+- [ ] Short description absente en mène : dans l'écran de mène (PlayingView), ne pas afficher la short description de la règle — elle doit apparaître uniquement en inter-mène (inter-round) et en écran de config.
+
 - [fait] Bug AlertBox : l'AlertBox custom n'est pas utilisée lors de l'annulation d'une partie fantasy. - Difficulté 1/5 - Codex
 - [fait] Mode simple — ajustements layout : blocs en bas, historique ancré au-dessus (pousse vers le haut), skip inter-mène. (commit `142a1dc`)
 - [fait] Refonte HomeScreen selon les maquettes Figma fournies.
@@ -43,12 +47,12 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 
 <!-- améliorations, polish, nice-to-have -->
 
-- [ ] UI règles : aligner le contenu des règles en haut de l'écran plutôt qu'au milieu.
+- [fait] UI règles : aligner le contenu des règles en haut de l'écran plutôt qu'au milieu. - Difficulté 1/5 - Claude
 - [fait] UI composant Rule : ajuster le composant selon la maquette Figma mise à jour (`node-id=4-730`). - Difficulté 2/5 - Codex
-- [ ] UI Scoreboard : ajuster le composant selon la maquette Figma mise à jour avec le total sous la mène (`node-id=4-268`).
+- [fait] UI Scoreboard : ajuster le composant selon la maquette Figma mise à jour avec le total sous la mène (`node-id=4-268`). - Difficulté 1/5 - Claude
 - [fait] Cadrage UI règles spécifiques : lister les règles avec UI dédiée, associer chaque règle à sa maquette Figma, valider le découpage et identifier les conflits éventuels avec les composants partagés. - Difficulté 1/5 - Codex
 - [fait] UI spécifique règle Casino : refonte selon maquette Figma. - Difficulté 4/5 - Codex
-- [ ] UI spécifique règle Prédiction : refonte selon maquette Figma.
+- [fait] UI spécifique règle Prédiction : refonte selon maquette Figma. - Difficulté 3/5 - Claude
 - [ ] UI spécifique règle Totem d'immunité : refonte selon maquette Figma.
 - [fait] UI spécifique règles bonus/malus simples : Gauche caviar, Les extrêmes, Censure, La boule maudite, King of the Hill. Mockups disponibles dans `UI_RULES_CADRAGE.md` pour toutes les règles sauf King of the Hill. Le pattern `bonus-buttons` / `malus-buttons` est partagé : une seule implémentation couvre tous les types. Test manuel obligatoire sur TOUTES les règles concernées (l'agent listera les règles à ouvrir au moment du test). - Difficulté 3/5 - Codex
 - [ ] UI spécifique règle Sortie de porc : refonte selon maquette Figma.
@@ -57,10 +61,15 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 - [ ] UI spécifique règle Frontière : refonte selon maquette Figma.
 - [ ] UI spécifique règle L'impair contre-attaque : vérifier/refondre l'affichage d'aide au scoring automatique.
 - [fait] Score board UI : animer le changement de tous les chiffres style tableau de gare ; un chiffre qui s'incrémente part vers le haut, un chiffre qui décrémente part vers le bas, et les variations supérieures à 1 s'animent rapidement point par point. - Difficulté 2/5 - Claude
+- [ ] Animation UI — lévitation point bonus : le badge "+X" vert dans le bloc score de la mène doit avoir une animation de lévitation (flottement léger en boucle).
+- [ ] Polish UI — tailles de textes : réduire la taille du score de mène dans l'interface partie en cours ; réduire globalement les tailles de textes d'un cran.
 - [ ] Design system / bouton disabled : ajouter le token de couleur disabled et appliquer le style du bouton disabled depuis la maquette Figma `node-id=4-276`.
 - [fait] Créer un design system tokénisé et en profiter pour créer une identité visuelle à l'application. (commit `7b186e8`)
 - [ ] Typographie centralisée : créer un fichier de design system pour toutes les propriétés de chaque style de police (taille, graisse, line height, letter spacing, etc.) afin de pouvoir les ajuster en un seul endroit.
 - [ ] QA manuelle des règles une par une : vérifier pour chacune des 24 règles la description, l'interface, la logique de jeu et l'équilibrage. Créer une checklist de validation par règle.
+- [ ] Home — tagline : réduire la police de la tagline à 21 px.
+- [ ] Inter-mène UI — règle alignée en haut : dans l'écran inter-mène (affichage règle + vétos), aligner le contenu de la règle en haut de l'écran plutôt qu'en bas.
+- [ ] Config règles — padding excessif : réduire le padding autour des règles dans les écrans de config (mode CONFIG).
 - [ ] Mène classique UI : ajouter un espace de 4 px entre le score board et le bouton.
 - [ ] Mène classique UI : ajouter un masque gradient ou progressive blur en haut sous le header et dans l'historique pour un effet smooth.
 - [ ] Fin de partie UI : ajouter un masque gradient ou progressive blur en bas au-dessus du bouton et dans l'historique pour un effet smooth.
