@@ -22,7 +22,7 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 - [en cours] Refonte HomeScreen selon les maquettes Figma fournies.
 - [fait] Plein écran avec navigation OS accessible : passer l'app en mode immersif (edge-to-edge) tout en permettant aux boutons de navigation OS d'apparaître sur swipe/tap. (commit `c5c04ed`)
 - [fait] Refonte SetupScreen selon les maquettes Figma fournies (à décomposer en sous-tâches par écran lors de l'implémentation). (commit `45bc3c8`)
-- [ ] Refonte écrans de jeu selon les maquettes Figma fournies — 4 écrans : Mène classique, Mène fantasy, Inter-mène fantasy, Fin de partie.
+- [fait] Refonte écrans de jeu selon les maquettes Figma fournies — 4 écrans : Mène classique, Mène fantasy, Inter-mène fantasy, Fin de partie. (commit `08ad8bd`)
 - [ ] Affichage enrichi des textes de règles : supporter le highlight `<b>...</b>`, le style atténué `<weak>...</weak>` et les retours à la ligne `\n` dans les règles affichées.
 - [fait] Config création de partie (commits `7b186e8`, `ac355d6`) : par défaut, sélectionner la condition de fin "score 13 points" plutôt que le nombre de mènes.
 - [fait] Ajustements interaction score classique (commit `7b186e8`) : supprimer le bouton "Annuler" au profit du tap sur l'équipe adverse, afficher "Tapez pour annuler" côté adverse, garder les boutons de score carrés et stables, et positionner le "+X" en absolu pour éviter tout agrandissement.
