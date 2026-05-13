@@ -42,7 +42,16 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 
 <!-- améliorations, polish, nice-to-have -->
 
-- [ ] Refonte écrans de jeu spécifiques selon les maquettes Figma fournies (à décomposer par type de règle nécessitant un UI dédié).
+- [fait] Cadrage UI règles spécifiques : lister les règles avec UI dédiée, associer chaque règle à sa maquette Figma, valider le découpage et identifier les conflits éventuels avec les composants partagés. - Difficulté 1/5 - Codex
+- [ ] UI spécifique règle Casino : refonte selon maquette Figma.
+- [ ] UI spécifique règle Prédiction : refonte selon maquette Figma.
+- [ ] UI spécifique règle Totem d'immunité : refonte selon maquette Figma.
+- [ ] UI spécifique règles bonus/malus simples : Gauche caviar, Les extrêmes, Censure, La boule maudite, King of the Hill.
+- [ ] UI spécifique règle Sortie de porc : refonte selon maquette Figma.
+- [ ] UI spécifique règle Contrat : refonte selon maquette Figma.
+- [ ] UI spécifique règle Assurance vie : refonte selon maquette Figma.
+- [ ] UI spécifique règle Frontière : refonte selon maquette Figma.
+- [ ] UI spécifique règle L'impair contre-attaque : vérifier/refondre l'affichage d'aide au scoring automatique.
 - [ ] Score board UI : animer le changement de tous les chiffres style tableau de gare ; un chiffre qui s'incrémente part vers le haut, un chiffre qui décrémente part vers le bas, et les variations supérieures à 1 s'animent rapidement point par point.
 - [ ] Design system / bouton disabled : ajouter le token de couleur disabled et appliquer le style du bouton disabled depuis la maquette Figma `node-id=4-276`.
 - [fait] Créer un design system tokénisé et en profiter pour créer une identité visuelle à l'application. (commit `7b186e8`)
