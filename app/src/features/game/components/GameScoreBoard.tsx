@@ -1,5 +1,6 @@
 import React from 'react';
 import { Pressable, StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native';
+import AnimatedNumber from 'react-native-animated-numbers';
 import { Team } from '../../../domain/game/models';
 import { typography } from '../../../shared/constants';
 import { gameUiColors } from './gameUiTheme';
@@ -54,18 +55,28 @@ export function GameScoreBoard({
     <View style={[styles.board, showRoundBar ? (compact ? styles.compact : styles.full) : undefined, style]}>
       {(['blue', 'red'] as const).map((team) => {
         const ui = TEAM_UI[team];
+        const meneValue = roundPoints ? roundPoints[team] : scores[team];
+
         const content = (
           <View style={styles.teamColumn}>
             {showTotals && (
               <View style={[styles.total, { backgroundColor: ui.surface }]}>
-                <Text style={styles.totalText}>{scores[team]}</Text>
+                <AnimatedNumber
+                  animateToNumber={scores[team]}
+                  fontStyle={styles.totalText}
+                  animationDuration={400}
+                  containerStyle={styles.totalContainer}
+                />
               </View>
             )}
             {showRoundBar && (
               <View style={[styles.mene, { backgroundColor: ui.surface }]}>
-                <Text style={styles.meneText}>
-                  {roundPoints ? roundPoints[team] : scores[team]}
-                </Text>
+                <AnimatedNumber
+                  animateToNumber={meneValue}
+                  fontStyle={styles.meneText}
+                  animationDuration={300}
+                  containerStyle={styles.meneContainer}
+                />
               </View>
             )}
           </View>
@@ -139,6 +150,19 @@ const styles = StyleSheet.create({
     borderTopColor: gameUiColors.background,
     opacity: 0.92,
   },
+  totalContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  mene: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  meneContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   totalText: {
     color: gameUiColors.white,
     fontFamily: typography.family.bodySemibold,
@@ -147,11 +171,6 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.semibold,
     textAlign: 'center',
     letterSpacing: 0,
-  },
-  mene: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   meneText: {
     color: gameUiColors.white,
@@ -187,4 +206,3 @@ const styles = StyleSheet.create({
     letterSpacing: 0,
   },
 });
-

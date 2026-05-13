@@ -28,9 +28,9 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 - [fait] Scroll adaptatif écran de mène : quand le texte d'une règle est trop long, permettre de scroller la vue. Adapter la gesture selon l'intention : lire la règle (scroll) vs ajouter les points (interaction score).
 - [fait] Historique de mène classique : conserver l'empilement avec la dernière mène en bas et, lors de l'ajout d'une mène, garder la nouvelle mène visible en masquant d'abord les anciennes mènes en haut.
 - [fait] Flow règles à interface spécifique : pour les règles nécessitant un choix avant la mène, afficher ce choix dans un écran séparé entre l'inter-mène et la mène (exemple : choix du côté pour la règle Frontière).
-- [en cours] Review technique de milieu de projet : auditer l'ensemble de la codebase pour repérer la dette technique, les incohérences d'architecture, les risques de tests manquants et les refactors prioritaires avant d'accumuler davantage.
+- [fait] Review technique de milieu de projet : auditer l'ensemble de la codebase pour repérer la dette technique, les incohérences d'architecture, les risques de tests manquants et les refactors prioritaires avant d'accumuler davantage. (commit `58e903d`)
 - [fait] Header commun des écrans de jeu : factoriser la top bar et le bouton retour dans un composant partagé utilisant l'icône Phosphor, aligné avec les pages setup.
-- [ ] AlertBox custom : remplacer les alertes système par des alertes custom alignées avec la maquette Figma à fournir.
+- [fait] AlertBox custom : remplacer les alertes système par des alertes custom alignées avec la maquette Figma à fournir. - Difficulté 2/5 - Claude
 - [fait] Config création de partie (commits `7b186e8`, `ac355d6`) : par défaut, sélectionner la condition de fin "score 13 points" plutôt que le nombre de mènes.
 - [fait] Ajustements interaction score classique (commit `7b186e8`) : supprimer le bouton "Annuler" au profit du tap sur l'équipe adverse, afficher "Tapez pour annuler" côté adverse, garder les boutons de score carrés et stables, et positionner le "+X" en absolu pour éviter tout agrandissement.
 - [fait] Refonte UI GameScreen (commit `5e83607`) : (1) supprimer les labels "Partie en cours" et "Mène X" ; (2) centrer et mettre en avant le nom + description de la règle ; (3) boutons véto positionnés tout en haut de l'écran (collés) ; (4) bouton "Terminer la mène" ancré en bas de l'écran.
@@ -42,6 +42,8 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 
 <!-- améliorations, polish, nice-to-have -->
 
+- [en cours] UI composant Rule : ajuster le composant selon la maquette Figma mise à jour (`node-id=4-730`).
+- [ ] UI Scoreboard : ajuster le composant selon la maquette Figma mise à jour avec le total sous la mène (`node-id=4-268`).
 - [fait] Cadrage UI règles spécifiques : lister les règles avec UI dédiée, associer chaque règle à sa maquette Figma, valider le découpage et identifier les conflits éventuels avec les composants partagés. - Difficulté 1/5 - Codex
 - [ ] UI spécifique règle Casino : refonte selon maquette Figma.
 - [ ] UI spécifique règle Prédiction : refonte selon maquette Figma.
@@ -52,7 +54,7 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 - [ ] UI spécifique règle Assurance vie : refonte selon maquette Figma.
 - [ ] UI spécifique règle Frontière : refonte selon maquette Figma.
 - [ ] UI spécifique règle L'impair contre-attaque : vérifier/refondre l'affichage d'aide au scoring automatique.
-- [ ] Score board UI : animer le changement de tous les chiffres style tableau de gare ; un chiffre qui s'incrémente part vers le haut, un chiffre qui décrémente part vers le bas, et les variations supérieures à 1 s'animent rapidement point par point.
+- [fait] Score board UI : animer le changement de tous les chiffres style tableau de gare ; un chiffre qui s'incrémente part vers le haut, un chiffre qui décrémente part vers le bas, et les variations supérieures à 1 s'animent rapidement point par point. - Difficulté 2/5 - Claude
 - [ ] Design system / bouton disabled : ajouter le token de couleur disabled et appliquer le style du bouton disabled depuis la maquette Figma `node-id=4-276`.
 - [fait] Créer un design system tokénisé et en profiter pour créer une identité visuelle à l'application. (commit `7b186e8`)
 - [ ] Typographie centralisée : créer un fichier de design system pour toutes les propriétés de chaque style de police (taille, graisse, line height, letter spacing, etc.) afin de pouvoir les ajuster en un seul endroit.
