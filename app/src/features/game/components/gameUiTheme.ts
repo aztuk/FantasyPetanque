@@ -3,6 +3,7 @@ export const gameUiColors = {
   divider: '#3B382E',
   muted: '#949084',
   primary: '#E7C241',
+  secondary: '#41E79A',
   white: '#ECEBE8',
   green: '#41E79A',
   blueSurface: '#395ADC',
@@ -11,4 +12,3 @@ export const gameUiColors = {
   redText: '#E86868',
   darkOverlay: 'rgba(0,0,0,0.2)',
 } as const;
-

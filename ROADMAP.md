@@ -23,7 +23,7 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 - [fait] Plein écran avec navigation OS accessible : passer l'app en mode immersif (edge-to-edge) tout en permettant aux boutons de navigation OS d'apparaître sur swipe/tap. (commit `c5c04ed`)
 - [fait] Refonte SetupScreen selon les maquettes Figma fournies (à décomposer en sous-tâches par écran lors de l'implémentation). (commit `45bc3c8`)
 - [fait] Refonte écrans de jeu selon les maquettes Figma fournies — 4 écrans : Mène classique, Mène fantasy, Inter-mène fantasy, Fin de partie. (commit `08ad8bd`)
-- [en cours] Affichage enrichi des textes de règles : supporter le highlight `<b>...</b>`, le style atténué `<weak>...</weak>` et les retours à la ligne `\n` dans les règles affichées.
+- [fait] Affichage enrichi des textes de règles : supporter le highlight `<b>...</b>` en couleur secondaire et les retours à la ligne `\n` dans les règles affichées.
 - [ ] Historique de mène classique : conserver l'empilement avec la dernière mène en bas et, lors de l'ajout d'une mène, garder la nouvelle mène visible en masquant d'abord les anciennes mènes en haut.
 - [ ] Header commun des écrans de jeu : factoriser la top bar et le bouton retour dans un composant partagé utilisant l'icône Phosphor, aligné avec les pages setup.
 - [ ] Cadrage animations/transitions Game : demander où les transitions doivent avoir lieu, évaluer si une librairie est nécessaire, puis créer une tâche par transition avec un brief précis validé par l'utilisateur.

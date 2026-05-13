@@ -10,29 +10,80 @@ interface Props {
   style?: StyleProp<ViewStyle>;
 }
 
-function splitDescription(description: string) {
-  const trimmed = description.trim();
-  const firstEnd = trimmed.indexOf('.');
-  if (firstEnd === -1 || firstEnd === trimmed.length - 1) {
-    return { main: trimmed, weak: null };
+export interface RuleDescriptionSegment {
+  text: string;
+  bold: boolean;
+}
+
+const RULE_TEXT_TAG_PATTERN = /<\/?b>/g;
+
+export function parseRuleDescription(description: string): RuleDescriptionSegment[] {
+  const source = description.trim().replace(/\\n/g, '\n');
+  let boldDepth = 0;
+  const segments: RuleDescriptionSegment[] = [];
+  let cursor = 0;
+
+  const pushSegment = (text: string) => {
+    if (!text) return;
+
+    const segment = {
+      text,
+      bold: boldDepth > 0,
+    };
+    const previous = segments[segments.length - 1];
+
+    if (previous && previous.bold === segment.bold) {
+      previous.text += segment.text;
+      return;
+    }
+
+    segments.push(segment);
+  };
+
+  for (const match of source.matchAll(RULE_TEXT_TAG_PATTERN)) {
+    const matchIndex = match.index ?? cursor;
+
+    pushSegment(source.slice(cursor, matchIndex));
+
+    switch (match[0]) {
+      case '<b>':
+        boldDepth += 1;
+        break;
+      case '</b>':
+        boldDepth = Math.max(0, boldDepth - 1);
+        break;
+      default:
+        break;
+    }
+
+    cursor = matchIndex + match[0].length;
   }
 
-  return {
-    main: trimmed.slice(0, firstEnd + 1).trim(),
-    weak: trimmed.slice(firstEnd + 1).trim(),
-  };
+  pushSegment(source.slice(cursor));
+
+  return segments;
 }
 
 export function RuleDisplay({ rule, immuneTeam = null, style }: Props) {
-  const { main, weak } = splitDescription(rule.description);
+  const segments = parseRuleDescription(rule.description);
 
   return (
     <View style={[styles.wrapper, style]}>
       <Text style={styles.title}>{rule.name}</Text>
-      <Text style={styles.description}>{main}</Text>
-      {weak && <Text style={styles.weak}>{weak}</Text>}
+      <Text style={styles.description}>
+        {segments.map((segment, index) => (
+          <Text
+            key={`${segment.text}-${index}`}
+            style={[
+              segment.bold && styles.highlightText,
+            ]}
+          >
+            {segment.text}
+          </Text>
+        ))}
+      </Text>
       {immuneTeam && (
-        <Text style={styles.weak}>
+        <Text style={styles.immunity}>
           {TEAM_LABELS[immuneTeam]} est immunisé contre cette règle.
         </Text>
       )}
@@ -68,7 +119,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     letterSpacing: 0,
   },
-  weak: {
+  highlightText: {
+    color: gameUiColors.secondary,
+    fontFamily: typography.family.bodySemibold,
+    fontWeight: typography.weight.bold,
+  },
+  immunity: {
     width: '100%',
     color: gameUiColors.muted,
     fontFamily: typography.family.body,
@@ -80,4 +136,3 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
 });
-
