@@ -1,6 +1,7 @@
 import { useGameStore } from '../features/game/state/gameStore';
 import { ALL_RULES } from '../data/rules/rules';
 import { createRound } from '../domain/game/engine';
+import { buildSteps } from '../features/game/screens/GameScreen/PostRoundView';
 
 // Reset store before each test
 beforeEach(() => {
@@ -408,5 +409,93 @@ describe('Game over', () => {
     useGameStore.getState().addNormalPoint('blue');
     useGameStore.getState().finishRound();
     expect(useGameStore.getState().isGameOver).toBe(true);
+  });
+});
+
+describe('finishRound - bonus/malus storage', () => {
+  it('stores negative (malus) values in round.bonuses', () => {
+    const censureRule = ALL_RULES.find((r) => r.id === 'censure')!;
+    const round = createRound(1, censureRule);
+    useGameStore.setState({
+      mode: 'fantasy',
+      currentRound: { ...round, censureMalus: { blue: 2, red: 0 } },
+      scores: { blue: 5, red: 3 },
+      phase: 'playing',
+    });
+    useGameStore.getState().finishRound();
+    const finished = useGameStore.getState().rounds[0];
+    const malusEntry = finished.bonuses.find((b) => b.value < 0);
+    expect(malusEntry).toBeDefined();
+    expect(malusEntry?.team).toBe('blue');
+    expect(malusEntry?.value).toBe(-2);
+  });
+
+  it('stores positive bonus values in round.bonuses', () => {
+    const gaucheRule = ALL_RULES.find((r) => r.id === 'gauche-caviar')!;
+    const round = createRound(1, gaucheRule);
+    useGameStore.setState({
+      mode: 'fantasy',
+      currentRound: { ...round, gaucheBonus: { blue: true, red: false }, normalPoints: { blue: 2, red: 0 } },
+      scores: { blue: 3, red: 3 },
+      phase: 'playing',
+    });
+    useGameStore.getState().finishRound();
+    const finished = useGameStore.getState().rounds[0];
+    const bonusEntry = finished.bonuses.find((b) => b.value > 0 && b.team === 'blue');
+    expect(bonusEntry).toBeDefined();
+    expect(bonusEntry?.value).toBe(1);
+  });
+});
+
+describe('buildSteps (PostRoundView)', () => {
+  const scoreBefore = { blue: 3, red: 5 };
+
+  it('builds a normal-points step for the scoring team', () => {
+    const steps = buildSteps({ blue: 2, red: 0 }, [], null, undefined, scoreBefore);
+    expect(steps).toHaveLength(1);
+    expect(steps[0].blueDelta).toBe(2);
+    expect(steps[0].redDelta).toBe(0);
+    expect(steps[0].blueAfter).toBe(5);
+    expect(steps[0].redAfter).toBe(5);
+  });
+
+  it('builds steps for bonus and malus entries', () => {
+    const bonuses = [
+      { team: 'blue' as const, value: 1, reason: 'Tir réussi' },
+      { team: 'red' as const, value: -1, reason: 'A parlé 1 fois' },
+    ];
+    const steps = buildSteps({ blue: 0, red: 0 }, bonuses, null, undefined, scoreBefore);
+    expect(steps).toHaveLength(2);
+    expect(steps[0].blueDelta).toBe(1);
+    expect(steps[0].blueAfter).toBe(4);
+    expect(steps[1].redDelta).toBe(-1);
+    expect(steps[1].redAfter).toBe(4);
+  });
+
+  it('returns no steps when no scoring and no bonuses', () => {
+    const steps = buildSteps({ blue: 0, red: 0 }, [], null, undefined, scoreBefore);
+    expect(steps).toHaveLength(0);
+  });
+
+  it('clamps score to 0 on malus', () => {
+    const bonuses = [{ team: 'red' as const, value: -10, reason: 'Grosse pénalité' }];
+    const steps = buildSteps({ blue: 0, red: 0 }, bonuses, null, undefined, scoreBefore);
+    expect(steps[0].redAfter).toBe(0);
+  });
+
+  it('handles impairResult odd case', () => {
+    const impairResult = { winner: 'blue' as const, points: 3, isOdd: true };
+    const steps = buildSteps({ blue: 0, red: 0 }, [], impairResult, 'impair-contre-attaque', scoreBefore);
+    expect(steps).toHaveLength(1);
+    expect(steps[0].blueDelta).toBe(3);
+    expect(steps[0].blueAfter).toBe(6);
+  });
+
+  it('handles impairResult even case (loser gets 1)', () => {
+    const impairResult = { winner: 'blue' as const, points: 0, isOdd: false };
+    const steps = buildSteps({ blue: 0, red: 0 }, [], impairResult, 'impair-contre-attaque', scoreBefore);
+    expect(steps).toHaveLength(1);
+    expect(steps[0].redDelta).toBe(1);
+    expect(steps[0].redAfter).toBe(6);
   });
 });

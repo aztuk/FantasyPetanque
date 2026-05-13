@@ -34,11 +34,9 @@ export function PlayingView() {
     mode,
     scores,
     currentRound,
-    debugMode,
     addNormalPoint,
     undoNormalPoint,
     finishRound,
-    startNewRound,
     resetGame,
     setCasinoWinner,
   } = useGameStore();
@@ -105,15 +103,8 @@ export function PlayingView() {
 
   const handleFinishRound = () => {
     finishRound();
-    const nextState = useGameStore.getState();
-    if (!nextState.isGameOver) {
-      if (debugMode) {
-        startNewRound();
-        navigation.replace('DebugRuleSelect');
-      } else {
-        startNewRound();
-      }
-    }
+    // GameScreen will route to PostRoundView (phase 'round-summary')
+    // PostRoundView.handleNext calls startNewRound() and navigates to DebugRuleSelect if needed
   };
 
   return (

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useGameStore } from '../../state/gameStore';
 import { GameOverView } from './GameOverView';
-import { RoundSummaryView } from './RoundSummaryView';
+import { PostRoundView } from './PostRoundView';
 import { SimpleModeView } from './SimpleModeView';
 import { PreMeneView } from './PreMeneView';
 import { RuleSetupView } from './RuleSetupView';
@@ -13,7 +13,7 @@ export function GameScreen() {
   if (isGameOver) return <GameOverView />;
 
   if (!currentRound && phase === 'round-summary' && mode === 'fantasy') {
-    return <RoundSummaryView />;
+    return <PostRoundView />;
   }
 
   if (!currentRound) return null;

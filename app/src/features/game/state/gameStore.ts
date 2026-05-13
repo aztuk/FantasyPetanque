@@ -255,7 +255,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const bonusMalusList = buildBonusMalusFromRound(round);
     const finishedRound: RoundState = {
       ...round,
-      bonuses: bonusMalusList.filter((b) => b.value > 0),
+      bonuses: bonusMalusList,
       scoreAfter: newScores,
     };
 
