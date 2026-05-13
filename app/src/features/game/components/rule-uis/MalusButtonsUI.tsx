@@ -1,49 +1,78 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { Team } from '../../../../domain/game/models';
+import { GameTeamActionRow } from '../GameTeamActionRow';
 import { useGameStore } from '../../state/gameStore';
-import { TeamButton } from '../../../../shared/components/TeamButton';
-import { Section, Props, styles, TEAM_COLORS } from './shared';
+import { Props } from './shared';
+
+function makeCensureLabel(count: number, max: number): string {
+  if (count >= max) return 'Mais chut!';
+  return `Mot prononcé: ${count}`;
+}
+
+function makeBouleMauditeLabel(hit: boolean): string {
+  return hit ? 'Fallait mieux viser' : 'Boule touchée';
+}
 
 export function MalusButtonsUI({ round }: Props) {
   const { addCensureMalus, removeCensureMalus, setBouleMauditeHit } = useGameStore();
   const ruleId = round.rule!.id;
 
   if (ruleId === 'censure') {
+    const max = round.rule!.maxMalusPerTeam ?? 3;
+    const labels: Record<Team, string> = {
+      blue: makeCensureLabel(round.censureMalus.blue, max),
+      red: makeCensureLabel(round.censureMalus.red, max),
+    };
+    const activeTeams = {
+      blue: round.censureMalus.blue >= max,
+      red: round.censureMalus.red >= max,
+    };
+
+    const handlePress = (team: Team) => {
+      if (round.censureMalus[team] >= max) {
+        removeCensureMalus(team);
+        return;
+      }
+
+      addCensureMalus(team);
+    };
+
+    const handleLongPress = (team: Team) => {
+      if (round.censureMalus[team] > 0) removeCensureMalus(team);
+    };
+
     return (
-      <Section title="Malus">
-        {(['blue', 'red'] as const).map((team) => {
-          const count = round.censureMalus[team];
-          const max = round.rule!.maxMalusPerTeam ?? 3;
-          return (
-            <View key={team} style={styles.teamRow}>
-              <TeamButton team={team} label="A parlé -1" onPress={() => addCensureMalus(team)} disabled={count >= max} />
-              <TouchableOpacity style={[styles.undoBtn, count === 0 && styles.disabledEl]} onPress={() => removeCensureMalus(team)} disabled={count === 0}>
-                <Text style={styles.undoText}>Annuler</Text>
-              </TouchableOpacity>
-              {count > 0 && <Text style={[styles.countBadge, { color: TEAM_COLORS[team] }]}>{-count}</Text>}
-            </View>
-          );
-        })}
-      </Section>
+      <GameTeamActionRow
+        label={labels}
+        activeTeams={activeTeams}
+        onTeamPress={handlePress}
+        onTeamLongPress={handleLongPress}
+        testIDPrefix="censure-malus"
+      />
     );
   }
 
   if (ruleId === 'boule-maudite') {
+    const labels: Record<Team, string> = {
+      blue: makeBouleMauditeLabel(round.boucleMauditeHit.blue),
+      red: makeBouleMauditeLabel(round.boucleMauditeHit.red),
+    };
+    const activeTeams = {
+      blue: round.boucleMauditeHit.blue,
+      red: round.boucleMauditeHit.red,
+    };
+
+    const handlePress = (team: Team) => {
+      setBouleMauditeHit(team, !round.boucleMauditeHit[team]);
+    };
+
     return (
-      <Section title="Malus">
-        {(['blue', 'red'] as const).map((team) => {
-          const hit = round.boucleMauditeHit[team];
-          return (
-            <View key={team} style={styles.teamRow}>
-              <TeamButton team={team} label="A touché la boule -1" onPress={() => setBouleMauditeHit(team, true)} disabled={hit} />
-              <TouchableOpacity style={[styles.undoBtn, !hit && styles.disabledEl]} onPress={() => setBouleMauditeHit(team, false)} disabled={!hit}>
-                <Text style={styles.undoText}>Annuler</Text>
-              </TouchableOpacity>
-              {hit && <Text style={[styles.countBadge, { color: TEAM_COLORS[team] }]}>-1</Text>}
-            </View>
-          );
-        })}
-      </Section>
+      <GameTeamActionRow
+        label={labels}
+        activeTeams={activeTeams}
+        onTeamPress={handlePress}
+        testIDPrefix="boule-maudite-malus"
+      />
     );
   }
 

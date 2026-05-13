@@ -8,6 +8,7 @@ import { gameUiColors } from './gameUiTheme';
 interface Props {
   scores: Record<Team, number>;
   roundPoints?: Record<Team, number>;
+  modifierPoints?: Partial<Record<Team, number>>;
   roundNumber?: number;
   badgeLabel?: string;
   badgeTeam?: Team | null;
@@ -40,6 +41,7 @@ function formatBadge(roundNumber?: number, badgeLabel?: string) {
 export function GameScoreBoard({
   scores,
   roundPoints,
+  modifierPoints,
   roundNumber,
   badgeLabel,
   badgeTeam = null,
@@ -56,6 +58,7 @@ export function GameScoreBoard({
       {(['blue', 'red'] as const).map((team) => {
         const ui = TEAM_UI[team];
         const meneValue = roundPoints ? roundPoints[team] : scores[team];
+        const modifierValue = modifierPoints?.[team] ?? 0;
 
         const content = (
           <View style={styles.teamColumn}>
@@ -67,6 +70,17 @@ export function GameScoreBoard({
                   animationDuration={300}
                   containerStyle={styles.meneContainer}
                 />
+                {modifierValue !== 0 && (
+                  <Text
+                    style={[
+                      styles.modifierText,
+                      team === 'blue' ? styles.modifierBlue : styles.modifierRed,
+                    ]}
+                    testID={`score-modifier-${team}`}
+                  >
+                    {modifierValue > 0 ? `+${modifierValue}` : String(modifierValue)}
+                  </Text>
+                )}
               </View>
             )}
             {showTotals && (
@@ -158,6 +172,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
   },
   meneContainer: {
     justifyContent: 'center',
@@ -180,6 +195,24 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.semibold,
     textAlign: 'center',
     letterSpacing: 0,
+  },
+  modifierText: {
+    position: 'absolute',
+    top: '50%',
+    marginTop: -24,
+    color: gameUiColors.secondary,
+    fontFamily: typography.family.bodySemibold,
+    fontSize: 32,
+    lineHeight: 54,
+    fontWeight: typography.weight.semibold,
+    textAlign: 'center',
+    letterSpacing: 0,
+  },
+  modifierBlue: {
+    left: 36,
+  },
+  modifierRed: {
+    right: 36,
   },
   badge: {
     position: 'absolute',

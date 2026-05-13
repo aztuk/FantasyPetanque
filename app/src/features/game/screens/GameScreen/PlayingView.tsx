@@ -14,6 +14,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../../../app/navigation/types';
 import { shouldSkipNormalScore } from '../../../../domain/game/engine';
 import { Team } from '../../../../domain/game/models';
+import { buildBonusMalusFromRound } from '../../../../domain/game/scoring';
 import { CancelGameSheet } from '../../../../shared/components/CancelGameSheet';
 import { GameActionButton } from '../../components/GameActionButton';
 import { GameScoreBoard } from '../../components/GameScoreBoard';
@@ -78,9 +79,19 @@ export function PlayingView() {
   const round = currentRound!;
   const bluePoints = round.normalPoints.blue;
   const redPoints = round.normalPoints.red;
+  const modifierPoints = buildBonusMalusFromRound(round).reduce(
+    (acc, item) => {
+      acc[item.team] += item.value;
+      return acc;
+    },
+    { blue: 0, red: 0 } as Record<Team, number>,
+  );
   const scoringTeam: Team | null = bluePoints > 0 ? 'blue' : redPoints > 0 ? 'red' : null;
   const skipNormal = shouldSkipNormalScore(round);
   const isCasino = round.rule?.id === 'casino';
+  const renderRuleUIInDrawer =
+    round.rule?.uiType === 'bonus-buttons' ||
+    round.rule?.uiType === 'malus-buttons';
   const canFinishRound = isCasino ? round.casinoWinner !== null : skipNormal || scoringTeam !== null;
 
   const handleTeamPress = (team: Team) => {
@@ -126,7 +137,7 @@ export function PlayingView() {
             {round.rule && (
               <RuleDisplay rule={round.rule} immuneTeam={round.totemImmuneTeam} />
             )}
-            <RuleUI round={round} />
+            {!renderRuleUIInDrawer && <RuleUI round={round} />}
           </ScrollView>
         </View>
 
@@ -150,9 +161,12 @@ export function PlayingView() {
               testIDPrefix="casino-winner"
             />
           )}
+          {renderRuleUIInDrawer && <RuleUI round={round} />}
+          {(isCasino || renderRuleUIInDrawer) && <View style={gameScreenStyles.actionScoreGap} />}
           <GameScoreBoard
             scores={scores}
             roundPoints={!isCasino && drawerExpanded ? { blue: bluePoints, red: redPoints } : undefined}
+            modifierPoints={!isCasino && drawerExpanded ? modifierPoints : undefined}
             roundNumber={round.number}
             showRoundBar={!isCasino}
             onTeamPress={drawerExpanded && !skipNormal ? handleTeamPress : undefined}

@@ -1,44 +1,70 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { Team } from '../../../../domain/game/models';
+import { GameTeamActionRow } from '../GameTeamActionRow';
 import { useGameStore } from '../../state/gameStore';
-import { TeamButton } from '../../../../shared/components/TeamButton';
-import { Section, Props, styles, TEAM_COLORS } from './shared';
+import { Props } from './shared';
+
+type BonusRuleId = 'gauche-caviar' | 'les-extremes' | 'king-of-the-hill';
+
+const ACTION_LABELS: Record<BonusRuleId, string> = {
+  'gauche-caviar': 'Tir réussi',
+  'les-extremes': 'Placement réussi',
+  'king-of-the-hill': 'Boule gagnante',
+};
+
+const MAXED_LABELS: Record<BonusRuleId, string> = {
+  'gauche-caviar': 'Bravo!',
+  'les-extremes': 'Bravo!',
+  'king-of-the-hill': 'Au sommet!',
+};
 
 export function BonusButtonsUI({ round }: Props) {
   const { addBonus, removeBonus } = useGameStore();
-  const ruleId = round.rule!.id as 'gauche-caviar' | 'les-extremes' | 'king-of-the-hill';
+  const ruleId = round.rule!.id as BonusRuleId;
+  const max = round.rule!.maxBonusPerTeam ?? 1;
 
-  const getBonusState = (team: 'blue' | 'red'): boolean | number => {
+  const getBonusState = (team: Team): boolean | number => {
     if (ruleId === 'king-of-the-hill') return round.kingBonus[team];
     if (ruleId === 'gauche-caviar') return round.gaucheBonus[team];
     if (ruleId === 'les-extremes') return round.extremesBonus[team];
     return false;
   };
 
-  const getBonusLabel = (): string => {
-    if (ruleId === 'king-of-the-hill') return 'Boule gagnante dans zone +1';
-    if (ruleId === 'gauche-caviar') return 'Tir réussi +1';
-    if (ruleId === 'les-extremes') return 'Boule dans zone +1';
-    return '+1';
+  const getCount = (team: Team): number => {
+    const bonusState = getBonusState(team);
+    return typeof bonusState === 'number' ? bonusState : (bonusState ? 1 : 0);
+  };
+
+  const labels = (['blue', 'red'] as const).reduce((acc, team) => {
+    const count = getCount(team);
+    acc[team] = count >= max ? MAXED_LABELS[ruleId] : ACTION_LABELS[ruleId];
+    return acc;
+  }, {} as Record<Team, string>);
+  const activeTeams = {
+    blue: getCount('blue') >= max,
+    red: getCount('red') >= max,
+  };
+
+  const handlePress = (team: Team) => {
+    if (getCount(team) >= max) {
+      removeBonus(team, ruleId);
+      return;
+    }
+
+    addBonus(team, ruleId);
+  };
+
+  const handleLongPress = (team: Team) => {
+    if (getCount(team) > 0) removeBonus(team, ruleId);
   };
 
   return (
-    <Section title="Bonus">
-      {(['blue', 'red'] as const).map((team) => {
-        const bonusState = getBonusState(team);
-        const count = typeof bonusState === 'number' ? bonusState : (bonusState ? 1 : 0);
-        const max = round.rule!.maxBonusPerTeam ?? 1;
-
-        return (
-          <View key={team} style={styles.teamRow}>
-            <TeamButton team={team} label={getBonusLabel()} onPress={() => addBonus(team, ruleId)} disabled={count >= max} />
-            <TouchableOpacity style={[styles.undoBtn, count === 0 && styles.disabledEl]} onPress={() => removeBonus(team, ruleId)} disabled={count === 0}>
-              <Text style={styles.undoText}>Annuler</Text>
-            </TouchableOpacity>
-            {count > 0 && <Text style={[styles.countBadge, { color: TEAM_COLORS[team] }]}>+{count}</Text>}
-          </View>
-        );
-      })}
-    </Section>
+    <GameTeamActionRow
+      label={labels}
+      activeTeams={activeTeams}
+      onTeamPress={handlePress}
+      onTeamLongPress={handleLongPress}
+      testIDPrefix={`${ruleId}-bonus`}
+    />
   );
 }

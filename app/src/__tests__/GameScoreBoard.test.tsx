@@ -33,6 +33,19 @@ describe('GameScoreBoard', () => {
     expect(onPress).toHaveBeenCalledWith('red');
   });
 
+  it('renders bonus and malus modifiers inside round score blocks', () => {
+    render(
+      <GameScoreBoard
+        scores={{ blue: 5, red: 3 }}
+        roundPoints={{ blue: 2, red: 0 }}
+        modifierPoints={{ blue: 1, red: -2 }}
+      />,
+    );
+
+    expect(screen.getByTestId('score-modifier-blue').props.children).toBe('+1');
+    expect(screen.getByTestId('score-modifier-red').props.children).toBe('-2');
+  });
+
   it('re-renders without crashing when score changes', () => {
     const { rerender } = render(<GameScoreBoard scores={{ blue: 5, red: 3 }} />);
     act(() => { rerender(<GameScoreBoard scores={{ blue: 8, red: 3 }} />); });

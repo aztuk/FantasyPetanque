@@ -63,6 +63,11 @@ export const gameScreenStyles = StyleSheet.create({
     left: 0,
     right: 0,
   },
+  actionScoreGap: {
+    height: 2,
+    width: '100%',
+    backgroundColor: gameUiColors.background,
+  },
   drawerGradient: {
     position: 'absolute',
     bottom: COMPACT_SCORE_HEIGHT,

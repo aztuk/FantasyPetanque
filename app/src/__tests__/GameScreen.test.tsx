@@ -184,6 +184,73 @@ describe('GameScreen fantasy inter-mene', () => {
   });
 });
 
+describe('GameScreen simple bonus and malus rule controls', () => {
+  function startFantasyRule(ruleId: string) {
+    useGameStore.getState().startGame({ mode: 'fantasy', vetosEnabled: true });
+    useGameStore.getState().forceRule(ALL_RULES.find((rule) => rule.id === ruleId)!);
+    render(<GameScreen />);
+    fireEvent.press(screen.getByTestId('begin-round-button'));
+  }
+
+  it('toggles a max-one bonus from the team action row and shows its score modifier', () => {
+    startFantasyRule('gauche-caviar');
+
+    fireEvent.press(screen.getByTestId('gauche-caviar-bonus-blue-button'));
+
+    expect(useGameStore.getState().currentRound?.gaucheBonus.blue).toBe(true);
+    expect(screen.getByText('Bravo!')).toBeTruthy();
+    expect(screen.getByTestId('score-modifier-blue').props.children).toBe('+1');
+
+    fireEvent.press(screen.getByTestId('gauche-caviar-bonus-blue-button'));
+
+    expect(useGameStore.getState().currentRound?.gaucheBonus.blue).toBe(false);
+    expect(screen.queryByTestId('score-modifier-blue')).toBeNull();
+  });
+
+  it('increments and long-press decrements censure malus while showing the live modifier', () => {
+    startFantasyRule('censure');
+
+    fireEvent.press(screen.getByTestId('censure-malus-red-button'));
+    fireEvent.press(screen.getByTestId('censure-malus-red-button'));
+
+    expect(useGameStore.getState().currentRound?.censureMalus.red).toBe(2);
+    expect(screen.getByText('Mot prononcé: 2')).toBeTruthy();
+    expect(screen.getByTestId('score-modifier-red').props.children).toBe('-2');
+
+    fireEvent(screen.getByTestId('censure-malus-red-button'), 'longPress');
+
+    expect(useGameStore.getState().currentRound?.censureMalus.red).toBe(1);
+    expect(screen.getByText('Mot prononcé: 1')).toBeTruthy();
+    expect(screen.getByTestId('score-modifier-red').props.children).toBe('-1');
+  });
+
+  it('toggles Boule maudite malus from the shared action row', () => {
+    startFantasyRule('boule-maudite');
+
+    fireEvent.press(screen.getByTestId('boule-maudite-malus-blue-button'));
+
+    expect(useGameStore.getState().currentRound?.boucleMauditeHit.blue).toBe(true);
+    expect(screen.getByText('Fallait mieux viser')).toBeTruthy();
+    expect(screen.getByTestId('score-modifier-blue').props.children).toBe('-1');
+
+    fireEvent.press(screen.getByTestId('boule-maudite-malus-blue-button'));
+
+    expect(useGameStore.getState().currentRound?.boucleMauditeHit.blue).toBe(false);
+    expect(screen.queryByTestId('score-modifier-blue')).toBeNull();
+  });
+
+  it('keeps King of the Hill on the same shared bonus pattern', () => {
+    startFantasyRule('king-of-the-hill');
+
+    fireEvent.press(screen.getByTestId('king-of-the-hill-bonus-red-button'));
+    fireEvent.press(screen.getByTestId('king-of-the-hill-bonus-red-button'));
+
+    expect(useGameStore.getState().currentRound?.kingBonus.red).toBe(2);
+    expect(screen.getAllByText('Boule gagnante').length).toBeGreaterThan(0);
+    expect(screen.getByTestId('score-modifier-red').props.children).toBe('+2');
+  });
+});
+
 describe('GameScreen simple mode - skip inter-mene', () => {
   it('starts new round immediately after finishing a round without round-summary', () => {
     useGameStore.getState().startGame({ mode: 'simple' });
