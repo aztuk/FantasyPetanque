@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { getCasinoMaxBet, CASINO_MIN_BET } from '../../../../domain/game/scoring';
 import { Team } from '../../../../domain/game/models';
-import { typography } from '../../../../shared/constants';
+import { textStyles } from '../../../../shared/constants';
 import { useGameStore } from '../../state/gameStore';
 import { gameUiColors } from '../gameUiTheme';
 import { Props } from './shared';
@@ -101,27 +101,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   betLabel: {
+    ...textStyles.actionLabel,
     width: '100%',
-    fontFamily: typography.family.bodySemibold,
-    fontSize: 21,
-    lineHeight: 32,
-    fontWeight: typography.weight.semibold,
     textAlign: 'center',
-    letterSpacing: 0,
   },
   resolution: {
     width: '100%',
-    flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     marginTop: 28,
   },
   readonlyValue: {
+    ...textStyles.uiValueLg,
     color: gameUiColors.white,
-    fontFamily: typography.family.bodySemibold,
-    fontSize: 40,
-    lineHeight: 68,
-    fontWeight: typography.weight.bold,
+    fontWeight: '700',
     textAlign: 'center',
-    letterSpacing: 0,
   },
 });

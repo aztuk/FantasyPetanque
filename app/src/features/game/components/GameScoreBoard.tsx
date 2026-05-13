@@ -2,7 +2,7 @@ import React from 'react';
 import { Pressable, StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import AnimatedNumber from 'react-native-animated-numbers';
 import { Team } from '../../../domain/game/models';
-import { typography } from '../../../shared/constants';
+import { textStyles, typography } from '../../../shared/constants';
 import { gameUiColors } from './gameUiTheme';
 
 interface Props {
@@ -179,13 +179,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   totalText: {
+    ...textStyles.labelMd,
     color: gameUiColors.white,
-    fontFamily: typography.family.bodySemibold,
-    fontSize: 25,
-    lineHeight: 43,
-    fontWeight: typography.weight.semibold,
     textAlign: 'center',
-    letterSpacing: 0,
   },
   meneText: {
     color: gameUiColors.white,
@@ -197,16 +193,12 @@ const styles = StyleSheet.create({
     letterSpacing: 0,
   },
   modifierText: {
+    ...textStyles.titleLg,
     position: 'absolute',
     top: '50%',
     marginTop: -24,
     color: gameUiColors.secondary,
-    fontFamily: typography.family.bodySemibold,
-    fontSize: 32,
-    lineHeight: 54,
-    fontWeight: typography.weight.semibold,
     textAlign: 'center',
-    letterSpacing: 0,
   },
   modifierBlue: {
     left: 36,

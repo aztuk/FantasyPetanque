@@ -9,7 +9,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import { ArrowLeftIcon } from 'phosphor-react-native';
-import { colors, typography } from '../constants';
+import { colors, textStyles } from '../constants';
 
 interface AppHeaderProps {
   onBack: () => void;
@@ -73,12 +73,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
+    ...textStyles.titleLg,
     flex: 1,
-    fontFamily: typography.family.bodySemibold,
-    fontSize: 32,
-    lineHeight: 54,
-    fontWeight: typography.weight.bold,
-    letterSpacing: 0,
+    fontWeight: '700',
     includeFontPadding: false,
   },
   actions: {

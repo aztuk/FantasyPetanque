@@ -2,7 +2,7 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Minus, Plus } from 'phosphor-react-native';
 import { Team } from '../../../../domain/game/models';
-import { typography } from '../../../../shared/constants';
+import { textStyles } from '../../../../shared/constants';
 import { gameUiColors } from '../gameUiTheme';
 
 interface TeamStepperProps {
@@ -104,21 +104,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   valueText: {
+    ...textStyles.uiValueLg,
     color: gameUiColors.white,
-    fontFamily: typography.family.bodySemibold,
-    fontSize: 40,
-    lineHeight: 68,
-    fontWeight: typography.weight.semibold,
     textAlign: 'center',
-    letterSpacing: 0,
   },
   label: {
-    fontFamily: typography.family.bodySemibold,
-    fontSize: 21,
-    lineHeight: 32,
-    fontWeight: typography.weight.semibold,
+    ...textStyles.actionLabel,
     textAlign: 'center',
     marginTop: 10,
-    letterSpacing: 0,
   },
 });

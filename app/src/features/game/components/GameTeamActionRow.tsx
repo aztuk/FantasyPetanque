@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Team } from '../../../domain/game/models';
-import { typography } from '../../../shared/constants';
+import { textStyles } from '../../../shared/constants';
 import { gameUiColors } from './gameUiTheme';
 
 interface Props {
@@ -92,12 +92,8 @@ const styles = StyleSheet.create({
     opacity: 0.55,
   },
   label: {
+    ...textStyles.actionLabel,
     color: gameUiColors.white,
-    fontFamily: typography.family.bodySemibold,
-    fontSize: 21,
-    lineHeight: 32,
-    fontWeight: typography.weight.semibold,
     textAlign: 'center',
-    letterSpacing: 0,
   },
 });

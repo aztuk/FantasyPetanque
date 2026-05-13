@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Team } from '../../../../domain/game/models';
-import { typography } from '../../../../shared/constants';
+import { textStyles } from '../../../../shared/constants';
 import { useGameStore } from '../../state/gameStore';
 import { gameUiColors } from '../gameUiTheme';
 import { Props } from './shared';
@@ -74,20 +74,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   readonlyValue: {
+    ...textStyles.uiValueLg,
     color: gameUiColors.white,
-    fontFamily: typography.family.bodySemibold,
-    fontSize: 40,
-    lineHeight: 68,
-    fontWeight: typography.weight.semibold,
     textAlign: 'center',
-    letterSpacing: 0,
   },
   readonlyLabel: {
-    fontFamily: typography.family.bodySemibold,
-    fontSize: 21,
-    lineHeight: 32,
-    fontWeight: typography.weight.semibold,
+    ...textStyles.actionLabel,
     textAlign: 'center',
-    letterSpacing: 0,
   },
 });

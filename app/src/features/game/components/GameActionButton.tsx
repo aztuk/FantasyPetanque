@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, ViewStyle } from 'react-native';
-import { typography } from '../../../shared/constants';
+import { textStyles } from '../../../shared/constants';
 import { gameUiColors } from './gameUiTheme';
 
 interface Props {
@@ -57,11 +57,7 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
   },
   label: {
-    fontFamily: typography.family.bodySemibold,
-    fontSize: 32,
-    lineHeight: 54,
-    fontWeight: typography.weight.semibold,
+    ...textStyles.titleLg,
     textAlign: 'center',
-    letterSpacing: 0,
   },
 });

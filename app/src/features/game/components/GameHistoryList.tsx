@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { RoundState } from '../../../domain/game/models';
-import { typography } from '../../../shared/constants';
+import { textStyles, typography } from '../../../shared/constants';
 import { gameUiColors, gameUiMotion } from './gameUiTheme';
 
 interface Props {
@@ -315,13 +315,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   score: {
+    ...textStyles.labelMd,
     flex: 1,
-    fontFamily: typography.family.bodySemibold,
-    fontSize: 25,
-    lineHeight: 43,
-    fontWeight: typography.weight.semibold,
     textAlign: 'center',
-    letterSpacing: 0,
   },
   blue: {
     color: gameUiColors.blueText,
@@ -330,15 +326,12 @@ const styles = StyleSheet.create({
     color: gameUiColors.redText,
   },
   roundLabel: {
+    ...textStyles.bodySm,
     position: 'absolute',
     left: 0,
     right: 0,
     color: gameUiColors.muted,
-    fontFamily: typography.family.body,
-    fontSize: 18,
-    lineHeight: 31,
     fontWeight: typography.weight.medium,
     textAlign: 'center',
-    letterSpacing: 0,
   },
 });

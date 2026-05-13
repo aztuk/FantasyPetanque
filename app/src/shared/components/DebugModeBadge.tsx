@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TextStyle } from 'react-native';
-import { colors, homeTypography, typography } from '../constants';
+import { colors, textStyles } from '../constants';
 
 interface Props {
   style?: TextStyle;
@@ -18,11 +18,8 @@ export function DebugModeBadge({ style, testID }: Props) {
 
 const styles = StyleSheet.create({
   badge: {
+    ...textStyles.displaySm,
     color: colors.brand.secondary,
-    fontFamily: typography.family.display,
-    fontSize: homeTypography.debug.fontSize,
-    lineHeight: homeTypography.debug.lineHeight,
-    letterSpacing: 0,
     includeFontPadding: false,
     textAlign: 'center',
     textShadowColor: 'rgba(0, 0, 0, 0.35)',

@@ -72,6 +72,7 @@ export const typography = {
     display: 'RoadRage_400Regular',
     body: 'GoogleSansFlex_400Regular',
     bodySemibold: 'GoogleSansFlex_600SemiBold',
+    bodyBold: 'GoogleSansFlex_700Bold',
   },
   size: {
     base: 18,  // minimum absolu — body, labels, notes
@@ -91,20 +92,110 @@ export const typography = {
   },
 } as const;
 
-export const homeTypography = {
-  tagline: {
-    fontSize: 24,
-    lineHeight: 41,
-  },
-  button: {
-    fontSize: 32,
+// Presets typographiques complets — toutes les propriétés de police en un seul endroit.
+// Usage dans StyleSheet : { ...textStyles.ctaLabel, color: ... }
+export const textStyles = {
+  // Libellés de boutons CTA pleine largeur (letterSpacing resserré pour l'impact visuel)
+  // → FullWidthCtaButton, SetupScreen (choiceLabel, bottomButtonLabel), CancelGameSheet (cancelLabel, confirmLabel)
+  ctaLabel: {
+    fontFamily: typography.family.bodySemibold,
+    fontSize: 28,
     lineHeight: 54,
+    fontWeight: typography.weight.semibold,
+    letterSpacing: -1.2,
   },
-  debug: {
+  // Titres et boutons dans le contexte de jeu (letterSpacing neutre)
+  // → GameActionButton, AppHeader (titre), RuleDisplay (nom de règle), GameScoreBoard (modificateur +/-)
+  titleLg: {
+    fontFamily: typography.family.bodySemibold,
+    fontSize: 28,
+    lineHeight: 54,
+    fontWeight: typography.weight.semibold,
+    letterSpacing: -1.2,
+  },
+  // Valeurs numériques moyennes — scores et totaux
+  // → GameScoreBoard (total sous la mène), GameHistoryList (score par mène)
+  labelMd: {
+    fontFamily: typography.family.bodySemibold,
+    fontSize: 24,
+    lineHeight: 43,
+    fontWeight: typography.weight.semibold,
+    letterSpacing: 0,
+  },
+  // Texte de marque et unités de mesure (letterSpacing légèrement resserré)
+  // → BrandTagline ("Le jeu qui vous fera perdre..."), SetupScreen (unité du picker ex: "pts")
+  tagline: {
+    fontFamily: typography.family.body,
+    fontSize: 21,
+    lineHeight: 34,
+    fontWeight: typography.weight.regular,
+    letterSpacing: -1,
+  },
+  // Libellés des boutons d'action par équipe et des steppers
+  // → GameTeamActionRow (label équipe), CasinoUI (betLabel), PredictionUI (readonlyLabel), TeamStepper (label)
+  actionLabel: {
+    fontFamily: typography.family.bodySemibold,
+    fontSize: 18,
+    lineHeight: 32,
+    fontWeight: typography.weight.semibold,
+    letterSpacing: 0,
+  },
+  // Corps de texte long — description des règles
+  // → RuleDisplay (description, paragraphes)
+  bodyMd: {
+    fontFamily: typography.family.body,
+    fontSize: 18,
+    lineHeight: 26,
+    fontWeight: typography.weight.regular,
+    letterSpacing: -0.6,
+  },
+  // Texte secondaire — notes, annotations, numéros de mène
+  // → RuleDisplay (note de bas de règle, texte immunité), GameHistoryList (label "Mène XX")
+  bodySm: {
+    fontFamily: typography.family.body,
+    fontSize: 15,
+    lineHeight: 21,
+    fontWeight: typography.weight.regular,
+    letterSpacing: -0.4,
+  },
+  // Texte display décoratif (police RoadRage)
+  // → DebugModeBadge ("Debug MODE")
+  displaySm: {
+    fontFamily: typography.family.display,
     fontSize: 45,
     lineHeight: 54,
+    fontWeight: typography.weight.regular,
+    letterSpacing: 0,
+  },
+  // Grandes valeurs numériques interactives dans les règles
+  // → TeamStepper (valeur centrale), CasinoUI (mise en lecture seule), PredictionUI (prédiction en lecture seule)
+  uiValueLg: {
+    fontFamily: typography.family.bodySemibold,
+    fontSize: 32,
+    lineHeight: 40,
+    fontWeight: typography.weight.semibold,
+    letterSpacing: 0,
+  },
+  // Options du picker Setup — état non sélectionné (letterspacing progressif via animation)
+  // → SetupScreen (pickerText, base de l'interpolation animée)
+  pickerText: {
+    fontFamily: typography.family.bodyBold,
+    fontSize: 48,
+    lineHeight: 82,
+    fontWeight: typography.weight.bold,
+    letterSpacing: -1.92,
+  },
+  // Options du picker Setup — état sélectionné (valeur centrale en évidence)
+  // → SetupScreen (pickerSelectedText, cible de l'interpolation animée)
+  pickerSelected: {
+    fontFamily: typography.family.bodyBold,
+    fontSize: 60,
+    lineHeight: 102,
+    fontWeight: typography.weight.bold,
+    letterSpacing: -2.4,
   },
 } as const;
+
 
 export const spacing = {
   1: 4,

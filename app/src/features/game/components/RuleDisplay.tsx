@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import { Rule, Team } from '../../../domain/game/models';
-import { TEAM_LABELS, typography } from '../../../shared/constants';
+import { TEAM_LABELS, textStyles, typography } from '../../../shared/constants';
 import { gameUiColors } from './gameUiTheme';
 
 interface Props {
@@ -140,14 +140,11 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   title: {
+    ...textStyles.titleLg,
     width: '100%',
     color: gameUiColors.primary,
-    fontFamily: typography.family.bodySemibold,
-    fontSize: 32,
-    lineHeight: 54,
     fontWeight: typography.weight.bold,
     textAlign: 'center',
-    letterSpacing: 0,
   },
   descriptionGroup: {
     width: '100%',
@@ -155,24 +152,16 @@ const styles = StyleSheet.create({
     gap: 24,
   },
   description: {
+    ...textStyles.bodyMd,
     width: '100%',
     color: gameUiColors.white,
-    fontFamily: typography.family.body,
-    fontSize: 21,
-    lineHeight: 32,
-    fontWeight: typography.weight.regular,
     textAlign: 'center',
-    letterSpacing: 0,
   },
   note: {
+    ...textStyles.bodySm,
     width: '100%',
     color: gameUiColors.muted,
-    fontFamily: typography.family.body,
-    fontSize: 18,
-    lineHeight: 31,
-    fontWeight: typography.weight.regular,
     textAlign: 'center',
-    letterSpacing: 0,
   },
   highlightText: {
     color: gameUiColors.secondary,
@@ -180,14 +169,10 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.bold,
   },
   immunity: {
+    ...textStyles.bodySm,
     width: '100%',
     color: gameUiColors.muted,
-    fontFamily: typography.family.body,
-    fontSize: 18,
-    lineHeight: 31,
-    fontWeight: typography.weight.regular,
     textAlign: 'center',
-    letterSpacing: 0,
     marginTop: 12,
   },
 });

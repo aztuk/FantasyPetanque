@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, ViewStyle } from 'react-native';
-import { colors, homeTypography, opacity, typography } from '../constants';
+import { colors, opacity, textStyles } from '../constants';
 
 interface Props {
   label: string;
@@ -46,12 +46,8 @@ const styles = StyleSheet.create({
     opacity: opacity.disabled,
   },
   label: {
+    ...textStyles.ctaLabel,
     color: colors.brand.dark,
-    fontFamily: typography.family.bodySemibold,
-    fontWeight: typography.weight.semibold,
-    fontSize: homeTypography.button.fontSize,
-    lineHeight: homeTypography.button.lineHeight,
-    letterSpacing: -1.28,
     includeFontPadding: false,
     textAlign: 'center',
     textTransform: 'uppercase',

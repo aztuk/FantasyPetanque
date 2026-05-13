@@ -18,6 +18,7 @@ import { useGameStore } from '../state/gameStore';
 import { GameMode } from '../../../domain/game/models';
 import { RootStackParamList } from '../../../app/navigation/types';
 import { AppHeader } from '../../../shared/components/AppHeader';
+import { textStyles, typography } from '../../../shared/constants';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'Setup'>;
 type Step = 1 | 2 | 3 | 4;
@@ -45,11 +46,6 @@ const SETUP_COLORS = {
   secondary: '#41E79A',
   white: '#ECEBE8',
   textSmooth: '#949084',
-} as const;
-const SETUP_FONTS = {
-  regular: 'GoogleSansFlex_400Regular',
-  semibold: 'GoogleSansFlex_600SemiBold',
-  bold: 'GoogleSansFlex_700Bold',
 } as const;
 
 export function SetupScreen() {
@@ -396,7 +392,7 @@ const styles = StyleSheet.create({
     backgroundColor: SETUP_COLORS.dark,
   },
   headerTitle: {
-    fontFamily: SETUP_FONTS.bold,
+    fontFamily: typography.family.bodyBold,
     letterSpacing: -1.28,
   },
   choiceContent: {
@@ -416,11 +412,8 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   choiceLabel: {
+    ...textStyles.ctaLabel,
     color: SETUP_COLORS.dark,
-    fontFamily: SETUP_FONTS.semibold,
-    fontSize: 32,
-    lineHeight: 54,
-    letterSpacing: -1.28,
     textAlign: 'center',
     textTransform: 'uppercase',
     includeFontPadding: false,
@@ -457,11 +450,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   pickerText: {
+    ...textStyles.pickerText,
     color: SETUP_COLORS.textSmooth,
-    fontFamily: SETUP_FONTS.bold,
-    fontSize: 48,
-    lineHeight: 82,
-    letterSpacing: -1.92,
     textAlign: 'center',
     includeFontPadding: false,
   },
@@ -487,11 +477,8 @@ const styles = StyleSheet.create({
     gap: 24,
   },
   pickerSelectedText: {
+    ...textStyles.pickerSelected,
     color: SETUP_COLORS.white,
-    fontFamily: SETUP_FONTS.bold,
-    fontSize: 60,
-    lineHeight: 102,
-    letterSpacing: -2.4,
     textAlign: 'center',
     includeFontPadding: false,
   },
@@ -502,11 +489,8 @@ const styles = StyleSheet.create({
     zIndex: 3,
   },
   pickerUnit: {
+    ...textStyles.tagline,
     color: SETUP_COLORS.textSmooth,
-    fontFamily: SETUP_FONTS.regular,
-    fontSize: 24,
-    lineHeight: 41,
-    letterSpacing: -0.96,
     includeFontPadding: false,
   },
   bottomButton: {
@@ -519,11 +503,8 @@ const styles = StyleSheet.create({
     backgroundColor: SETUP_COLORS.primary,
   },
   bottomButtonLabel: {
+    ...textStyles.ctaLabel,
     color: SETUP_COLORS.dark,
-    fontFamily: SETUP_FONTS.semibold,
-    fontSize: 32,
-    lineHeight: 54,
-    letterSpacing: -1.28,
     textAlign: 'center',
     textTransform: 'uppercase',
     includeFontPadding: false,

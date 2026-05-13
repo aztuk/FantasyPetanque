@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { AlertSheet } from './AlertSheet';
-import { colors, homeTypography, typography } from '../constants';
+import { colors, textStyles, typography } from '../constants';
 
 interface Props {
   visible: boolean;
@@ -30,22 +30,16 @@ export function CancelGameSheet({ visible, onConfirm, onCancel }: Props) {
 
 const styles = StyleSheet.create({
   title: {
+    ...textStyles.ctaLabel,
     color: colors.brand.white,
     fontFamily: typography.family.body,
     fontWeight: typography.weight.bold,
-    fontSize: homeTypography.button.fontSize,
-    lineHeight: homeTypography.button.lineHeight,
-    letterSpacing: -1.28,
     includeFontPadding: false,
     textAlign: 'center',
   },
   message: {
+    ...textStyles.bodyMd,
     color: colors.brand.white,
-    fontFamily: typography.family.body,
-    fontWeight: typography.weight.regular,
-    fontSize: 25,
-    lineHeight: 42,
-    letterSpacing: -1,
     includeFontPadding: false,
     textAlign: 'center',
     paddingTop: 24,
@@ -57,23 +51,15 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.bold,
   },
   cancelLabel: {
+    ...textStyles.titleLg,
     color: colors.brand.white,
-    fontFamily: typography.family.bodySemibold,
-    fontWeight: typography.weight.semibold,
-    fontSize: homeTypography.button.fontSize,
-    lineHeight: homeTypography.button.lineHeight,
-    letterSpacing: -1.28,
     includeFontPadding: false,
     textAlign: 'center',
     textTransform: 'uppercase',
   },
   confirmLabel: {
+    ...textStyles.titleLg,
     color: colors.brand.dark,
-    fontFamily: typography.family.bodySemibold,
-    fontWeight: typography.weight.semibold,
-    fontSize: homeTypography.button.fontSize,
-    lineHeight: homeTypography.button.lineHeight,
-    letterSpacing: -1.28,
     includeFontPadding: false,
     textAlign: 'center',
     textTransform: 'uppercase',

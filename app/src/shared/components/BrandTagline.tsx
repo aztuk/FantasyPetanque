@@ -1,6 +1,6 @@
 import React from 'react';
-import { Platform, StyleSheet, Text, View, ViewStyle } from 'react-native';
-import { colors, homeTypography } from '../constants';
+import { StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { colors, textStyles } from '../constants';
 
 interface Props {
   style?: ViewStyle;
@@ -21,11 +21,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   line: {
+    ...textStyles.tagline,
     color: colors.brand.white,
-    fontFamily: Platform.OS === 'ios' ? 'GoogleSansFlex_400Regular' : undefined,
-    fontSize: homeTypography.tagline.fontSize,
-    lineHeight: homeTypography.tagline.lineHeight,
-    letterSpacing: -0.96,
     textAlign: 'center',
   },
   accent: {
