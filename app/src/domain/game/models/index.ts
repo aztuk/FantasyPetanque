@@ -49,7 +49,8 @@ export interface Rule {
   skipNormalScore?: boolean;
   maxBonusPerTeam?: number;
   maxMalusPerTeam?: number;
-  conditionId?: string; // references a condition function by id
+  conditionId?: string;
+  isAvailable?: (scores: Record<Team, number>) => boolean;
 }
 
 export interface BonusMalus {

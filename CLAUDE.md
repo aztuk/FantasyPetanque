@@ -7,10 +7,10 @@ Exécuter ce protocole **uniquement quand l'utilisateur demande la prochaine tâ
 **Ne pas exécuter automatiquement à chaque début de session.**
 
 1. Lire l'inbox de `TODO.md` — si des items sont présents, les fusionner avec `ROADMAP.md` par priorité, puis vider l'inbox.
-2. Sinon, prendre la prochaine tâche `[ ]` de `ROADMAP.md` (les tâches `[en cours]` ne sont pas sélectionnables — elles appartiennent à une session en cours ; vérifier uniquement qu'elles ne créent pas de conflit avec la tâche choisie). Analyser (scope, archi, tests), poser les questions nécessaires, puis marquer `[en cours]` avant de coder.
+2. Sinon, prendre la prochaine tâche `[ ]` de `ROADMAP.md`. **Les tâches `[en cours]` sont prises par un autre agent — les ignorer complètement, ne pas les analyser, ne pas vérifier les conflits, ne pas les mentionner.** Analyser (scope, archi, tests), poser les questions nécessaires, puis marquer `[en cours]` avant de coder.
    - Si cette tâche est manifestement petite et sans ambiguïté, l'agent peut proposer de prendre en même temps la prochaine petite tâche compatible, à condition d'analyser les deux scopes, de vérifier l'absence de conflit, puis de marquer les deux tâches `[en cours]` avant de coder.
 3. Une fois le développement terminé : **demander à l'utilisateur d'effectuer un test manuel** (décrire précisément le scénario), et attendre sa validation explicite.
-4. Seulement après validation : committer, passer à `[fait]` dans `ROADMAP.md`, et mettre à jour `MEMORY.md` si besoin.
+4. Seulement après validation : committer, passer à `[fait]` dans `ROADMAP.md` en indiquant la difficulté sur 5 et l'agent (`Codex` ou `Claude`), puis mettre à jour `MEMORY.md` si besoin.
 
 ---
 
@@ -207,7 +207,12 @@ Tests minimum obligatoires :
 - message de commit clair et précis
 - pas de mélange de sujets non liés
 
-**Ne jamais committer ni marquer `[fait]` dans `ROADMAP.md` sans confirmation explicite de l'utilisateur.**
+**Ne jamais committer ni marquer `[fait]` dans `ROADMAP.md` sans confirmation explicite de l'utilisateur. Toute tâche marquée `[fait]` doit indiquer la difficulté sur 5 et l'agent (`Codex` ou `Claude`).**
+
+Format de tâche terminée attendu dans `ROADMAP.md` :
+```
+- [fait] Tâche X - Difficulté 1/5 - Claude
+```
 
 Format de commit recommandé :
 ```
@@ -269,4 +274,4 @@ npm run lint
 - Ne jamais inventer silencieusement une décision produit structurante
 - Ne jamais ajouter de `any` TypeScript sans justification explicite
 - **Ne jamais committer sans avoir demandé un test manuel à l'utilisateur et reçu sa validation explicite**
-- **Ne jamais modifier `ROADMAP.md` (passer `[en cours]` → `[fait]`) sans validation manuelle confirmée**
+- **Ne jamais modifier `ROADMAP.md` (passer `[en cours]` → `[fait]`) sans validation manuelle confirmée, ni oublier la difficulté sur 5 et l'agent (`Codex` ou `Claude`)**

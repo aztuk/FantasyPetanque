@@ -155,7 +155,7 @@ export const ALL_RULES: Rule[] = [
   {
     id: 'le-duel',
     name: 'Le duel',
-    description: 'Chaque équipe choisit son champion. Le champion lance toutes les boules. Le champion perdant doit être humilié.',
+    description: 'Chaque équipe choisit <b>son champion</b>. Le champion lance toutes les boules. Le champion perdant doit être humilié.',
     shortDescription: 'Un champion par équipe. Les autres encouragent.',
     tags: ['setup', 'totem-compatible', 'auto-arbitrage'],
     uiType: 'none',
@@ -185,6 +185,7 @@ export const ALL_RULES: Rule[] = [
     uiType: 'casino',
     skipNormalScore: true,
     conditionId: 'casino-condition',
+    isAvailable: (scores) => scores.blue >= 1 || scores.red >= 1,
   },
   {
     id: 'prediction',
@@ -194,6 +195,7 @@ export const ALL_RULES: Rule[] = [
     tags: ['specific', 'bet', 'specific-ui', 'score-modifier', 'not-available-at-zero'],
     uiType: 'prediction',
     conditionId: 'prediction-condition',
+    isAvailable: (scores) => scores.blue >= 1 && scores.red >= 1,
   },
   {
     id: 'totem-immunite',

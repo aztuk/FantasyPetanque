@@ -1,5 +1,6 @@
 import { Rule, RuleUIType, Team, GameState, RoundState } from '../models';
 import { ALL_RULES } from '../../../data/rules/rules';
+export { resolveRound } from './roundResolver';
 
 const PRE_MENE_SETUP_UI_TYPES: RuleUIType[] = [
   'contrat',
@@ -7,19 +8,16 @@ const PRE_MENE_SETUP_UI_TYPES: RuleUIType[] = [
   'frontiere',
 ];
 
-// Check if a rule can appear given current game state
-export function ruleIsAvailable(rule: Rule, state: GameState): boolean {
+// Check if a rule can appear given current scores
+export function ruleIsAvailable(rule: Rule, scores: Record<Team, number>): boolean {
+  if (rule.isAvailable) return rule.isAvailable(scores);
   if (!rule.conditionId) return true;
 
   switch (rule.conditionId) {
     case 'casino-condition':
-      // Casino: at least one team has at least 1 point
-      return state.scores.blue >= 1 || state.scores.red >= 1;
-
+      return scores.blue >= 1 || scores.red >= 1;
     case 'prediction-condition':
-      // Prédiction: neither team has 0 points (both must have >= 1)
-      return state.scores.blue >= 1 && state.scores.red >= 1;
-
+      return scores.blue >= 1 && scores.red >= 1;
     default:
       return true;
   }
@@ -31,41 +29,21 @@ export function drawRule(
   overridePool?: Rule[],
 ): Rule {
   const pool = overridePool ?? ALL_RULES;
+  const { playedRuleIds, scores } = state;
 
-  // Build the filtered state for availability check
-  const fakeState: GameState = {
-    mode: 'fantasy',
-    rounds: [],
-    currentRound: null,
-    scores: state.scores,
-    vetos: { blue: true, red: true },
-    playedRuleIds: state.playedRuleIds,
-    pendingNextRule: null,
-    immuneTeam: null,
-    isGameOver: false,
-    winningScore: 13,
-    maxRounds: null,
-    vetosEnabled: true,
-    phase: 'rule-display',
-  };
-
-  // Available = not yet played in this cycle AND condition satisfied
   let available = pool.filter(
-    (r) => !state.playedRuleIds.includes(r.id) && ruleIsAvailable(r, fakeState),
+    (r) => !playedRuleIds.includes(r.id) && ruleIsAvailable(r, scores),
   );
 
-  // If all rules played (or none available), reset cycle and try again
   if (available.length === 0) {
-    available = pool.filter((r) => ruleIsAvailable(r, fakeState));
+    available = pool.filter((r) => ruleIsAvailable(r, scores));
   }
 
-  // If still none (e.g., all conditions fail), fall back to all rules
   if (available.length === 0) {
     available = pool;
   }
 
-  const idx = Math.floor(Math.random() * available.length);
-  return available[idx];
+  return available[Math.floor(Math.random() * available.length)];
 }
 
 // Draw the next totem-compatible rule (for Totem d'immunité)
@@ -76,39 +54,21 @@ export function drawTotemRule(
   const totemPool = ALL_RULES.filter(
     (r) => r.tags.includes('totem-compatible') && r.id !== currentRuleId,
   );
+  const { playedRuleIds, scores } = state;
 
-  const fakeState: GameState = {
-    mode: 'fantasy',
-    rounds: [],
-    currentRound: null,
-    scores: state.scores,
-    vetos: { blue: true, red: true },
-    playedRuleIds: state.playedRuleIds,
-    pendingNextRule: null,
-    immuneTeam: null,
-    isGameOver: false,
-    winningScore: 13,
-    maxRounds: null,
-    vetosEnabled: true,
-    phase: 'rule-display',
-  };
-
-  // Not yet played totem-compatible rules
   let available = totemPool.filter(
-    (r) => !state.playedRuleIds.includes(r.id) && ruleIsAvailable(r, fakeState),
+    (r) => !playedRuleIds.includes(r.id) && ruleIsAvailable(r, scores),
   );
 
-  // Decision: if none available, recycle all totem-compatible rules (see CLAUDE.md)
   if (available.length === 0) {
-    available = totemPool.filter((r) => ruleIsAvailable(r, fakeState));
+    available = totemPool.filter((r) => ruleIsAvailable(r, scores));
   }
 
   if (available.length === 0) {
     available = totemPool;
   }
 
-  const idx = Math.floor(Math.random() * available.length);
-  return available[idx];
+  return available[Math.floor(Math.random() * available.length)];
 }
 
 // Create a fresh round state

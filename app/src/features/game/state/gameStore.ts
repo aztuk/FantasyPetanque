@@ -4,19 +4,12 @@ import {
   drawRule,
   drawTotemRule,
   createRound,
-  shouldSkipNormalScore,
   isGameOver,
   requiresPreMeneSetup,
   isPreMeneSetupComplete,
+  resolveRound,
 } from '../../../domain/game/engine';
-import {
-  clampScore,
-  resolveImpair,
-  resolveAssuranceVie,
-  resolveCasino,
-  resolvePrediction,
-  buildBonusMalusFromRound,
-} from '../../../domain/game/scoring';
+import { buildBonusMalusFromRound } from '../../../domain/game/scoring';
 import { CONTRAT_MISSIONS } from '../../../data/rules/rules';
 
 const WINNING_SCORE = 13;
@@ -257,72 +250,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!state.currentRound) return;
 
     const round = state.currentRound;
-    let newScores = { ...state.scores };
-    let newImmuneTeam: Team | null = state.immuneTeam;
+    const { newScores, newImmuneTeam } = resolveRound(round, state.scores, state.immuneTeam);
 
-    const ruleId = round.rule?.id;
-    const skip = shouldSkipNormalScore(round);
-
-    if (skip) {
-      // Casino
-      if (ruleId === 'casino' && round.casinoWinner) {
-        newScores = resolveCasino(round.casinoWinner, round.casinoBets, newScores);
-      }
-      // Sortie de porc
-      if (ruleId === 'sortie-de-porc' && round.sortieDePorc) {
-        newScores[round.sortieDePorc] = clampScore(newScores[round.sortieDePorc] + 6);
-      }
-    } else {
-      // Normal scoring
-      const winner: Team | null =
-        round.normalPoints.blue > 0 ? 'blue' :
-        round.normalPoints.red > 0 ? 'red' : null;
-
-      if (ruleId === 'impair-contre-attaque' && winner) {
-        const points = round.normalPoints[winner];
-        const result = resolveImpair(winner, points, newScores);
-        newScores = result.newScores;
-      } else if (ruleId === 'assurance-vie') {
-        newScores = resolveAssuranceVie(
-          winner ?? 'blue',
-          round.normalPoints,
-          round.assurance,
-          newScores,
-        );
-      } else {
-        // Standard: add normal points to winner
-        if (winner) {
-          newScores[winner] = clampScore(newScores[winner] + round.normalPoints[winner]);
-        }
-      }
-
-      // Apply Prédiction after normal score
-      if (ruleId === 'prediction') {
-        newScores = resolvePrediction(round.predictionValues, round.normalPoints, newScores);
-      }
-    }
-
-    // Apply bonuses/maluses from rule-specific actions
     const bonusMalusList = buildBonusMalusFromRound(round);
-    for (const bm of bonusMalusList) {
-      if (bm.value > 0) {
-        newScores[bm.team] = clampScore(newScores[bm.team] + bm.value);
-      } else {
-        newScores[bm.team] = clampScore(newScores[bm.team] + bm.value); // value is negative
-      }
-    }
-
-    // Totem: set immune team for next round (loser of totem mene)
-    if (ruleId === 'totem-immunite') {
-      const winner: Team | null =
-        round.normalPoints.blue > 0 ? 'blue' :
-        round.normalPoints.red > 0 ? 'red' : null;
-      // Loser gets immunity (decision: no immunity if tie)
-      if (winner) {
-        newImmuneTeam = winner === 'blue' ? 'red' : 'blue';
-      }
-    }
-
     const finishedRound: RoundState = {
       ...round,
       bonuses: bonusMalusList.filter((b) => b.value > 0),
