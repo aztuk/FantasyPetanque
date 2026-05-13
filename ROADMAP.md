@@ -27,8 +27,8 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 - [fait] Scroll adaptatif écran de mène : quand le texte d'une règle est trop long, permettre de scroller la vue. Adapter la gesture selon l'intention : lire la règle (scroll) vs ajouter les points (interaction score).
 - [fait] Historique de mène classique : conserver l'empilement avec la dernière mène en bas et, lors de l'ajout d'une mène, garder la nouvelle mène visible en masquant d'abord les anciennes mènes en haut.
 - [fait] Flow règles à interface spécifique : pour les règles nécessitant un choix avant la mène, afficher ce choix dans un écran séparé entre l'inter-mène et la mène (exemple : choix du côté pour la règle Frontière).
-- [ ] Review technique de milieu de projet : auditer l'ensemble de la codebase pour repérer la dette technique, les incohérences d'architecture, les risques de tests manquants et les refactors prioritaires avant d'accumuler davantage.
-- [ ] Header commun des écrans de jeu : factoriser la top bar et le bouton retour dans un composant partagé utilisant l'icône Phosphor, aligné avec les pages setup.
+- [en cours] Review technique de milieu de projet : auditer l'ensemble de la codebase pour repérer la dette technique, les incohérences d'architecture, les risques de tests manquants et les refactors prioritaires avant d'accumuler davantage.
+- [fait] Header commun des écrans de jeu : factoriser la top bar et le bouton retour dans un composant partagé utilisant l'icône Phosphor, aligné avec les pages setup.
 - [ ] AlertBox custom : remplacer les alertes système par des alertes custom alignées avec la maquette Figma à fournir.
 - [fait] Config création de partie (commits `7b186e8`, `ac355d6`) : par défaut, sélectionner la condition de fin "score 13 points" plutôt que le nombre de mènes.
 - [fait] Ajustements interaction score classique (commit `7b186e8`) : supprimer le bouton "Annuler" au profit du tap sur l'équipe adverse, afficher "Tapez pour annuler" côté adverse, garder les boutons de score carrés et stables, et positionner le "+X" en absolu pour éviter tout agrandissement.
