@@ -7,6 +7,8 @@ import {
   resolveAssuranceVie,
   resolveCasino,
   resolvePrediction,
+  clampCasinoBet,
+  getCasinoMaxBet,
 } from '../domain/game/scoring';
 
 describe('clampScore', () => {
@@ -110,6 +112,16 @@ describe('Assurance vie', () => {
 });
 
 describe('Casino', () => {
+  it('limits bets to 1-6 and to the opponent score', () => {
+    const scores = { blue: 3, red: 8 };
+
+    expect(getCasinoMaxBet('blue', scores)).toBe(6);
+    expect(getCasinoMaxBet('red', scores)).toBe(3);
+    expect(clampCasinoBet('blue', 0, scores)).toBe(1);
+    expect(clampCasinoBet('blue', 7, scores)).toBe(6);
+    expect(clampCasinoBet('red', 7, scores)).toBe(3);
+  });
+
   it('winner recovers bet and gains same amount', () => {
     const scores = { blue: 8, red: 4 };
     const bets = { blue: 3, red: 4 };

@@ -11,3 +11,6 @@
 - Dans `RuleDisplay`, une phrase finale commençant par `Maximum` est extraite automatiquement de `description` et rendue comme note muted sous la règle, sans modifier la spec ni les données de règles.
 - Les règles fantasy avec choix à faire avant la première boule passent par une phase dédiée `rule-setup` entre `pre-mene` et `playing`. Pour l'instant, ce flow s'applique à `Contrat`, `Assurance vie` et `Frontière`; les autres règles `setup` seront ajustées pendant la QA règle par règle.
 - Les refontes des UI de règles spécifiques sont cadrées dans `UI_RULES_CADRAGE.md` : bonus/malus simples restent groupées, les règles à flow dédié sont traitées une par une, et `L'impair contre-attaque` reste séparée car elle explique une résolution automatique sensible.
+- Casino utilise un flow en deux temps : setup avant mène pour choisir les mises, puis résolution pendant la mène avec une action `Gagnant` attachée au bloc scoreboard, pas au contenu scrollable.
+- Les mises Casino valent 1 par défaut, sont bornées entre 1 et 6, et ne peuvent jamais dépasser le score de l'adversaire. Casino n'est tirable que si les deux équipes ont au moins 1 point.
+- Les actions d'équipe liées au score pendant une mène doivent être attachées à la zone scoreboard via un composant partagé, afin de rester cohérentes avec les futures UI bonus/malus.

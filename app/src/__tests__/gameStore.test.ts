@@ -1,5 +1,6 @@
 import { useGameStore } from '../features/game/state/gameStore';
 import { ALL_RULES } from '../data/rules/rules';
+import { createRound } from '../domain/game/engine';
 
 // Reset store before each test
 beforeEach(() => {
@@ -225,6 +226,20 @@ describe('pre-mene rule setup flow', () => {
 
     expect(useGameStore.getState().phase).toBe('playing');
   });
+
+  it('opens Casino setup before playing with default bets', () => {
+    useGameStore.getState().startGame({ mode: 'fantasy' });
+    useGameStore.setState({ scores: { blue: 1, red: 1 } });
+    useGameStore.getState().forceRule(ALL_RULES.find((rule) => rule.id === 'casino')!);
+
+    useGameStore.getState().beginRound();
+    expect(useGameStore.getState().phase).toBe('rule-setup');
+    expect(useGameStore.getState().currentRound?.casinoBets).toEqual({ blue: 1, red: 1 });
+
+    useGameStore.getState().beginRound();
+
+    expect(useGameStore.getState().phase).toBe('playing');
+  });
 });
 
 describe('debug rule selection', () => {
@@ -283,32 +298,11 @@ describe('debug rule selection', () => {
 
 describe('Casino', () => {
   it('sets casino bets correctly', () => {
+    const casinoRule = ALL_RULES.find((rule) => rule.id === 'casino')!;
+
     useGameStore.setState({
       scores: { blue: 8, red: 4 },
-      currentRound: {
-        number: 1,
-        rule: { id: 'casino', name: 'Casino', description: '', shortDescription: '', tags: ['specific', 'bet', 'specific-ui', 'skip-normal-score', 'not-available-at-zero'], uiType: 'casino', skipNormalScore: true, conditionId: 'casino-condition' },
-        normalPoints: { blue: 0, red: 0 },
-        bonuses: [],
-        scoreAfter: { blue: 0, red: 0 },
-        vetoUsed: null,
-        sortieDePorc: null,
-        assurance: { blue: false, red: false },
-        frontiereChoice: { blue: null, red: null },
-        contratMission: { blue: null, red: null },
-        contratSuccess: { blue: false, red: false },
-        boucleMauditeHit: { blue: false, red: false },
-        kingBonus: { blue: 0, red: 0 },
-        gaucheBonus: { blue: false, red: false },
-        extremesBonus: { blue: false, red: false },
-        censureMalus: { blue: 0, red: 0 },
-        casinoBets: { blue: 0, red: 0 },
-        casinoWinner: null,
-        predictionValues: { blue: null, red: null },
-        totemNextRule: null,
-        totemImmuneTeam: null,
-        impairResult: null,
-      },
+      currentRound: createRound(1, casinoRule),
     });
 
     useGameStore.getState().setCasinoBet('blue', 3);
@@ -319,13 +313,21 @@ describe('Casino', () => {
     expect(round.casinoBets.red).toBe(4);
   });
 
-  it('bet cannot exceed team score', () => {
-    useGameStore.setState({ scores: { blue: 3, red: 8 } });
-    const round = useGameStore.getState().currentRound;
-    if (round) {
-      useGameStore.getState().setCasinoBet('blue', 10); // over limit
-      expect(useGameStore.getState().currentRound!.casinoBets.blue).toBe(3);
-    }
+  it('bet cannot exceed opponent score or six and cannot go below one', () => {
+    const casinoRule = ALL_RULES.find((rule) => rule.id === 'casino')!;
+    useGameStore.setState({
+      scores: { blue: 3, red: 8 },
+      currentRound: createRound(1, casinoRule),
+    });
+
+    useGameStore.getState().setCasinoBet('blue', 10);
+    expect(useGameStore.getState().currentRound!.casinoBets.blue).toBe(6);
+
+    useGameStore.getState().setCasinoBet('red', 7);
+    expect(useGameStore.getState().currentRound!.casinoBets.red).toBe(3);
+
+    useGameStore.getState().setCasinoBet('red', 0);
+    expect(useGameStore.getState().currentRound!.casinoBets.red).toBe(1);
   });
 });
 

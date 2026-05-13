@@ -29,6 +29,7 @@ describe('Rules data bank', () => {
 
   it('casino has skip-normal-score and not-available-at-zero tags', () => {
     const rule = getRuleById('casino')!;
+    expect(rule.tags).toContain('setup');
     expect(rule.tags).toContain('skip-normal-score');
     expect(rule.tags).toContain('not-available-at-zero');
   });

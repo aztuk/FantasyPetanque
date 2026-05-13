@@ -47,7 +47,7 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 - [fait] UI composant Rule : ajuster le composant selon la maquette Figma mise à jour (`node-id=4-730`). - Difficulté 2/5 - Codex
 - [ ] UI Scoreboard : ajuster le composant selon la maquette Figma mise à jour avec le total sous la mène (`node-id=4-268`).
 - [fait] Cadrage UI règles spécifiques : lister les règles avec UI dédiée, associer chaque règle à sa maquette Figma, valider le découpage et identifier les conflits éventuels avec les composants partagés. - Difficulté 1/5 - Codex
-- [ ] UI spécifique règle Casino : refonte selon maquette Figma.
+- [fait] UI spécifique règle Casino : refonte selon maquette Figma. - Difficulté 4/5 - Codex
 - [ ] UI spécifique règle Prédiction : refonte selon maquette Figma.
 - [ ] UI spécifique règle Totem d'immunité : refonte selon maquette Figma.
 - [ ] UI spécifique règles bonus/malus simples : Gauche caviar, Les extrêmes, Censure, La boule maudite, King of the Hill.

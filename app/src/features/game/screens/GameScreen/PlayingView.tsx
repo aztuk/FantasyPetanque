@@ -17,6 +17,7 @@ import { Team } from '../../../../domain/game/models';
 import { CancelGameSheet } from '../../../../shared/components/CancelGameSheet';
 import { GameActionButton } from '../../components/GameActionButton';
 import { GameScoreBoard } from '../../components/GameScoreBoard';
+import { GameTeamActionRow } from '../../components/GameTeamActionRow';
 import { GameTopBar } from '../../components/GameTopBar';
 import { RuleDisplay } from '../../components/RuleDisplay';
 import { RuleUI } from '../../components/RuleUI';
@@ -38,6 +39,7 @@ export function PlayingView() {
     finishRound,
     startNewRound,
     resetGame,
+    setCasinoWinner,
   } = useGameStore();
 
   const [showCancelSheet, setShowCancelSheet] = useState(false);
@@ -78,7 +80,8 @@ export function PlayingView() {
   const redPoints = round.normalPoints.red;
   const scoringTeam: Team | null = bluePoints > 0 ? 'blue' : redPoints > 0 ? 'red' : null;
   const skipNormal = shouldSkipNormalScore(round);
-  const canFinishRound = skipNormal || scoringTeam !== null;
+  const isCasino = round.rule?.id === 'casino';
+  const canFinishRound = isCasino ? round.casinoWinner !== null : skipNormal || scoringTeam !== null;
 
   const handleTeamPress = (team: Team) => {
     const otherTeam = team === 'blue' ? 'red' : 'blue';
@@ -111,10 +114,13 @@ export function PlayingView() {
       />
       <GameTopBar onCancel={() => setShowCancelSheet(true)} />
       <View style={gameScreenStyles.fantasyContent}>
-        <View style={gameScreenStyles.ruleArea} onTouchStart={() => animateDrawer(false)}>
+        <View style={gameScreenStyles.ruleArea} onTouchStart={() => { if (!isCasino) animateDrawer(false); }}>
           <ScrollView
             style={StyleSheet.absoluteFill}
-            contentContainerStyle={gameScreenStyles.ruleScrollContent}
+            contentContainerStyle={[
+              gameScreenStyles.ruleScrollContent,
+              isCasino && gameScreenStyles.casinoRuleScrollContent,
+            ]}
             showsVerticalScrollIndicator={false}
           >
             {round.rule && (
@@ -134,16 +140,25 @@ export function PlayingView() {
         <Animated.View
           style={[gameScreenStyles.drawer, { transform: [{ translateY: drawerTranslate }] }]}
           onLayout={handleDrawerLayout}
-          onTouchStart={() => animateDrawer(true)}
+          onTouchStart={() => { if (!isCasino) animateDrawer(true); }}
         >
+          {isCasino && (
+            <GameTeamActionRow
+              label="Gagnant"
+              onTeamPress={setCasinoWinner}
+              selectedTeam={round.casinoWinner}
+              testIDPrefix="casino-winner"
+            />
+          )}
           <GameScoreBoard
             scores={scores}
-            roundPoints={drawerExpanded ? { blue: bluePoints, red: redPoints } : undefined}
+            roundPoints={!isCasino && drawerExpanded ? { blue: bluePoints, red: redPoints } : undefined}
             roundNumber={round.number}
+            showRoundBar={!isCasino}
             onTeamPress={drawerExpanded && !skipNormal ? handleTeamPress : undefined}
           />
           <GameActionButton
-            label={canFinishRound ? 'Mène terminée' : 'Points manquants'}
+            label={isCasino ? 'Confirmer' : canFinishRound ? 'Mène terminée' : 'Points manquants'}
             onPress={handleFinishRound}
             disabled={!canFinishRound}
             testID="end-round-button"

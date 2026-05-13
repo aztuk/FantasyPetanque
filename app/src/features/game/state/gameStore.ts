@@ -9,7 +9,7 @@ import {
   isPreMeneSetupComplete,
   resolveRound,
 } from '../../../domain/game/engine';
-import { buildBonusMalusFromRound } from '../../../domain/game/scoring';
+import { buildBonusMalusFromRound, clampCasinoBet } from '../../../domain/game/scoring';
 import { CONTRAT_MISSIONS } from '../../../data/rules/rules';
 
 const WINNING_SCORE = 13;
@@ -444,8 +444,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const state = get();
     if (!state.currentRound) return;
     const round = state.currentRound;
-    const maxBet = state.scores[team];
-    const clamped = Math.max(0, Math.min(amount, maxBet));
+    const clamped = clampCasinoBet(team, amount, state.scores);
     set({ currentRound: { ...round, casinoBets: { ...round.casinoBets, [team]: clamped } } });
   },
 

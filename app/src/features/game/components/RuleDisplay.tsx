@@ -21,7 +21,7 @@ export interface RuleDisplayContent {
 }
 
 const RULE_TEXT_TAG_PATTERN = /<\/?b>/g;
-const FINAL_NOTE_PATTERN = /(?:^|\s)(Maximum\b[\s\S]*?)\.?$/;
+const FINAL_NOTE_PATTERN = /(?:^|\s)((?:Maximum|Pas de score normal)\b[\s\S]*?)\.?$/;
 const PARAGRAPH_SPLIT_PATTERN = /\n{2,}|(?<=\.)\s+(?=[A-ZÀ-ÖØ-Þ])/;
 
 function normalizeRuleDescription(description: string): string {

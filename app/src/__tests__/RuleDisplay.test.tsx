@@ -101,4 +101,20 @@ describe('RuleDisplay', () => {
     expect(noteStyle.color).toBe(gameUiColors.muted);
     expect(noteStyle.fontSize).toBe(18);
   });
+
+  it('renders the final no-normal-score sentence as muted note text', () => {
+    render(
+      <RuleDisplay
+        rule={{
+          ...baseRule,
+          description: 'Chaque équipe mise des points. Pas de score normal sur cette mène.',
+        }}
+      />,
+    );
+
+    const noteStyle = StyleSheet.flatten(screen.getByText('Pas de score normal sur cette mène').props.style);
+
+    expect(screen.getByText('Chaque équipe mise des points.')).toBeTruthy();
+    expect(noteStyle.color).toBe(gameUiColors.muted);
+  });
 });

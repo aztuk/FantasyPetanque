@@ -2,6 +2,29 @@ import { Team, RoundState, GameState, BonusMalus } from '../models';
 
 export const clampScore = (score: number): number => Math.max(0, score);
 
+export const CASINO_MIN_BET = 1;
+export const CASINO_MAX_BET = 6;
+
+export function getOpponent(team: Team): Team {
+  return team === 'blue' ? 'red' : 'blue';
+}
+
+export function getCasinoMaxBet(team: Team, scores: Record<Team, number>): number {
+  return Math.min(CASINO_MAX_BET, scores[getOpponent(team)]);
+}
+
+export function clampCasinoBet(
+  team: Team,
+  amount: number,
+  scores: Record<Team, number>,
+): number {
+  const maxBet = getCasinoMaxBet(team, scores);
+
+  if (maxBet < CASINO_MIN_BET) return 0;
+
+  return Math.max(CASINO_MIN_BET, Math.min(amount, maxBet));
+}
+
 export function applyNormalScore(
   scores: Record<Team, number>,
   team: Team,
@@ -89,7 +112,7 @@ export function resolveCasino(
   bets: Record<Team, number>,
   scores: Record<Team, number>,
 ): Record<Team, number> {
-  const loser: Team = winner === 'blue' ? 'red' : 'blue';
+  const loser = getOpponent(winner);
   let newScores = { ...scores };
 
   // Loser loses bet

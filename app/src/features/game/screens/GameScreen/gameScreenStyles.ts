@@ -34,6 +34,11 @@ export const gameScreenStyles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 20,
   },
+  ruleSetupScrollContentFocused: {
+    justifyContent: 'flex-start',
+    paddingTop: 24,
+    paddingBottom: 220,
+  },
   simpleHistory: {
     flex: 1,
   },
@@ -47,6 +52,10 @@ export const gameScreenStyles = StyleSheet.create({
     justifyContent: 'flex-start',
     paddingVertical: 20,
     paddingBottom: COMPACT_SCORE_HEIGHT + 20,
+  },
+  casinoRuleScrollContent: {
+    paddingTop: 0,
+    paddingBottom: 260,
   },
   drawer: {
     position: 'absolute',

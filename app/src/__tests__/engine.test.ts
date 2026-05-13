@@ -37,16 +37,13 @@ describe('drawRule', () => {
     expect(rule).toBeDefined();
   });
 
-  it('casino rule does not appear when both teams have 0 points', () => {
-    const scores = { blue: 0, red: 0 };
+  it('casino rule does not appear unless both teams have at least 1 point', () => {
     const playedIds = ALL_RULES.filter((r) => r.id !== 'casino').map((r) => r.id);
-    // Force only casino to be available (cycle reset)
-    // Casino should still not appear due to condition
-    const rule = drawRule({ playedRuleIds: playedIds, scores });
-    // If the condition gates casino properly, it shouldn't be drawn when no points
-    // (But if it's the only rule with condition, we fall back to any rule)
-    // At minimum, verify no crash
-    expect(rule).toBeDefined();
+
+    for (const scores of [{ blue: 0, red: 0 }, { blue: 0, red: 5 }, { blue: 5, red: 0 }]) {
+      const rule = drawRule({ playedRuleIds: playedIds, scores });
+      expect(rule.id).not.toBe('casino');
+    }
   });
 
   it('prediction rule does not appear when a team has 0 points', () => {
@@ -86,6 +83,7 @@ describe('createRound', () => {
     expect(round.normalPoints.red).toBe(0);
     expect(round.vetoUsed).toBeNull();
     expect(round.sortieDePorc).toBeNull();
+    expect(round.casinoBets).toEqual({ blue: 1, red: 1 });
     expect(round.casinoWinner).toBeNull();
   });
 });
