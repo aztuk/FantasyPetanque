@@ -1,4 +1,11 @@
 const palette = {
+  // Figma brand palette
+  brandDark: '#28261F',
+  brandPrimary: '#E7C241',
+  brandSecondary: '#41E79A',
+  brandWhite: '#ECEBE8',
+  brandShadow: '#1F1D15',
+
   // Nocturne background
   neutral950: '#111118',
   neutral900: '#1D1C2A',
@@ -36,6 +43,14 @@ export const colors = {
   accent: palette.gold,
   accentLight: palette.goldLight,
 
+  brand: {
+    dark: palette.brandDark,
+    primary: palette.brandPrimary,
+    secondary: palette.brandSecondary,
+    white: palette.brandWhite,
+    shadow: palette.brandShadow,
+  },
+
   team: {
     blue: palette.blue,
     blueLight: palette.blueLight,
@@ -51,6 +66,11 @@ export const colors = {
 
 // Minimum 18px — rien en dessous
 export const typography = {
+  family: {
+    display: 'RoadRage_400Regular',
+    body: 'GoogleSansFlex_400Regular',
+    bodySemibold: 'GoogleSansFlex_600SemiBold',
+  },
   size: {
     base: 18,  // minimum absolu — body, labels, notes
     md: 20,    // corps mis en avant
@@ -66,6 +86,21 @@ export const typography = {
     semibold: '600' as const,
     bold: '700' as const,
     extrabold: '800' as const,
+  },
+} as const;
+
+export const homeTypography = {
+  tagline: {
+    fontSize: 24,
+    lineHeight: 41,
+  },
+  button: {
+    fontSize: 32,
+    lineHeight: 54,
+  },
+  debug: {
+    fontSize: 45,
+    lineHeight: 54,
   },
 } as const;
 
@@ -90,4 +125,21 @@ export const radius = {
 
 export const opacity = {
   disabled: 0.35,
+} as const;
+
+export const shadows = {
+  title: {
+    shadowColor: palette.brandShadow,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  debug: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 4,
+  },
 } as const;

@@ -1,5 +1,5 @@
 export * from './theme';
-export { colors, typography, spacing, radius, opacity } from './theme';
+export { colors, typography, homeTypography, spacing, radius, opacity, shadows } from './theme';
 
 import { colors } from './theme';
 

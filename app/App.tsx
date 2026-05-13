@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Platform } from 'react-native';
+import { AppState, Platform } from 'react-native';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
@@ -24,9 +24,13 @@ export default function App() {
   }, [fontError, fontsLoaded]);
 
   useEffect(() => {
-    if (Platform.OS === 'android') {
-      NavigationBar.setVisibilityAsync('hidden');
-    }
+    if (Platform.OS !== 'android') return;
+    const hide = () => NavigationBar.setVisibilityAsync('hidden');
+    hide();
+    const sub = AppState.addEventListener('change', state => {
+      if (state === 'active') hide();
+    });
+    return () => sub.remove();
   }, []);
 
   if (!fontsLoaded && !fontError) {
