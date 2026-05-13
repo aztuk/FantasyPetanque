@@ -12,6 +12,7 @@ interface Props {
   badgeTeam?: Team | null;
   compact?: boolean;
   showTotals?: boolean;
+  showRoundBar?: boolean;
   onTeamPress?: (team: Team) => void;
   style?: StyleProp<ViewStyle>;
 }
@@ -43,13 +44,14 @@ export function GameScoreBoard({
   badgeTeam = null,
   compact = false,
   showTotals = true,
+  showRoundBar = true,
   onTeamPress,
   style,
 }: Props) {
   const badge = formatBadge(roundNumber, badgeLabel);
 
   return (
-    <View style={[styles.board, compact ? styles.compact : styles.full, style]}>
+    <View style={[styles.board, showRoundBar ? (compact ? styles.compact : styles.full) : undefined, style]}>
       {(['blue', 'red'] as const).map((team) => {
         const ui = TEAM_UI[team];
         const content = (
@@ -59,11 +61,13 @@ export function GameScoreBoard({
                 <Text style={styles.totalText}>{scores[team]}</Text>
               </View>
             )}
-            <View style={[styles.mene, { backgroundColor: ui.surface }]}>
-              <Text style={styles.meneText}>
-                {roundPoints ? roundPoints[team] : scores[team]}
-              </Text>
-            </View>
+            {showRoundBar && (
+              <View style={[styles.mene, { backgroundColor: ui.surface }]}>
+                <Text style={styles.meneText}>
+                  {roundPoints ? roundPoints[team] : scores[team]}
+                </Text>
+              </View>
+            )}
           </View>
         );
 

@@ -8,6 +8,7 @@ Exécuter ce protocole **uniquement quand l'utilisateur demande la prochaine tâ
 
 1. Lire l'inbox de `TODO.md` — si des items sont présents, les fusionner avec `ROADMAP.md` par priorité, puis vider l'inbox.
 2. Sinon, prendre la prochaine tâche `[ ]` de `ROADMAP.md` (les tâches `[en cours]` ne sont pas sélectionnables — elles appartiennent à une session en cours ; vérifier uniquement qu'elles ne créent pas de conflit avec la tâche choisie). Analyser (scope, archi, tests), poser les questions nécessaires, puis marquer `[en cours]` avant de coder.
+   - Si cette tâche est manifestement petite et sans ambiguïté, l'agent peut proposer de prendre en même temps la prochaine petite tâche compatible, à condition d'analyser les deux scopes, de vérifier l'absence de conflit, puis de marquer les deux tâches `[en cours]` avant de coder.
 3. Une fois le développement terminé : **demander à l'utilisateur d'effectuer un test manuel** (décrire précisément le scénario), et attendre sa validation explicite.
 4. Seulement après validation : committer, passer à `[fait]` dans `ROADMAP.md`, et mettre à jour `MEMORY.md` si besoin.
 

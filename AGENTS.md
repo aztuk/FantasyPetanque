@@ -22,6 +22,7 @@ Ce protocole s'exécute **uniquement quand l'utilisateur demande la prochaine t�
 - Les tâches `[en cours]` **ne sont pas sélectionnables** — elles appartiennent à un agent ou une session en cours.
 - Prendre la première tâche `[ ]` dans `ROADMAP.md` (priorité haute en premier).
 - Vérifier que les tâches `[en cours]` ne créent pas de conflit (fichiers partagés, dépendances) avec la tâche choisie — si oui, le signaler à l'utilisateur avant de continuer.
+- Si la tâche choisie est manifestement petite et sans ambiguïté, l'agent peut proposer de prendre en même temps la prochaine petite tâche compatible, à condition d'analyser les deux scopes, de vérifier l'absence de conflit, puis de marquer les deux tâches `[en cours]` avant de coder.
 
 ### 3. Analyser avant de coder
 
