@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  Alert,
   Animated,
   Easing,
   LayoutChangeEvent,
@@ -15,6 +14,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../../../app/navigation/types';
 import { shouldSkipNormalScore } from '../../../../domain/game/engine';
 import { Team } from '../../../../domain/game/models';
+import { CancelGameSheet } from '../../../../shared/components/CancelGameSheet';
 import { GameActionButton } from '../../components/GameActionButton';
 import { GameScoreBoard } from '../../components/GameScoreBoard';
 import { GameTopBar } from '../../components/GameTopBar';
@@ -40,6 +40,7 @@ export function PlayingView() {
     resetGame,
   } = useGameStore();
 
+  const [showCancelSheet, setShowCancelSheet] = useState(false);
   const [drawerExpanded, setDrawerExpanded] = useState(true);
   const drawerTranslate = useRef(new Animated.Value(0)).current;
   const drawerExpandedRef = useRef(true);
@@ -79,24 +80,6 @@ export function PlayingView() {
   const skipNormal = shouldSkipNormalScore(round);
   const canFinishRound = skipNormal || scoringTeam !== null;
 
-  const handleCancelGame = () => {
-    Alert.alert(
-      'Annuler la partie ?',
-      'La partie en cours sera perdue si tu confirmes.',
-      [
-        { text: 'Continuer', style: 'cancel' },
-        {
-          text: 'Annuler la partie',
-          style: 'destructive',
-          onPress: () => {
-            resetGame();
-            navigation.replace('Home');
-          },
-        },
-      ],
-    );
-  };
-
   const handleTeamPress = (team: Team) => {
     const otherTeam = team === 'blue' ? 'red' : 'blue';
     if (scoringTeam === otherTeam) {
@@ -121,7 +104,12 @@ export function PlayingView() {
 
   return (
     <SafeAreaView style={gameScreenStyles.safe} edges={['top', 'bottom']}>
-      <GameTopBar onCancel={handleCancelGame} />
+      <CancelGameSheet
+        visible={showCancelSheet}
+        onConfirm={() => { resetGame(); navigation.replace('Home'); }}
+        onCancel={() => setShowCancelSheet(false)}
+      />
+      <GameTopBar onCancel={() => setShowCancelSheet(true)} />
       <View style={gameScreenStyles.fantasyContent}>
         <View style={gameScreenStyles.ruleArea} onTouchStart={() => animateDrawer(false)}>
           <ScrollView

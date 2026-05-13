@@ -1,5 +1,4 @@
 import React from 'react';
-import { Alert } from 'react-native';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { ALL_RULES } from '../data/rules/rules';
 import { GameScreen } from '../features/game/screens/GameScreen';
@@ -41,36 +40,22 @@ describe('GameScreen cancel top bar', () => {
     expect(screen.getByTestId('cancel-game-button')).toBeTruthy();
   });
 
-  it('shows confirmation alert when cancel is pressed', () => {
-    const alertSpy = jest.spyOn(Alert, 'alert');
+  it('shows confirmation sheet when cancel is pressed', () => {
     useGameStore.getState().startGame({ mode: 'simple' });
     render(<GameScreen />);
 
     fireEvent.press(screen.getByTestId('cancel-game-button'));
 
-    expect(alertSpy).toHaveBeenCalledWith(
-      'Annuler la partie ?',
-      'La partie en cours sera perdue si tu confirmes.',
-      expect.arrayContaining([
-        expect.objectContaining({ text: 'Continuer' }),
-        expect.objectContaining({ text: 'Annuler la partie', style: 'destructive' }),
-      ]),
-    );
+    expect(screen.getByText('Etes-vous sûr ?')).toBeTruthy();
   });
 
-  it('resets game and navigates home on confirm', () => {
-    const alertSpy = jest.spyOn(Alert, 'alert');
+  it('resets game and navigates home on sheet confirm', () => {
     useGameStore.getState().startGame({ mode: 'simple' });
     useGameStore.getState().addNormalPoint('blue');
     render(<GameScreen />);
 
     fireEvent.press(screen.getByTestId('cancel-game-button'));
-
-    const confirmBtn = (alertSpy.mock.calls[0][2] as { text: string; onPress?: () => void }[])
-      .find((b) => b.text === 'Annuler la partie');
-    act(() => {
-      confirmBtn?.onPress?.();
-    });
+    fireEvent.press(screen.getByTestId('alert-sheet-confirm'));
 
     expect(useGameStore.getState().phase).toBe('setup');
     expect(mockReplace).toHaveBeenCalledWith('Home');

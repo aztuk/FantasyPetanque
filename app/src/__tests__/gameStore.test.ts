@@ -153,6 +153,7 @@ describe('useVeto', () => {
   });
 
   it('keeps veto available while normal points are edited before the round is finished', () => {
+    useGameStore.getState().forceRule(ALL_RULES.find((r) => r.id === 'dome-de-fer')!);
     const ruleBeforeScoring = useGameStore.getState().currentRound?.rule?.id;
 
     useGameStore.getState().beginRound();

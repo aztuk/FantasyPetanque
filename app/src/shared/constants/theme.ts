@@ -1,6 +1,7 @@
 const palette = {
   // Figma brand palette
   brandDark: '#28261F',
+  brandDarkSmooth: '#3B382E',
   brandPrimary: '#E7C241',
   brandSecondary: '#41E79A',
   brandWhite: '#ECEBE8',
@@ -45,6 +46,7 @@ export const colors = {
 
   brand: {
     dark: palette.brandDark,
+    darkSmooth: palette.brandDarkSmooth,
     primary: palette.brandPrimary,
     secondary: palette.brandSecondary,
     white: palette.brandWhite,

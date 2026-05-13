@@ -1,11 +1,11 @@
-import React from 'react';
-import { Alert } from 'react-native';
+import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../../../app/navigation/types';
 import { shouldSkipNormalScore } from '../../../../domain/game/engine';
 import { Team } from '../../../../domain/game/models';
+import { CancelGameSheet } from '../../../../shared/components/CancelGameSheet';
 import { GameActionButton } from '../../components/GameActionButton';
 import { GameHistoryList } from '../../components/GameHistoryList';
 import { GameScoreBoard } from '../../components/GameScoreBoard';
@@ -28,30 +28,14 @@ export function SimpleModeView() {
     resetGame,
   } = useGameStore();
 
+  const [showCancelSheet, setShowCancelSheet] = useState(false);
+
   const round = currentRound!;
   const bluePoints = round.normalPoints.blue;
   const redPoints = round.normalPoints.red;
   const scoringTeam: Team | null = bluePoints > 0 ? 'blue' : redPoints > 0 ? 'red' : null;
   const skipNormal = shouldSkipNormalScore(round);
   const canFinishRound = skipNormal || scoringTeam !== null;
-
-  const handleCancelGame = () => {
-    Alert.alert(
-      'Annuler la partie ?',
-      'La partie en cours sera perdue si tu confirmes.',
-      [
-        { text: 'Continuer', style: 'cancel' },
-        {
-          text: 'Annuler la partie',
-          style: 'destructive',
-          onPress: () => {
-            resetGame();
-            navigation.replace('Home');
-          },
-        },
-      ],
-    );
-  };
 
   const handleTeamPress = (team: Team) => {
     const otherTeam = team === 'blue' ? 'red' : 'blue';
@@ -70,7 +54,12 @@ export function SimpleModeView() {
 
   return (
     <SafeAreaView style={gameScreenStyles.safe} edges={['top', 'bottom']}>
-      <GameTopBar onCancel={handleCancelGame} />
+      <CancelGameSheet
+        visible={showCancelSheet}
+        onConfirm={() => { resetGame(); navigation.replace('Home'); }}
+        onCancel={() => setShowCancelSheet(false)}
+      />
+      <GameTopBar onCancel={() => setShowCancelSheet(true)} />
       <GameHistoryList rounds={rounds} orientation="bottom" style={gameScreenStyles.simpleHistory} />
       <GameScoreBoard
         scores={scores}

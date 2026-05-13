@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Alert, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -6,6 +6,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../../../app/navigation/types';
 import { requiresPreMeneSetup } from '../../../../domain/game/engine';
 import { Team } from '../../../../domain/game/models';
+import { CancelGameSheet } from '../../../../shared/components/CancelGameSheet';
 import { GameActionButton } from '../../components/GameActionButton';
 import { GameTopBar } from '../../components/GameTopBar';
 import { RuleDisplay } from '../../components/RuleDisplay';
@@ -18,26 +19,10 @@ export function PreMeneView() {
   const navigation = useNavigation<Nav>();
   const { currentRound, vetos, vetosEnabled, beginRound, useVeto, resetGame } = useGameStore();
 
+  const [showCancelSheet, setShowCancelSheet] = useState(false);
+
   const round = currentRound!;
   const requiresSetup = requiresPreMeneSetup(round.rule);
-
-  const handleCancelGame = () => {
-    Alert.alert(
-      'Annuler la partie ?',
-      'La partie en cours sera perdue si tu confirmes.',
-      [
-        { text: 'Continuer', style: 'cancel' },
-        {
-          text: 'Annuler la partie',
-          style: 'destructive',
-          onPress: () => {
-            resetGame();
-            navigation.replace('Home');
-          },
-        },
-      ],
-    );
-  };
 
   const handleVeto = (team: Team) => {
     Alert.alert(
@@ -52,7 +37,12 @@ export function PreMeneView() {
 
   return (
     <SafeAreaView style={gameScreenStyles.safe} edges={['top', 'bottom']}>
-      <GameTopBar onCancel={handleCancelGame} />
+      <CancelGameSheet
+        visible={showCancelSheet}
+        onConfirm={() => { resetGame(); navigation.replace('Home'); }}
+        onCancel={() => setShowCancelSheet(false)}
+      />
+      <GameTopBar onCancel={() => setShowCancelSheet(true)} />
       <View style={gameScreenStyles.centerContent}>
         {round.rule && (
           <RuleDisplay

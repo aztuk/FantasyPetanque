@@ -1,9 +1,10 @@
-import React from 'react';
-import { Alert, View } from 'react-native';
+import React, { useState } from 'react';
+import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../../../app/navigation/types';
+import { CancelGameSheet } from '../../../../shared/components/CancelGameSheet';
 import { GameActionButton } from '../../components/GameActionButton';
 import { GameTopBar } from '../../components/GameTopBar';
 import { useGameStore } from '../../state/gameStore';
@@ -14,28 +15,16 @@ type Nav = NativeStackNavigationProp<RootStackParamList, 'Game'>;
 export function RoundSummaryView() {
   const navigation = useNavigation<Nav>();
   const { debugMode, startNewRound, resetGame } = useGameStore();
-
-  const handleCancelGame = () => {
-    Alert.alert(
-      'Annuler la partie ?',
-      'La partie en cours sera perdue si tu confirmes.',
-      [
-        { text: 'Continuer', style: 'cancel' },
-        {
-          text: 'Annuler la partie',
-          style: 'destructive',
-          onPress: () => {
-            resetGame();
-            navigation.replace('Home');
-          },
-        },
-      ],
-    );
-  };
+  const [showCancelSheet, setShowCancelSheet] = useState(false);
 
   return (
     <SafeAreaView style={gameScreenStyles.safe} edges={['top', 'bottom']}>
-      <GameTopBar onCancel={handleCancelGame} />
+      <CancelGameSheet
+        visible={showCancelSheet}
+        onConfirm={() => { resetGame(); navigation.replace('Home'); }}
+        onCancel={() => setShowCancelSheet(false)}
+      />
+      <GameTopBar onCancel={() => setShowCancelSheet(true)} />
       <View style={gameScreenStyles.centerContent} />
       <GameActionButton
         label="Commencer"
