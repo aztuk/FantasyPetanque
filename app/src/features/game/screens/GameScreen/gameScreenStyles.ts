@@ -44,7 +44,7 @@ export const gameScreenStyles = StyleSheet.create({
   ruleScrollContent: {
     flexGrow: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     paddingVertical: 20,
     paddingBottom: COMPACT_SCORE_HEIGHT + 20,
   },

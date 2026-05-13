@@ -59,16 +59,6 @@ export function GameScoreBoard({
 
         const content = (
           <View style={styles.teamColumn}>
-            {showTotals && (
-              <View style={[styles.total, { backgroundColor: ui.surface }]}>
-                <AnimatedNumber
-                  animateToNumber={scores[team]}
-                  fontStyle={styles.totalText}
-                  animationDuration={400}
-                  containerStyle={styles.totalContainer}
-                />
-              </View>
-            )}
             {showRoundBar && (
               <View style={[styles.mene, { backgroundColor: ui.surface }]}>
                 <AnimatedNumber
@@ -76,6 +66,16 @@ export function GameScoreBoard({
                   fontStyle={styles.meneText}
                   animationDuration={300}
                   containerStyle={styles.meneContainer}
+                />
+              </View>
+            )}
+            {showTotals && (
+              <View style={[styles.total, { backgroundColor: ui.surface }]}>
+                <AnimatedNumber
+                  animateToNumber={scores[team]}
+                  fontStyle={styles.totalText}
+                  animationDuration={400}
+                  containerStyle={styles.totalContainer}
                 />
               </View>
             )}
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   total: {
     minHeight: 57,
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     paddingVertical: 8,
     borderTopWidth: 2,
     borderTopColor: gameUiColors.background,
