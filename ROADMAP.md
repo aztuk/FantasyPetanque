@@ -21,7 +21,7 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 
 - [fait] Écran post-mène : après la fin d'une mène, afficher un écran intermédiaire qui anime l'incrément du score et résume les mini-objectifs/bonus/malus accomplis durant la mène. - Difficulté 3/5 - Claude
 - [ ] BUG — Drawer score en partie en cours : ouvrir le drawer clique accidentellement les boutons bonus/malus en-dessous (les boutons se togglent). Identifier et neutraliser les touch events pendant l'ouverture du drawer.
-- [ ] Short description absente en mène : dans l'écran de mène (PlayingView), ne pas afficher la short description de la règle — elle doit apparaître uniquement en inter-mène (inter-round) et en écran de config.
+- [fait] Short description absente en mène : dans l'écran de mène (PlayingView), ne pas afficher la short description de la règle — elle doit apparaître uniquement en inter-mène (inter-round) et en écran de config. - Difficulté 2/5 - Codex
 
 - [fait] Bug AlertBox : l'AlertBox custom n'est pas utilisée lors de l'annulation d'une partie fantasy. - Difficulté 1/5 - Codex
 - [fait] Mode simple — ajustements layout : blocs en bas, historique ancré au-dessus (pousse vers le haut), skip inter-mène. (commit `142a1dc`)

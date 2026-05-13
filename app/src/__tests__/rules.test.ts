@@ -84,6 +84,16 @@ describe('Rules data bank', () => {
     expect(rule.maxBonusPerTeam).toBe(1);
   });
 
+  it('stores display notes separately from descriptions', () => {
+    const gauche = getRuleById('gauche-caviar')!;
+    const casino = getRuleById('casino')!;
+
+    expect(gauche.description).not.toContain('Maximum');
+    expect(gauche.note).toBe('Maximum 1 bonus par équipe.');
+    expect(casino.description).not.toContain('Pas de score normal');
+    expect(casino.note).toBe('Pas de score normal sur cette mène.');
+  });
+
   it('censure maxMalusPerTeam is 3', () => {
     const rule = getRuleById('censure')!;
     expect(rule.maxMalusPerTeam).toBe(3);

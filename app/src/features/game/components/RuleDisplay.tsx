@@ -7,6 +7,7 @@ import { gameUiColors } from './gameUiTheme';
 interface Props {
   rule: Rule;
   immuneTeam?: Team | null;
+  showNote?: boolean;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -17,11 +18,9 @@ export interface RuleDescriptionSegment {
 
 export interface RuleDisplayContent {
   paragraphs: RuleDescriptionSegment[][];
-  note: RuleDescriptionSegment[] | null;
 }
 
 const RULE_TEXT_TAG_PATTERN = /<\/?b>/g;
-const FINAL_NOTE_PATTERN = /(?:^|\s)((?:Maximum|Pas de score normal)\b[\s\S]*?)\.?$/;
 const PARAGRAPH_SPLIT_PATTERN = /\n{2,}|(?<=\.)\s+(?=[A-ZÀ-ÖØ-Þ])/;
 
 function normalizeRuleDescription(description: string): string {
@@ -77,18 +76,14 @@ export function parseRuleDescription(description: string): RuleDescriptionSegmen
 
 export function parseRuleDisplayContent(description: string): RuleDisplayContent {
   const source = normalizeRuleDescription(description);
-  const noteMatch = source.match(FINAL_NOTE_PATTERN);
-  const bodySource = noteMatch ? source.slice(0, noteMatch.index).trim() : source;
-  const noteSource = noteMatch ? noteMatch[1].trim().replace(/\.$/, '') : null;
 
-  const paragraphs = bodySource
+  const paragraphs = source
     .split(PARAGRAPH_SPLIT_PATTERN)
     .map((paragraph) => parseRuleDescription(paragraph))
     .filter((paragraph) => paragraph.length > 0);
 
   return {
     paragraphs,
-    note: noteSource ? parseRuleDescription(noteSource) : null,
   };
 }
 
@@ -109,7 +104,7 @@ function renderSegments(segments: RuleDescriptionSegment[]) {
   ));
 }
 
-export function RuleDisplay({ rule, immuneTeam = null, style }: Props) {
+export function RuleDisplay({ rule, immuneTeam = null, showNote = true, style }: Props) {
   const content = parseRuleDisplayContent(rule.description);
 
   return (
@@ -121,9 +116,9 @@ export function RuleDisplay({ rule, immuneTeam = null, style }: Props) {
             {renderSegments(paragraph)}
           </Text>
         ))}
-        {content.note && (
+        {showNote && rule.note && (
           <Text style={styles.note}>
-            {renderSegments(content.note)}
+            {renderSegments(parseRuleDescription(rule.note))}
           </Text>
         )}
       </View>

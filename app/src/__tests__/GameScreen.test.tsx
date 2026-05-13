@@ -66,18 +66,25 @@ describe('GameScreen cancel top bar', () => {
 describe('GameScreen fantasy inter-mene', () => {
   it('shows veto actions and starts the playable round', () => {
     useGameStore.getState().startGame({ mode: 'fantasy', vetosEnabled: true });
-    useGameStore.getState().forceRule(ALL_RULES.find((rule) => rule.id === 'dome-de-fer')!);
+    const rule = ALL_RULES.find((item) => item.id === 'gauche-caviar')!;
+    useGameStore.getState().forceRule(rule);
     render(<GameScreen />);
 
     expect(useGameStore.getState().phase).toBe('pre-mene');
     expect(screen.getByTestId('cancel-game-button')).toBeTruthy();
     expect(screen.getByTestId('veto-blue-button')).toBeTruthy();
     expect(screen.getByTestId('veto-red-button')).toBeTruthy();
+    expect(screen.getByText(/mauvaise main/)).toBeTruthy();
+    expect(screen.getByText(/Maximum 1 bonus/)).toBeTruthy();
     expect(screen.getByText('COMMENCER')).toBeTruthy();
 
     fireEvent.press(screen.getByTestId('begin-round-button'));
 
     expect(useGameStore.getState().phase).toBe('playing');
+    expect(screen.getByText(rule.name)).toBeTruthy();
+    expect(screen.getByText(/mauvaise main/)).toBeTruthy();
+    expect(screen.getByText(/Maximum 1 bonus/)).toBeTruthy();
+    expect(screen.queryByText(rule.shortDescription)).toBeNull();
     expect(screen.getByTestId('end-round-button').props.accessibilityState.disabled).toBe(true);
   });
 

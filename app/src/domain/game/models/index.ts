@@ -44,6 +44,7 @@ export interface Rule {
   name: string;
   description: string;
   shortDescription: string;
+  note?: string;
   tags: RuleTag[];
   uiType: RuleUIType;
   skipNormalScore?: boolean;

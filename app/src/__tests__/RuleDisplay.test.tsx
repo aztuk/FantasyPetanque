@@ -31,7 +31,7 @@ describe('parseRuleDescription', () => {
 });
 
 describe('parseRuleDisplayContent', () => {
-  it('separates body sentences and final maximum note', () => {
+  it('keeps every description sentence in the body', () => {
     expect(
       parseRuleDisplayContent(
         'Chaque joueur doit lancer avec <b>sa mauvaise main</b>. Un tir réussi vaut <b>1 point bonus</b>. Maximum 1 par équipe.',
@@ -48,8 +48,10 @@ describe('parseRuleDisplayContent', () => {
           { text: '1 point bonus', bold: true },
           { text: '.', bold: false },
         ],
+        [
+          { text: 'Maximum 1 par équipe.', bold: false },
+        ],
       ],
-      note: [{ text: 'Maximum 1 par équipe', bold: false }],
     });
   });
 });
@@ -85,36 +87,55 @@ describe('RuleDisplay', () => {
     expect(StyleSheet.flatten(screen.getByText('Détail secondaire').props.style).color).toBeUndefined();
   });
 
-  it('renders the final maximum sentence as muted note text', () => {
+  it('renders rule note as muted note text', () => {
     render(
       <RuleDisplay
         rule={{
           ...baseRule,
-          description: 'Chaque joueur doit lancer. Maximum 1 par équipe.',
+          description: 'Chaque joueur doit lancer.',
+          note: 'Maximum 1 par équipe.',
         }}
       />,
     );
 
-    const noteStyle = StyleSheet.flatten(screen.getByText('Maximum 1 par équipe').props.style);
+    const noteStyle = StyleSheet.flatten(screen.getByText('Maximum 1 par équipe.').props.style);
 
     expect(screen.getByText('Chaque joueur doit lancer.')).toBeTruthy();
     expect(noteStyle.color).toBe(gameUiColors.muted);
     expect(noteStyle.fontSize).toBe(18);
   });
 
-  it('renders the final no-normal-score sentence as muted note text', () => {
+  it('renders no-normal-score rule note as muted note text', () => {
     render(
       <RuleDisplay
         rule={{
           ...baseRule,
-          description: 'Chaque équipe mise des points. Pas de score normal sur cette mène.',
+          description: 'Chaque équipe mise des points.',
+          note: 'Pas de score normal sur cette mène.',
         }}
       />,
     );
 
-    const noteStyle = StyleSheet.flatten(screen.getByText('Pas de score normal sur cette mène').props.style);
+    const noteStyle = StyleSheet.flatten(screen.getByText('Pas de score normal sur cette mène.').props.style);
 
     expect(screen.getByText('Chaque équipe mise des points.')).toBeTruthy();
     expect(noteStyle.color).toBe(gameUiColors.muted);
+  });
+
+  it('can hide the compact final note while keeping the description body', () => {
+    render(
+      <RuleDisplay
+        rule={{
+          ...baseRule,
+          description: 'Chaque joueur doit lancer.',
+          note: 'Maximum 1 par equipe.',
+        }}
+        showNote={false}
+      />,
+    );
+
+    expect(screen.getByText(/R.gle test/)).toBeTruthy();
+    expect(screen.getByText(/Chaque joueur doit lancer/)).toBeTruthy();
+    expect(screen.queryByText(/Maximum 1 par/)).toBeNull();
   });
 });
