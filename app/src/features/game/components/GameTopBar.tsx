@@ -1,13 +1,15 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { colors, radius, typography } from '../../../shared/constants';
+import { typography } from '../../../shared/constants';
+import { gameUiColors } from './gameUiTheme';
 
 interface Props {
   onCancel: () => void;
+  title?: string;
   children?: React.ReactNode;
 }
 
-export function GameTopBar({ onCancel, children }: Props) {
+export function GameTopBar({ onCancel, title, children }: Props) {
   return (
     <View style={styles.bar}>
       <TouchableOpacity
@@ -18,10 +20,10 @@ export function GameTopBar({ onCancel, children }: Props) {
         accessibilityLabel="Annuler la partie"
         testID="cancel-game-button"
       >
-        <Text style={styles.cancelIcon}>←</Text>
+        <Text style={styles.cancelIcon}>{'<'}</Text>
       </TouchableOpacity>
 
-      <View style={styles.actions}>{children}</View>
+      {title ? <Text style={styles.title}>{title}</Text> : <View style={styles.actions}>{children}</View>}
     </View>
   );
 }
@@ -30,30 +32,35 @@ const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 20,
-    paddingTop: 8,
-    paddingBottom: 6,
-    backgroundColor: colors.background,
+    width: '100%',
+    minHeight: 80,
+    paddingRight: 24,
+    backgroundColor: gameUiColors.background,
   },
   cancelButton: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.md,
-    borderWidth: 1.5,
-    borderColor: colors.surface2,
+    width: 80,
+    minHeight: 80,
     alignItems: 'center',
     justifyContent: 'center',
   },
   cancelIcon: {
-    color: colors.textPrimary,
-    fontSize: typography.size.lg,
+    color: gameUiColors.muted,
+    fontSize: 40,
+    fontWeight: typography.weight.regular,
+    lineHeight: 48,
+  },
+  title: {
+    flex: 1,
+    color: gameUiColors.white,
+    fontFamily: typography.family.bodySemibold,
+    fontSize: 32,
+    lineHeight: 54,
     fontWeight: typography.weight.bold,
-    lineHeight: 28,
+    letterSpacing: 0,
   },
   actions: {
     flex: 1,
     flexDirection: 'row',
-    gap: 8,
+    gap: 4,
   },
 });

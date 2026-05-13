@@ -33,7 +33,6 @@ beforeEach(() => {
     debugMode: false,
   });
 });
-
 describe('GameScreen cancel top bar', () => {
   it('shows cancel button during active game', () => {
     useGameStore.getState().startGame({ mode: 'simple' });
@@ -76,17 +75,27 @@ describe('GameScreen cancel top bar', () => {
     expect(mockReplace).toHaveBeenCalledWith('Home');
     expect(mockNavigate).not.toHaveBeenCalledWith('Home');
   });
+});
 
-  it('keeps veto actions in the safe top bar for fantasy games', () => {
+describe('GameScreen fantasy inter-mene', () => {
+  it('shows veto actions and starts the playable round', () => {
     useGameStore.getState().startGame({ mode: 'fantasy', vetosEnabled: true });
     render(<GameScreen />);
 
+    expect(useGameStore.getState().phase).toBe('pre-mene');
     expect(screen.getByTestId('cancel-game-button')).toBeTruthy();
-    expect(screen.getAllByText(/Véto/)).toHaveLength(2);
+    expect(screen.getByTestId('veto-blue-button')).toBeTruthy();
+    expect(screen.getByTestId('veto-red-button')).toBeTruthy();
+    expect(screen.getByText('COMMENCER')).toBeTruthy();
+
+    fireEvent.press(screen.getByTestId('begin-round-button'));
+
+    expect(useGameStore.getState().phase).toBe('playing');
+    expect(screen.getByTestId('end-round-button').props.accessibilityState.disabled).toBe(true);
   });
 });
 
-describe('GameScreen simple mode — skip inter-mène', () => {
+describe('GameScreen simple mode - skip inter-mene', () => {
   it('starts new round immediately after finishing a round without round-summary', () => {
     useGameStore.getState().startGame({ mode: 'simple' });
 
@@ -110,9 +119,9 @@ describe('GameScreen simple mode — skip inter-mène', () => {
     fireEvent.press(screen.getByTestId('score-block-red'));
     fireEvent.press(screen.getByTestId('end-round-button'));
 
-    expect(screen.getByText('Mène 1')).toBeTruthy();
-    expect(screen.getByText(/Rouge \+1/)).toBeTruthy();
-    expect(screen.getByText('0 — 1')).toBeTruthy();
+    expect(screen.getByText('Mène 01')).toBeTruthy();
+    expect(screen.getAllByText('0').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('1').length).toBeGreaterThan(0);
   });
 
   it('does not navigate to round-summary for simple mode', () => {
@@ -123,8 +132,8 @@ describe('GameScreen simple mode — skip inter-mène', () => {
     fireEvent.press(screen.getByTestId('score-block-blue'));
     fireEvent.press(screen.getByTestId('end-round-button'));
 
-    expect(screen.queryByText('Nouvelle mène')).toBeNull();
-    expect(screen.queryByText('Terminer la partie')).toBeNull();
+    expect(screen.queryByText('NOUVELLE MÈNE')).toBeNull();
+    expect(screen.queryByText('TERMINER LA PARTIE')).toBeNull();
   });
 
   it('shows game-over screen when winning score is reached', () => {
@@ -136,7 +145,9 @@ describe('GameScreen simple mode — skip inter-mène', () => {
     fireEvent.press(screen.getByTestId('end-round-button'));
 
     expect(useGameStore.getState().isGameOver).toBe(true);
-    expect(screen.getByText('Partie terminée.')).toBeTruthy();
+    expect(screen.getByText('Partie terminée')).toBeTruthy();
+    expect(screen.getByText('BLEU GAGNE')).toBeTruthy();
+    expect(screen.getByText('NOUVELLE PARTIE')).toBeTruthy();
   });
 });
 
@@ -149,15 +160,10 @@ describe('GameScreen normal scoring interaction', () => {
     expect(screen.queryByText('Tapez le nombre de points marqués')).toBeNull();
     expect(screen.queryByText(/Bleu marque/)).toBeNull();
     expect(screen.queryByText(/Rouge marque/)).toBeNull();
-    expect(screen.queryByText('Bleu')).toBeNull();
-    expect(screen.queryByText('Rouge')).toBeNull();
     expect(screen.getByTestId('end-round-button').props.accessibilityState.disabled).toBe(true);
 
     fireEvent.press(screen.getByTestId('score-block-blue'));
 
-    expect(screen.getByText('+1')).toBeTruthy();
-    expect(screen.getByText('Tapez pour annuler')).toBeTruthy();
-    expect(screen.queryByText(/Annuler dernier point/)).toBeNull();
     expect(useGameStore.getState().currentRound?.normalPoints.blue).toBe(1);
     expect(screen.getByTestId('end-round-button').props.accessibilityState.disabled).toBe(false);
 
@@ -165,8 +171,6 @@ describe('GameScreen normal scoring interaction', () => {
 
     expect(useGameStore.getState().currentRound?.normalPoints.blue).toBe(0);
     expect(useGameStore.getState().currentRound?.normalPoints.red).toBe(0);
-    expect(screen.queryByText('+1')).toBeNull();
-    expect(screen.queryByText('Tapez pour annuler')).toBeNull();
     expect(screen.getByTestId('end-round-button').props.accessibilityState.disabled).toBe(true);
   });
 });

@@ -49,6 +49,7 @@ interface GameStore extends GameState {
 
   // Round lifecycle
   startNewRound: () => void;
+  beginRound: () => void;
   useVeto: (team: Team) => void;
   finishRound: () => void;
 
@@ -123,7 +124,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   startGame: ({ mode, winningScore, maxRounds = null, vetosEnabled = true }) => {
     const initial = makeInitialState();
     initial.mode = mode;
-    initial.phase = 'rule-display';
+    initial.phase = mode === 'fantasy' ? 'pre-mene' : 'rule-display';
     if (winningScore !== undefined) initial.winningScore = winningScore;
     initial.maxRounds = maxRounds;
     initial.vetosEnabled = vetosEnabled;
@@ -193,14 +194,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
       playedRuleIds: newPlayedRuleIds,
       pendingNextRule: newPendingNextRule,
       immuneTeam: null, // consumed
-      phase: 'rule-display',
+      phase: state.mode === 'fantasy' ? 'pre-mene' : 'rule-display',
     });
+  },
+
+  beginRound: () => {
+    const state = get();
+    if (state.mode !== 'fantasy' || !state.currentRound) return;
+    set({ phase: 'playing' });
   },
 
   useVeto: (team) => {
     const state = get();
     if (!state.vetos[team] || !state.currentRound) return;
-    if (state.phase !== 'rule-display') return;
+    if (state.phase !== 'rule-display' && state.phase !== 'pre-mene') return;
 
     // Draw a new rule (veto'd rule can reappear later, so we don't add it to playedRuleIds)
     const newRule = drawRule({ playedRuleIds: state.playedRuleIds, scores: state.scores });

@@ -34,6 +34,7 @@ describe('startGame', () => {
     useGameStore.getState().startGame({ mode: 'fantasy' });
     const state = useGameStore.getState();
     expect(state.mode).toBe('fantasy');
+    expect(state.phase).toBe('pre-mene');
     expect(state.currentRound).not.toBeNull();
     expect(state.currentRound?.rule).not.toBeNull();
   });
@@ -154,13 +155,14 @@ describe('useVeto', () => {
   it('keeps veto available while normal points are edited before the round is finished', () => {
     const ruleBeforeScoring = useGameStore.getState().currentRound?.rule?.id;
 
+    useGameStore.getState().beginRound();
     useGameStore.getState().addNormalPoint('blue');
-    expect(useGameStore.getState().phase).toBe('rule-display');
+    expect(useGameStore.getState().phase).toBe('playing');
 
     useGameStore.getState().undoNormalPoint();
 
     const state = useGameStore.getState();
-    expect(state.phase).toBe('rule-display');
+    expect(state.phase).toBe('playing');
     expect(state.vetos.blue).toBe(true);
     expect(state.currentRound?.vetoUsed).toBeNull();
     expect(state.currentRound?.rule?.id).toBe(ruleBeforeScoring);
