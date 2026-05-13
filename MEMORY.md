@@ -8,5 +8,6 @@
 - L'iconographie de l'application doit utiliser Phosphor (`phosphor-react-native`) pour les nouvelles icônes React Native, afin de rester cohérente avec les maquettes.
 - En mode fantasy, une mène démarre en phase `pre-mene` pour afficher la règle, les vétos et l'action `COMMENCER`, puis passe en phase `playing` avant la saisie des points.
 - Les descriptions longues de règles supportent uniquement `<b>...</b>` pour mettre un segment en couleur secondaire, ainsi que `\n` pour les retours à la ligne. Le texte atténué reste porté par `shortDescription`, pas par un tag `<weak>`.
+- Dans `RuleDisplay`, une phrase finale commençant par `Maximum` est extraite automatiquement de `description` et rendue comme note muted sous la règle, sans modifier la spec ni les données de règles.
 - Les règles fantasy avec choix à faire avant la première boule passent par une phase dédiée `rule-setup` entre `pre-mene` et `playing`. Pour l'instant, ce flow s'applique à `Contrat`, `Assurance vie` et `Frontière`; les autres règles `setup` seront ajustées pendant la QA règle par règle.
 - Les refontes des UI de règles spécifiques sont cadrées dans `UI_RULES_CADRAGE.md` : bonus/malus simples restent groupées, les règles à flow dédié sont traitées une par une, et `L'impair contre-attaque` reste séparée car elle explique une résolution automatique sensible.

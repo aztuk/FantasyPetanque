@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { render, screen } from '@testing-library/react-native';
 import { Rule } from '../domain/game/models';
-import { RuleDisplay, parseRuleDescription } from '../features/game/components/RuleDisplay';
+import { RuleDisplay, parseRuleDescription, parseRuleDisplayContent } from '../features/game/components/RuleDisplay';
 import { gameUiColors } from '../features/game/components/gameUiTheme';
 
 const baseRule: Rule = {
@@ -27,6 +27,30 @@ describe('parseRuleDescription', () => {
     expect(parseRuleDescription('Première ligne\\nDeuxième ligne')).toEqual([
       { text: 'Première ligne\nDeuxième ligne', bold: false },
     ]);
+  });
+});
+
+describe('parseRuleDisplayContent', () => {
+  it('separates body sentences and final maximum note', () => {
+    expect(
+      parseRuleDisplayContent(
+        'Chaque joueur doit lancer avec <b>sa mauvaise main</b>. Un tir réussi vaut <b>1 point bonus</b>. Maximum 1 par équipe.',
+      ),
+    ).toEqual({
+      paragraphs: [
+        [
+          { text: 'Chaque joueur doit lancer avec ', bold: false },
+          { text: 'sa mauvaise main', bold: true },
+          { text: '.', bold: false },
+        ],
+        [
+          { text: 'Un tir réussi vaut ', bold: false },
+          { text: '1 point bonus', bold: true },
+          { text: '.', bold: false },
+        ],
+      ],
+      note: [{ text: 'Maximum 1 par équipe', bold: false }],
+    });
   });
 });
 
@@ -59,5 +83,22 @@ describe('RuleDisplay', () => {
 
     expect(StyleSheet.flatten(screen.getByText('Important').props.style).color).toBe(gameUiColors.secondary);
     expect(StyleSheet.flatten(screen.getByText('Détail secondaire').props.style).color).toBeUndefined();
+  });
+
+  it('renders the final maximum sentence as muted note text', () => {
+    render(
+      <RuleDisplay
+        rule={{
+          ...baseRule,
+          description: 'Chaque joueur doit lancer. Maximum 1 par équipe.',
+        }}
+      />,
+    );
+
+    const noteStyle = StyleSheet.flatten(screen.getByText('Maximum 1 par équipe').props.style);
+
+    expect(screen.getByText('Chaque joueur doit lancer.')).toBeTruthy();
+    expect(noteStyle.color).toBe(gameUiColors.muted);
+    expect(noteStyle.fontSize).toBe(18);
   });
 });
