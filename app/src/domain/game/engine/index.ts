@@ -6,6 +6,8 @@ const PRE_MENE_SETUP_UI_TYPES: RuleUIType[] = [
   'contrat',
   'assurance-vie',
   'frontiere',
+  'casino',
+  'prediction',
 ];
 
 // Check if a rule can appear given current scores
@@ -15,7 +17,7 @@ export function ruleIsAvailable(rule: Rule, scores: Record<Team, number>): boole
 
   switch (rule.conditionId) {
     case 'casino-condition':
-      return scores.blue >= 1 || scores.red >= 1;
+      return scores.blue >= 1 && scores.red >= 1;
     case 'prediction-condition':
       return scores.blue >= 1 && scores.red >= 1;
     default:
@@ -93,7 +95,7 @@ export function createRound(
     gaucheBonus: { blue: false, red: false },
     extremesBonus: { blue: false, red: false },
     censureMalus: { blue: 0, red: 0 },
-    casinoBets: { blue: 0, red: 0 },
+    casinoBets: { blue: 1, red: 1 },
     casinoWinner: null,
     predictionValues: { blue: null, red: null },
     totemNextRule: null,
@@ -125,6 +127,8 @@ export function isPreMeneSetupComplete(round: RoundState): boolean {
       return round.contratMission.blue !== null && round.contratMission.red !== null;
     case 'frontiere':
       return round.frontiereChoice.blue !== null && round.frontiereChoice.red !== null;
+    case 'prediction':
+      return round.predictionValues.blue !== null && round.predictionValues.red !== null;
     case 'assurance-vie':
       return true;
     default:

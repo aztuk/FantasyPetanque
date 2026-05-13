@@ -7,16 +7,16 @@ Ce document cadre les refontes des interfaces de regles dediees. Les maquettes F
 | Regle | `uiType` | Composant actuel | Phase | Tache roadmap | Maquette Figma |
 |---|---|---|---|---|---|
 | Gauche caviar | `bonus-buttons` | `BonusButtonsUI` | Pendant la mene | UI specifique regles bonus/malus simples | https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=14-1140&t=qil4nd06wX0YCs6f-11 et https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=14-1188&t=qil4nd06wX0YCs6f-11|
-| Les extremes | `bonus-buttons` | `BonusButtonsUI` | Pendant la mene | UI specifique regles bonus/malus simples | A fournir |
-| Censure | `malus-buttons` | `MalusButtonsUI` | Pendant la mene | UI specifique regles bonus/malus simples | A fournir |
-| La boule maudite | `malus-buttons` | `MalusButtonsUI` | Pendant la mene | UI specifique regles bonus/malus simples | A fournir |
+| Les extremes | `bonus-buttons` | `BonusButtonsUI` | Pendant la mene | UI specifique regles bonus/malus simples | https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=15-1299&t=qil4nd06wX0YCs6f-11 et https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=15-1340&t=qil4nd06wX0YCs6f-11 |
+| Censure | `malus-buttons` | `MalusButtonsUI` | Pendant la mene | UI specifique regles bonus/malus simples | https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=15-1385&t=qil4nd06wX0YCs6f-11 et https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=15-1427&t=qil4nd06wX0YCs6f-11 |
+| La boule maudite | `malus-buttons` | `MalusButtonsUI` | Pendant la mene | UI specifique regles bonus/malus simples | https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=15-1468&t=qil4nd06wX0YCs6f-11 et https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=15-1509&t=qil4nd06wX0YCs6f-11 |
 | King of the Hill | `bonus-buttons` | `BonusButtonsUI` | Pendant la mene | UI specifique regles bonus/malus simples | A fournir |
 | Sortie de porc | `cochonnet-sorti` | `SortieDePorc` | Pendant la mene, peut sauter le score normal | UI specifique regle Sortie de porc | A fournir |
 | Contrat | `contrat` | `ContratSetupUI`, `ContratResolutionUI` | Setup avant mene + pendant la mene | UI specifique regle Contrat | A fournir |
 | Assurance vie | `assurance-vie` | `AssuranceVieSetupUI`, `AssuranceVieReminderUI` | Setup avant mene + rappel pendant la mene | UI specifique regle Assurance vie | A fournir |
 | Frontiere | `frontiere` | `FrontiereSetupUI`, `FrontiereReminderUI` | Setup avant mene + rappel pendant la mene | UI specifique regle Frontiere | A fournir |
-| Casino | `casino` | `CasinoUI` | Mise + resolution gagnant, pas de score normal | UI specifique regle Casino | A fournir |
-| Prediction | `prediction` | `PredictionUI` | Saisie prediction + score normal modifie | UI specifique regle Prediction | A fournir |
+| Casino | `casino` | `CasinoSetupUI` (stepper TeamStepper) + `CasinoResolutionUI` | Setup avant mene + resolution gagnant, pas de score normal | UI specifique regle Casino | Setup : https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=16-1569&t=qil4nd06wX0YCs6f-11 / Ingame : https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=17-1625&t=qil4nd06wX0YCs6f-11 |
+| Prediction | `prediction` | `PredictionSetupUI` (stepper TeamStepper) + `PredictionUI` (readonly) | Setup avant mene + lecture seule pendant la mene | UI specifique regle Prediction | Setup : https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=17-1676 / Ingame : https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=18-1701 |
 | Totem d'immunite | `totem` | `TotemUI` | Pendant la mene + revelation regle suivante | UI specifique regle Totem d'immunite | A fournir |
 | L'impair contre-attaque | `impair` | `ImpairUI` | Aide au scoring automatique | UI specifique regle L'impair contre-attaque | A fournir |
 
@@ -41,6 +41,7 @@ Ces regles ont une contrainte ou un rappel, mais pas de controle dedie obligatoi
 ## Surfaces partagees a surveiller
 
 - `app/src/features/game/components/rule-uis/shared.tsx` : conteneur commun des blocs de regle. Une refonte ici impacte toutes les UI specifiques.
+- Composants de saisie / lecture seule des mises : Input https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=17-1611&t=qil4nd06wX0YCs6f-11 / Readonly https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=18-1775&t=qil4nd06wX0YCs6f-11
 - `app/src/shared/components/TeamButton.tsx` : bouton equipe utilise par bonus, malus, Sortie de porc, Contrat et Assurance vie.
 - `app/src/features/game/components/RuleUI.tsx` : routage entre `uiType` et composant dedie.
 - `app/src/features/game/screens/GameScreen/RuleSetupView.tsx` : layout des choix avant mene pour Contrat, Assurance vie et Frontiere.

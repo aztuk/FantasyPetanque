@@ -1,32 +1,93 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { Team } from '../../../../domain/game/models';
+import { typography } from '../../../../shared/constants';
 import { useGameStore } from '../../state/gameStore';
-import { Section, Props, styles, colors, typography, radius, TEAM_COLORS } from './shared';
+import { gameUiColors } from '../gameUiTheme';
+import { Props } from './shared';
+import { TeamStepper } from './TeamStepper';
 
-export function PredictionUI({ round }: Props) {
-  const { setPrediction } = useGameStore();
+const TEAMS: Team[] = ['blue', 'red'];
+
+const TEAM_TEXT: Record<Team, string> = {
+  blue: gameUiColors.blueText,
+  red: gameUiColors.redText,
+};
+
+const PREDICTION_MIN = 1;
+const PREDICTION_MAX = 6;
+
+export function PredictionSetupUI({ round }: Props) {
+  const setPrediction = useGameStore((state) => state.setPrediction);
+
   return (
-    <Section title="Valeurs">
-      <Text style={styles.note}>Prédire de combien de points vous allez gagner (1 à 6). Si réussi, l'adversaire perd ce nombre de points.</Text>
-      {(['blue', 'red'] as const).map((team) => (
-        <View key={team} style={styles.teamRow}>
-          <Text style={[styles.teamLabel, { color: TEAM_COLORS[team] }]}>{team === 'blue' ? 'Bleu' : 'Rouge'} :</Text>
-          {[1, 2, 3, 4, 5, 6].map((n) => (
-            <TouchableOpacity
-              key={n}
-              style={[localStyles.predBtn, round.predictionValues[team] === n && { backgroundColor: TEAM_COLORS[team] }]}
-              onPress={() => setPrediction(team, round.predictionValues[team] === n ? null : n)}
-            >
-              <Text style={localStyles.predBtnLabel}>{n}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+    <View style={styles.row}>
+      {TEAMS.map((team) => (
+        <TeamStepper
+          key={team}
+          team={team}
+          value={round.predictionValues[team] ?? 0}
+          onChange={(value) => setPrediction(team, value === 0 ? null : value)}
+          min={0}
+          max={PREDICTION_MAX}
+          label="Prédiction"
+          testID={`prediction-setup-${team}`}
+        />
       ))}
-    </Section>
+    </View>
   );
 }
 
-const localStyles = StyleSheet.create({
-  predBtn: { width: 42, height: 42, borderRadius: radius.md, backgroundColor: colors.surface2, alignItems: 'center', justifyContent: 'center', marginHorizontal: 3 },
-  predBtnLabel: { color: colors.textPrimary, fontWeight: typography.weight.bold, fontSize: typography.size.base },
+export function PredictionUI({ round }: Props) {
+  return (
+    <View style={styles.row}>
+      {TEAMS.map((team) => {
+        const value = round.predictionValues[team];
+        const color = TEAM_TEXT[team];
+
+        return (
+          <View key={team} style={styles.readonlyColumn}>
+            <Text style={styles.readonlyValue} testID={`prediction-readonly-${team}`}>
+              {value ?? '—'}
+            </Text>
+            <Text style={[styles.readonlyLabel, { color }]}>Prédiction</Text>
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  row: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    paddingHorizontal: 24,
+  },
+  readonlyColumn: {
+    flex: 1,
+    minWidth: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  readonlyValue: {
+    color: gameUiColors.white,
+    fontFamily: typography.family.bodySemibold,
+    fontSize: 40,
+    lineHeight: 68,
+    fontWeight: typography.weight.semibold,
+    textAlign: 'center',
+    letterSpacing: 0,
+  },
+  readonlyLabel: {
+    fontFamily: typography.family.bodySemibold,
+    fontSize: 21,
+    lineHeight: 32,
+    fontWeight: typography.weight.semibold,
+    textAlign: 'center',
+    letterSpacing: 0,
+  },
 });

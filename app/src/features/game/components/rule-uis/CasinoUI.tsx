@@ -1,68 +1,127 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { getCasinoMaxBet, CASINO_MIN_BET } from '../../../../domain/game/scoring';
+import { Team } from '../../../../domain/game/models';
+import { typography } from '../../../../shared/constants';
 import { useGameStore } from '../../state/gameStore';
-import { TeamButton } from '../../../../shared/components/TeamButton';
-import { Section, Props, styles, colors, typography, radius, TEAM_COLORS } from './shared';
+import { gameUiColors } from '../gameUiTheme';
+import { Props } from './shared';
+import { TeamStepper } from './TeamStepper';
 
-export function CasinoUI({ round }: Props) {
-  const { setCasinoBet, setCasinoWinner } = useGameStore();
-  const scores = useGameStore((s) => s.scores);
-  const [betInput, setBetInput] = useState<Record<'blue' | 'red', string>>({
-    blue: String(round.casinoBets.blue),
-    red: String(round.casinoBets.red),
-  });
+const TEAMS: Team[] = ['blue', 'red'];
 
-  const handleBet = (team: 'blue' | 'red', val: string) => {
-    setBetInput((prev) => ({ ...prev, [team]: val }));
-    const num = parseInt(val, 10);
-    if (!isNaN(num)) setCasinoBet(team, num);
-  };
+const TEAM_COPY = {
+  blue: {
+    label: 'Mise bleue',
+    stepperTestID: 'casino-bet-blue',
+    readonlyTestID: 'casino-bet-blue-readonly',
+    color: gameUiColors.blueText,
+  },
+  red: {
+    label: 'Mise rouge',
+    stepperTestID: 'casino-bet-red',
+    readonlyTestID: 'casino-bet-red-readonly',
+    color: gameUiColors.redText,
+  },
+} as const;
 
-  if (!round.casinoWinner) {
-    return (
-      <Section title="Mise">
-        {(['blue', 'red'] as const).map((team) => (
-          <View key={team} style={styles.teamRow}>
-            <Text style={[styles.teamLabel, { color: TEAM_COLORS[team] }]}>{team === 'blue' ? 'Bleu' : 'Rouge'} (max {scores[team]}) :</Text>
-            <TextInput
-              style={localStyles.betInput}
-              keyboardType="number-pad"
-              value={betInput[team]}
-              onChangeText={(v) => handleBet(team, v)}
-              maxLength={3}
-            />
-          </View>
-        ))}
-        <Text style={styles.note}>Pas de score normal. Désignez le gagnant à la fin de la mène.</Text>
-        <View style={styles.row}>
-          {(['blue', 'red'] as const).map((team) => (
-            <TeamButton key={team} team={team} label="Gagne la mène" onPress={() => setCasinoWinner(team)} />
-          ))}
-        </View>
-      </Section>
-    );
-  }
+export function CasinoSetupUI({ round }: Props) {
+  const scores = useGameStore((state) => state.scores);
+  const setCasinoBet = useGameStore((state) => state.setCasinoBet);
 
   return (
-    <Section title="Résultat">
-      <Text style={styles.note}>
-        {round.casinoWinner === 'blue' ? 'Bleu' : 'Rouge'} gagne !{'\n'}
-        Bleu mise : {round.casinoBets.blue} — Rouge mise : {round.casinoBets.red}
-      </Text>
-    </Section>
+    <View style={styles.betRow}>
+      {TEAMS.map((team) => {
+        const ui = TEAM_COPY[team];
+        const max = getCasinoMaxBet(team, scores);
+
+        return (
+          <TeamStepper
+            key={team}
+            team={team}
+            value={round.casinoBets[team]}
+            onChange={(value) => setCasinoBet(team, value)}
+            min={CASINO_MIN_BET}
+            max={max}
+            label={ui.label}
+            testID={ui.stepperTestID}
+          />
+        );
+      })}
+    </View>
   );
 }
 
-const localStyles = StyleSheet.create({
-  betInput: {
-    backgroundColor: colors.surface2,
-    color: colors.textPrimary,
-    borderRadius: radius.md,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    fontSize: typography.size.base,
-    width: 76,
-    marginLeft: 10,
+function StakeReadonly({ label, color, value, testID }: { label: string; color: string; value: string; testID?: string }) {
+  return (
+    <View style={styles.betColumn}>
+      <Text style={styles.readonlyValue} testID={testID}>{value}</Text>
+      <Text style={[styles.betLabel, { color }]} numberOfLines={1} adjustsFontSizeToFit>
+        {label}
+      </Text>
+    </View>
+  );
+}
+
+export function CasinoResolutionUI({ round }: Props) {
+  return (
+    <View style={styles.resolution}>
+      <View style={styles.betRow}>
+        {TEAMS.map((team) => {
+          const ui = TEAM_COPY[team];
+
+          return (
+            <StakeReadonly
+              key={team}
+              label={ui.label}
+              color={ui.color}
+              value={String(round.casinoBets[team])}
+              testID={ui.readonlyTestID}
+            />
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  betRow: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    paddingHorizontal: 24,
+  },
+  betColumn: {
+    flex: 1,
+    minWidth: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  betLabel: {
+    width: '100%',
+    fontFamily: typography.family.bodySemibold,
+    fontSize: 21,
+    lineHeight: 32,
+    fontWeight: typography.weight.semibold,
     textAlign: 'center',
+    letterSpacing: 0,
+  },
+  resolution: {
+    width: '100%',
+    flex: 1,
+    justifyContent: 'center',
+    marginTop: 28,
+  },
+  readonlyValue: {
+    color: gameUiColors.white,
+    fontFamily: typography.family.bodySemibold,
+    fontSize: 40,
+    lineHeight: 68,
+    fontWeight: typography.weight.bold,
+    textAlign: 'center',
+    letterSpacing: 0,
   },
 });

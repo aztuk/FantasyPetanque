@@ -6,8 +6,8 @@ import { SortieDePorc } from './SortieDePorc';
 import { ContratSetupUI, ContratResolutionUI } from './ContratUI';
 import { AssuranceVieSetupUI, AssuranceVieReminderUI } from './AssuranceVieUI';
 import { FrontiereSetupUI, FrontiereReminderUI } from './FrontiereUI';
-import { CasinoUI } from './CasinoUI';
-import { PredictionUI } from './PredictionUI';
+import { CasinoResolutionUI, CasinoSetupUI } from './CasinoUI';
+import { PredictionUI, PredictionSetupUI } from './PredictionUI';
 import { TotemUI } from './TotemUI';
 import { ImpairUI } from './ImpairUI';
 
@@ -22,7 +22,7 @@ export function RuleUI({ round }: Props) {
     case 'contrat': return <ContratResolutionUI round={round} />;
     case 'assurance-vie': return <AssuranceVieReminderUI round={round} />;
     case 'frontiere': return <FrontiereReminderUI round={round} />;
-    case 'casino': return <CasinoUI round={round} />;
+    case 'casino': return <CasinoResolutionUI round={round} />;
     case 'prediction': return <PredictionUI round={round} />;
     case 'totem': return <TotemUI round={round} />;
     case 'impair': return <ImpairUI />;
@@ -38,6 +38,8 @@ export function RuleSetupUI({ round }: Props) {
     case 'contrat': return <ContratSetupUI round={round} />;
     case 'assurance-vie': return <AssuranceVieSetupUI round={round} />;
     case 'frontiere': return <FrontiereSetupUI round={round} />;
+    case 'casino': return <CasinoSetupUI round={round} />;
+    case 'prediction': return <PredictionSetupUI round={round} />;
     default: return null;
   }
 }
