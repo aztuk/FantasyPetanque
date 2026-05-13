@@ -12,3 +12,9 @@ export const gameUiColors = {
   redText: '#E86868',
   darkOverlay: 'rgba(0,0,0,0.2)',
 } as const;
+
+export const gameUiMotion = {
+  curves: {
+    premium: [0.16, 1, 0.3, 1],
+  },
+} as const;

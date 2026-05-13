@@ -24,7 +24,7 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 - [fait] Refonte SetupScreen selon les maquettes Figma fournies (à décomposer en sous-tâches par écran lors de l'implémentation). (commit `45bc3c8`)
 - [fait] Refonte écrans de jeu selon les maquettes Figma fournies — 4 écrans : Mène classique, Mène fantasy, Inter-mène fantasy, Fin de partie. (commit `08ad8bd`)
 - [fait] Affichage enrichi des textes de règles : supporter le highlight `<b>...</b>` en couleur secondaire et les retours à la ligne `\n` dans les règles affichées.
-- [ ] Historique de mène classique : conserver l'empilement avec la dernière mène en bas et, lors de l'ajout d'une mène, garder la nouvelle mène visible en masquant d'abord les anciennes mènes en haut.
+- [fait] Historique de mène classique : conserver l'empilement avec la dernière mène en bas et, lors de l'ajout d'une mène, garder la nouvelle mène visible en masquant d'abord les anciennes mènes en haut.
 - [ ] Header commun des écrans de jeu : factoriser la top bar et le bouton retour dans un composant partagé utilisant l'icône Phosphor, aligné avec les pages setup.
 - [ ] Cadrage animations/transitions Game : demander où les transitions doivent avoir lieu, évaluer si une librairie est nécessaire, puis créer une tâche par transition avec un brief précis validé par l'utilisateur.
 - [fait] Config création de partie (commits `7b186e8`, `ac355d6`) : par défaut, sélectionner la condition de fin "score 13 points" plutôt que le nombre de mènes.
