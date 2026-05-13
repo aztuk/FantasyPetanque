@@ -11,13 +11,13 @@ import {
   ViewStyle,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ArrowLeftIcon } from 'phosphor-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useGameStore } from '../state/gameStore';
 import { GameMode } from '../../../domain/game/models';
 import { RootStackParamList } from '../../../app/navigation/types';
+import { AppHeader } from '../../../shared/components/AppHeader';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'Setup'>;
 type Step = 1 | 2 | 3 | 4;
@@ -192,18 +192,15 @@ export function SetupScreen() {
 
 function SetupHeader({ title, onBack }: { title: string; onBack: () => void }) {
   return (
-    <View style={styles.header}>
-      <Pressable
-        style={styles.backButton}
-        onPress={onBack}
-        accessibilityRole="button"
-        accessibilityLabel="Retour"
-        testID="setup-back-button"
-      >
-        <ArrowLeftIcon color={SETUP_COLORS.textSmooth} size={32} weight="regular" />
-      </Pressable>
-      <Text style={styles.headerTitle}>{title}</Text>
-    </View>
+    <AppHeader
+      onBack={onBack}
+      title={title}
+      backgroundColor={SETUP_COLORS.dark}
+      iconColor={SETUP_COLORS.textSmooth}
+      textColor={SETUP_COLORS.white}
+      backButtonTestID="setup-back-button"
+      titleStyle={styles.headerTitle}
+    />
   );
 }
 
@@ -398,27 +395,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: SETUP_COLORS.dark,
   },
-  header: {
-    height: 80,
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: SETUP_COLORS.dark,
-  },
-  backButton: {
-    width: 80,
-    height: 80,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   headerTitle: {
-    flex: 1,
-    color: SETUP_COLORS.white,
     fontFamily: SETUP_FONTS.bold,
-    fontSize: 32,
-    lineHeight: 54,
     letterSpacing: -1.28,
-    includeFontPadding: false,
   },
   choiceContent: {
     flex: 1,
