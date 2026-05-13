@@ -169,6 +169,63 @@ describe('useVeto', () => {
   });
 });
 
+describe('pre-mene rule setup flow', () => {
+  it('starts a normal fantasy rule directly from pre-mene', () => {
+    useGameStore.getState().startGame({ mode: 'fantasy' });
+    useGameStore.getState().forceRule(ALL_RULES.find((rule) => rule.id === 'dome-de-fer')!);
+
+    useGameStore.getState().beginRound();
+
+    expect(useGameStore.getState().phase).toBe('playing');
+  });
+
+  it('opens a setup phase before playing Frontiere and waits for both choices', () => {
+    useGameStore.getState().startGame({ mode: 'fantasy' });
+    useGameStore.getState().forceRule(ALL_RULES.find((rule) => rule.id === 'frontiere')!);
+
+    useGameStore.getState().beginRound();
+    expect(useGameStore.getState().phase).toBe('rule-setup');
+
+    useGameStore.getState().beginRound();
+    expect(useGameStore.getState().phase).toBe('rule-setup');
+
+    useGameStore.getState().setFrontiereChoice('blue', 'left');
+    useGameStore.getState().setFrontiereChoice('red', 'right');
+    useGameStore.getState().beginRound();
+
+    expect(useGameStore.getState().phase).toBe('playing');
+  });
+
+  it('requires both Contrat missions before playing', () => {
+    useGameStore.getState().startGame({ mode: 'fantasy' });
+    useGameStore.getState().forceRule(ALL_RULES.find((rule) => rule.id === 'contrat')!);
+
+    useGameStore.getState().beginRound();
+    expect(useGameStore.getState().phase).toBe('rule-setup');
+
+    useGameStore.getState().selectContratMission('blue', 0);
+    useGameStore.getState().beginRound();
+    expect(useGameStore.getState().phase).toBe('rule-setup');
+
+    useGameStore.getState().selectContratMission('red', 1);
+    useGameStore.getState().beginRound();
+
+    expect(useGameStore.getState().phase).toBe('playing');
+  });
+
+  it('lets Assurance vie continue even if no team takes insurance', () => {
+    useGameStore.getState().startGame({ mode: 'fantasy' });
+    useGameStore.getState().forceRule(ALL_RULES.find((rule) => rule.id === 'assurance-vie')!);
+
+    useGameStore.getState().beginRound();
+    expect(useGameStore.getState().phase).toBe('rule-setup');
+
+    useGameStore.getState().beginRound();
+
+    expect(useGameStore.getState().phase).toBe('playing');
+  });
+});
+
 describe('debug rule selection', () => {
   it('replaces the automatically drawn first-round rule with the selected rule', () => {
     useGameStore.getState().startGame({ mode: 'fantasy' });

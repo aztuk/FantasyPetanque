@@ -1,6 +1,14 @@
 import { create } from 'zustand';
 import { Team, GameState, GameMode, RoundState, Rule } from '../../../domain/game/models';
-import { drawRule, drawTotemRule, createRound, shouldSkipNormalScore, isGameOver } from '../../../domain/game/engine';
+import {
+  drawRule,
+  drawTotemRule,
+  createRound,
+  shouldSkipNormalScore,
+  isGameOver,
+  requiresPreMeneSetup,
+  isPreMeneSetupComplete,
+} from '../../../domain/game/engine';
 import {
   clampScore,
   resolveImpair,
@@ -201,6 +209,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
   beginRound: () => {
     const state = get();
     if (state.mode !== 'fantasy' || !state.currentRound) return;
+    if (state.phase === 'pre-mene' && requiresPreMeneSetup(state.currentRound.rule)) {
+      set({ phase: 'rule-setup' });
+      return;
+    }
+    if (state.phase === 'rule-setup' && !isPreMeneSetupComplete(state.currentRound)) {
+      return;
+    }
     set({ phase: 'playing' });
   },
 

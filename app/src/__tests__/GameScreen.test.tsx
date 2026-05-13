@@ -1,6 +1,7 @@
 import React from 'react';
 import { Alert } from 'react-native';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { ALL_RULES } from '../data/rules/rules';
 import { GameScreen } from '../features/game/screens/GameScreen';
 import { useGameStore } from '../features/game/state/gameStore';
 
@@ -80,6 +81,7 @@ describe('GameScreen cancel top bar', () => {
 describe('GameScreen fantasy inter-mene', () => {
   it('shows veto actions and starts the playable round', () => {
     useGameStore.getState().startGame({ mode: 'fantasy', vetosEnabled: true });
+    useGameStore.getState().forceRule(ALL_RULES.find((rule) => rule.id === 'dome-de-fer')!);
     render(<GameScreen />);
 
     expect(useGameStore.getState().phase).toBe('pre-mene');
@@ -92,6 +94,31 @@ describe('GameScreen fantasy inter-mene', () => {
 
     expect(useGameStore.getState().phase).toBe('playing');
     expect(screen.getByTestId('end-round-button').props.accessibilityState.disabled).toBe(true);
+  });
+
+  it('shows a dedicated setup screen before playing a setup rule', () => {
+    useGameStore.getState().startGame({ mode: 'fantasy', vetosEnabled: true });
+    useGameStore.getState().forceRule(ALL_RULES.find((rule) => rule.id === 'frontiere')!);
+    render(<GameScreen />);
+
+    expect(screen.getByText('CONFIGURER')).toBeTruthy();
+
+    fireEvent.press(screen.getByTestId('begin-round-button'));
+
+    expect(useGameStore.getState().phase).toBe('rule-setup');
+    expect(screen.getByTestId('confirm-rule-setup-button').props.accessibilityState.disabled).toBe(true);
+
+    act(() => {
+      useGameStore.getState().setFrontiereChoice('blue', 'left');
+      useGameStore.getState().setFrontiereChoice('red', 'right');
+    });
+
+    expect(screen.getByTestId('confirm-rule-setup-button').props.accessibilityState.disabled).toBe(false);
+
+    fireEvent.press(screen.getByTestId('confirm-rule-setup-button'));
+
+    expect(useGameStore.getState().phase).toBe('playing');
+    expect(screen.getByTestId('end-round-button')).toBeTruthy();
   });
 });
 

@@ -112,6 +112,7 @@ export type GamePhase =
   | 'setup'         // before game starts
   | 'rule-display'  // showing current rule
   | 'pre-mene'      // pre-mene setup (assurance, frontière, casino, prédiction)
+  | 'rule-setup'    // pre-round rule choices before the first boule
   | 'playing'       // during the round
   | 'scoring'       // normal scoring phase
   | 'round-summary' // after round, showing delta

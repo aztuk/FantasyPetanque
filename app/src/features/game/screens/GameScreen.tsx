@@ -13,14 +13,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../../app/navigation/types';
-import { shouldSkipNormalScore } from '../../../domain/game/engine';
+import {
+  isPreMeneSetupComplete,
+  requiresPreMeneSetup,
+  shouldSkipNormalScore,
+} from '../../../domain/game/engine';
 import { Team } from '../../../domain/game/models';
 import { GameActionButton } from '../components/GameActionButton';
 import { GameHistoryList } from '../components/GameHistoryList';
 import { GameScoreBoard } from '../components/GameScoreBoard';
 import { GameTopBar } from '../components/GameTopBar';
 import { RuleDisplay } from '../components/RuleDisplay';
-import { RuleUI } from '../components/RuleUI';
+import { RuleSetupUI, RuleUI } from '../components/RuleUI';
 import { useGameStore } from '../state/gameStore';
 import { gameUiColors } from '../components/gameUiTheme';
 
@@ -94,6 +98,8 @@ export function GameScreen() {
   const hasNormalPoints = scoringTeam !== null;
   const skipNormal = round ? shouldSkipNormalScore(round) : false;
   const canFinishRound = skipNormal || hasNormalPoints;
+  const requiresSetup = round ? requiresPreMeneSetup(round.rule) : false;
+  const setupComplete = round ? isPreMeneSetupComplete(round) : true;
 
   const handleCancelGame = () => {
     Alert.alert(
@@ -249,7 +255,39 @@ export function GameScreen() {
           </View>
         )}
 
-        <GameActionButton label="Commencer" onPress={beginRound} testID="begin-round-button" />
+        <GameActionButton
+          label={requiresSetup ? 'Configurer' : 'Commencer'}
+          onPress={beginRound}
+          testID="begin-round-button"
+        />
+      </SafeAreaView>
+    );
+  }
+
+  if (phase === 'rule-setup') {
+    return (
+      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+        <GameTopBar onCancel={handleCancelGame} />
+        <ScrollView
+          style={styles.ruleSetupContent}
+          contentContainerStyle={styles.ruleSetupScrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {round.rule && (
+            <RuleDisplay
+              rule={round.rule}
+              immuneTeam={round.totemImmuneTeam}
+              style={styles.preMeneRule}
+            />
+          )}
+          <RuleSetupUI round={round} />
+        </ScrollView>
+        <GameActionButton
+          label={setupComplete ? 'Commencer' : 'Choix manquants'}
+          onPress={beginRound}
+          disabled={!setupComplete}
+          testID="confirm-rule-setup-button"
+        />
       </SafeAreaView>
     );
   }
@@ -323,6 +361,17 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  ruleSetupContent: {
+    flex: 1,
+    width: '100%',
+  },
+  ruleSetupScrollContent: {
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 20,
   },
   simpleHistory: {
     flex: 1,

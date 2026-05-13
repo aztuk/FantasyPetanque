@@ -19,13 +19,25 @@ export function RuleUI({ round }: Props) {
     case 'bonus-buttons': return <BonusButtonsUI round={round} />;
     case 'malus-buttons': return <MalusButtonsUI round={round} />;
     case 'cochonnet-sorti': return <SortieDePorc round={round} />;
-    case 'contrat': return <ContratUI round={round} />;
-    case 'assurance-vie': return <AssuranceVieUI round={round} />;
-    case 'frontiere': return <FrontiereUI round={round} />;
+    case 'contrat': return <ContratResolutionUI round={round} />;
+    case 'assurance-vie': return <AssuranceVieReminderUI round={round} />;
+    case 'frontiere': return <FrontiereReminderUI round={round} />;
     case 'casino': return <CasinoUI round={round} />;
     case 'prediction': return <PredictionUI round={round} />;
     case 'totem': return <TotemUI round={round} />;
     case 'impair': return <ImpairUI />;
+    default: return null;
+  }
+}
+
+export function RuleSetupUI({ round }: Props) {
+  const rule = round.rule;
+  if (!rule) return null;
+
+  switch (rule.uiType) {
+    case 'contrat': return <ContratSetupUI round={round} />;
+    case 'assurance-vie': return <AssuranceVieSetupUI round={round} />;
+    case 'frontiere': return <FrontiereSetupUI round={round} />;
     default: return null;
   }
 }
@@ -152,8 +164,8 @@ function SortieDePorc({ round }: Props) {
   );
 }
 
-function ContratUI({ round }: Props) {
-  const { selectContratMission, clearContratMission, setContratSuccess } = useGameStore();
+function ContratSetupUI({ round }: Props) {
+  const { selectContratMission, clearContratMission } = useGameStore();
   const bothSelected = round.contratMission.blue !== null && round.contratMission.red !== null;
 
   return (
@@ -176,17 +188,42 @@ function ContratUI({ round }: Props) {
         </View>
       ))}
       {bothSelected && (
-        <View style={styles.row}>
-          {(['blue', 'red'] as const).map((team) => (
-            <TeamButton key={team} team={team} label={round.contratSuccess[team] ? '✓ Mission réussie' : 'Mission réussie +2'} onPress={() => setContratSuccess(team, !round.contratSuccess[team])} disabled={round.contratMission[team] === null} />
-          ))}
-        </View>
+        <Text style={styles.note}>Les missions sont choisies. Les réussites seront cochées pendant la mène.</Text>
       )}
     </Section>
   );
 }
 
-function AssuranceVieUI({ round }: Props) {
+function ContratResolutionUI({ round }: Props) {
+  const { setContratSuccess } = useGameStore();
+  const blueMission = round.contratMission.blue;
+  const redMission = round.contratMission.red;
+
+  if (blueMission === null || redMission === null) {
+    return null;
+  }
+
+  return (
+    <Section title="Mission">
+      <Text style={styles.note}>
+        Bleu : {CONTRAT_MISSIONS[blueMission]}{'\n'}
+        Rouge : {CONTRAT_MISSIONS[redMission]}
+      </Text>
+      <View style={styles.row}>
+        {(['blue', 'red'] as const).map((team) => (
+          <TeamButton
+            key={team}
+            team={team}
+            label={round.contratSuccess[team] ? 'Mission réussie' : 'Mission réussie +2'}
+            onPress={() => setContratSuccess(team, !round.contratSuccess[team])}
+          />
+        ))}
+      </View>
+    </Section>
+  );
+}
+
+function AssuranceVieSetupUI({ round }: Props) {
   const { toggleAssurance } = useGameStore();
   return (
     <Section title="Configuration">
@@ -200,7 +237,24 @@ function AssuranceVieUI({ round }: Props) {
   );
 }
 
-function FrontiereUI({ round }: Props) {
+function AssuranceVieReminderUI({ round }: Props) {
+  const activeTeams = (['blue', 'red'] as const)
+    .filter((team) => round.assurance[team])
+    .map((team) => (team === 'blue' ? 'Bleu' : 'Rouge'));
+
+  return (
+    <Section title="Assurance">
+      <Text style={styles.note}>
+        {activeTeams.length > 0
+          ? `Assurance active : ${activeTeams.join(', ')}.`
+          : 'Aucune assurance prise.'}
+        {'\n'}Perdre = +1, gagner = -1 sur les points normaux.
+      </Text>
+    </Section>
+  );
+}
+
+function FrontiereSetupUI({ round }: Props) {
   const { setFrontiereChoice } = useGameStore();
   const bothChosen = round.frontiereChoice.blue !== null && round.frontiereChoice.red !== null;
 
@@ -218,6 +272,25 @@ function FrontiereUI({ round }: Props) {
         </View>
       ))}
       {bothChosen && <Text style={styles.note}>Seules les boules du bon côté peuvent marquer.</Text>}
+    </Section>
+  );
+}
+
+function FrontiereReminderUI({ round }: Props) {
+  const formatChoice = (choice: 'left' | 'right' | null) => {
+    if (choice === 'left') return 'gauche';
+    if (choice === 'right') return 'droite';
+    return 'non choisi';
+  };
+  const blueChoice = formatChoice(round.frontiereChoice.blue);
+  const redChoice = formatChoice(round.frontiereChoice.red);
+
+  return (
+    <Section title="Côté">
+      <Text style={styles.note}>
+        Bleu joue à {blueChoice}. Rouge joue à {redChoice}.{'\n'}
+        Seules les boules du bon côté peuvent marquer.
+      </Text>
     </Section>
   );
 }
@@ -316,6 +389,8 @@ function ImpairUI() {
 const styles = StyleSheet.create({
   // Section sans fond
   section: {
+    width: '100%',
+    maxWidth: 420,
     marginVertical: 10,
     paddingBottom: 10,
     borderBottomWidth: 1,

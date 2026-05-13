@@ -1,5 +1,11 @@
-import { Rule, Team, GameState, RoundState } from '../models';
+import { Rule, RuleUIType, Team, GameState, RoundState } from '../models';
 import { ALL_RULES } from '../../../data/rules/rules';
+
+const PRE_MENE_SETUP_UI_TYPES: RuleUIType[] = [
+  'contrat',
+  'assurance-vie',
+  'frontiere',
+];
 
 // Check if a rule can appear given current game state
 export function ruleIsAvailable(rule: Rule, state: GameState): boolean {
@@ -147,6 +153,23 @@ export function shouldSkipNormalScore(round: RoundState): boolean {
   if (round.rule.id === 'sortie-de-porc' && round.sortieDePorc !== null) return true;
 
   return false;
+}
+
+export function requiresPreMeneSetup(rule: Rule | null): boolean {
+  return !!rule && rule.tags.includes('setup') && PRE_MENE_SETUP_UI_TYPES.includes(rule.uiType);
+}
+
+export function isPreMeneSetupComplete(round: RoundState): boolean {
+  switch (round.rule?.uiType) {
+    case 'contrat':
+      return round.contratMission.blue !== null && round.contratMission.red !== null;
+    case 'frontiere':
+      return round.frontiereChoice.blue !== null && round.frontiereChoice.red !== null;
+    case 'assurance-vie':
+      return true;
+    default:
+      return true;
+  }
 }
 
 // Determine if game is over
