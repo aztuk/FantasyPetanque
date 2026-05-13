@@ -144,30 +144,32 @@ export function PlayingView() {
           onLayout={handleDrawerLayout}
           onTouchStart={() => { if (!isCasino) animateDrawer(true); }}
         >
-          {isCasino && (
-            <GameTeamActionRow
-              label="Gagnant"
-              onTeamPress={setCasinoWinner}
-              selectedTeam={round.casinoWinner}
-              testIDPrefix="casino-winner"
+          <View pointerEvents={drawerExpanded ? 'auto' : 'none'}>
+            {isCasino && (
+              <GameTeamActionRow
+                label="Gagnant"
+                onTeamPress={setCasinoWinner}
+                selectedTeam={round.casinoWinner}
+                testIDPrefix="casino-winner"
+              />
+            )}
+            {renderRuleUIInDrawer && <RuleUI round={round} />}
+            {(isCasino || renderRuleUIInDrawer) && <View style={gameScreenStyles.actionScoreGap} />}
+            <GameScoreBoard
+              scores={scores}
+              roundPoints={!isCasino && drawerExpanded ? { blue: bluePoints, red: redPoints } : undefined}
+              modifierPoints={!isCasino && drawerExpanded ? modifierPoints : undefined}
+              roundNumber={round.number}
+              showRoundBar={!isCasino}
+              onTeamPress={drawerExpanded && !skipNormal ? handleTeamPress : undefined}
             />
-          )}
-          {renderRuleUIInDrawer && <RuleUI round={round} />}
-          {(isCasino || renderRuleUIInDrawer) && <View style={gameScreenStyles.actionScoreGap} />}
-          <GameScoreBoard
-            scores={scores}
-            roundPoints={!isCasino && drawerExpanded ? { blue: bluePoints, red: redPoints } : undefined}
-            modifierPoints={!isCasino && drawerExpanded ? modifierPoints : undefined}
-            roundNumber={round.number}
-            showRoundBar={!isCasino}
-            onTeamPress={drawerExpanded && !skipNormal ? handleTeamPress : undefined}
-          />
-          <GameActionButton
-            label={isCasino ? 'Confirmer' : canFinishRound ? 'Mène terminée' : 'Points manquants'}
-            onPress={handleFinishRound}
-            disabled={!canFinishRound}
-            testID="end-round-button"
-          />
+            <GameActionButton
+              label={isCasino ? 'Confirmer' : canFinishRound ? 'Mène terminée' : 'Points manquants'}
+              onPress={handleFinishRound}
+              disabled={!canFinishRound}
+              testID="end-round-button"
+            />
+          </View>
         </Animated.View>
       </View>
     </SafeAreaView>
