@@ -19,6 +19,7 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 
 <!-- fonctionnalités importantes mais non bloquantes -->
 
+- [fait] Bug AlertBox : l'AlertBox custom n'est pas utilisée lors de l'annulation d'une partie fantasy. - Difficulté 1/5 - Codex
 - [fait] Mode simple — ajustements layout : blocs en bas, historique ancré au-dessus (pousse vers le haut), skip inter-mène. (commit `142a1dc`)
 - [fait] Refonte HomeScreen selon les maquettes Figma fournies.
 - [fait] Plein écran avec navigation OS accessible : passer l'app en mode immersif (edge-to-edge) tout en permettant aux boutons de navigation OS d'apparaître sur swipe/tap. (commit `c5c04ed`)
@@ -42,6 +43,7 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 
 <!-- améliorations, polish, nice-to-have -->
 
+- [ ] UI règles : aligner le contenu des règles en haut de l'écran plutôt qu'au milieu.
 - [fait] UI composant Rule : ajuster le composant selon la maquette Figma mise à jour (`node-id=4-730`). - Difficulté 2/5 - Codex
 - [ ] UI Scoreboard : ajuster le composant selon la maquette Figma mise à jour avec le total sous la mène (`node-id=4-268`).
 - [fait] Cadrage UI règles spécifiques : lister les règles avec UI dédiée, associer chaque règle à sa maquette Figma, valider le découpage et identifier les conflits éventuels avec les composants partagés. - Difficulté 1/5 - Codex

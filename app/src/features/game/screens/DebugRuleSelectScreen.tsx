@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import {
-  Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View,
+  FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -8,6 +8,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ALL_RULES } from '../../../data/rules/rules';
 import { Rule } from '../../../domain/game/models';
 import { RootStackParamList } from '../../../app/navigation/types';
+import { CancelGameSheet } from '../../../shared/components/CancelGameSheet';
 import { PrimaryButton } from '../../../shared/components/PrimaryButton';
 import { GameTopBar } from '../components/GameTopBar';
 import { colors, typography, radius } from '../../../shared/constants';
@@ -18,6 +19,7 @@ type Nav = NativeStackNavigationProp<RootStackParamList, 'DebugRuleSelect'>;
 export function DebugRuleSelectScreen() {
   const navigation = useNavigation<Nav>();
   const [search, setSearch] = useState('');
+  const [showCancelSheet, setShowCancelSheet] = useState(false);
   const { currentRound, forceRule, resetGame } = useGameStore();
 
   const filteredRules = useMemo(() => {
@@ -32,16 +34,7 @@ export function DebugRuleSelectScreen() {
 
   const handleSelectRule = (rule: Rule) => { forceRule(rule); navigation.replace('Game'); };
   const handleCancel = () => { resetGame(); navigation.replace('Home'); };
-  const handleCancelPress = () => {
-    Alert.alert(
-      'Annuler la partie ?',
-      'La partie en cours sera perdue si tu confirmes.',
-      [
-        { text: 'Continuer', style: 'cancel' },
-        { text: 'Annuler la partie', style: 'destructive', onPress: handleCancel },
-      ],
-    );
-  };
+  const handleCancelPress = () => setShowCancelSheet(true);
 
   if (!currentRound) {
     return (
@@ -57,6 +50,11 @@ export function DebugRuleSelectScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+      <CancelGameSheet
+        visible={showCancelSheet}
+        onConfirm={handleCancel}
+        onCancel={() => setShowCancelSheet(false)}
+      />
       <GameTopBar onCancel={handleCancelPress} />
 
       <View style={styles.header}>
