@@ -19,3 +19,4 @@
 - Les choix de résolution `Gagnant` / `Perdant` (Casino, Sortie de porc) utilisent des boutons `Default` tant qu'aucune équipe n'est sélectionnée ; après sélection, seul le gagnant prend la couleur de son équipe et l'autre affiche `Perdant`.
 - Les UI bonus/malus simples utilisent le même composant d'action d'équipe que Casino, attaché au scoreboard. Pour les bonus/malus à maximum 1, un second tap annule l'action ; pour les compteurs, un long press décrémente.
 - Totem d'immunité révèle la prochaine règle via la variante compacte de `RuleDisplay` sous la règle courante. Même si la maquette mentionne l'équipe gagnante, `fantasy-petanque.md` prime : le perdant de la mène Totem est immunisé.
+- Contrat garde les cinq missions de `fantasy-petanque.md` comme source gameplay, y compris "Finir avec exactement 2 points" pour la mission 3. Les labels courts ajoutés pour l'écran en partie sont uniquement des résumés UI.

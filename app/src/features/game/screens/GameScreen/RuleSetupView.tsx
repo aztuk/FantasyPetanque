@@ -24,7 +24,8 @@ export function RuleSetupView() {
 
   const round = currentRound!;
   const isCasino = round.rule?.id === 'casino';
-  const useConfirmLabel = isCasino || round.rule?.id === 'prediction';
+  const isContrat = round.rule?.id === 'contrat';
+  const useConfirmLabel = isCasino || round.rule?.id === 'prediction' || isContrat;
   const setupComplete = isPreMeneSetupComplete(round);
   const confirmLabel = useConfirmLabel
     ? 'Confirmer'
@@ -48,11 +49,16 @@ export function RuleSetupView() {
         onConfirm={() => { resetGame(); navigation.replace('Home'); }}
         onCancel={() => setShowCancelSheet(false)}
       />
-      <GameTopBar onCancel={() => setShowCancelSheet(true)} />
+      <GameTopBar
+        onCancel={() => setShowCancelSheet(true)}
+        style={isContrat ? gameScreenStyles.floatingHead : undefined}
+        floating={isContrat}
+      />
       <ScrollView
         style={gameScreenStyles.ruleSetupContent}
         contentContainerStyle={[
           gameScreenStyles.ruleSetupScrollContent,
+          isContrat && gameScreenStyles.contratRuleSetupScrollContent,
           shouldFocusSetupControls && gameScreenStyles.ruleSetupScrollContentFocused,
         ]}
         showsVerticalScrollIndicator={false}

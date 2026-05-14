@@ -87,11 +87,13 @@ export function PlayingView() {
   const scoringTeam: Team | null = bluePoints > 0 ? 'blue' : redPoints > 0 ? 'red' : null;
   const skipNormal = shouldSkipNormalScore(round);
   const isCasino = round.rule?.id === 'casino';
+  const isContrat = round.rule?.id === 'contrat';
   const isSortieDePorc = round.rule?.id === 'sortie-de-porc';
   const usesWinnerConfirmation = isCasino || isSortieDePorc;
   const hasWinnerSelection = isCasino ? round.casinoWinner !== null : round.sortieDePorc !== null;
   const renderRuleUIInDrawer =
     round.rule?.uiType === 'cochonnet-sorti' ||
+    isContrat ||
     round.rule?.uiType === 'bonus-buttons' ||
     round.rule?.uiType === 'malus-buttons';
   const canFinishRound = usesWinnerConfirmation ? hasWinnerSelection : skipNormal || scoringTeam !== null;
@@ -186,7 +188,7 @@ export function PlayingView() {
                   onTeamPress={drawerExpanded && !skipNormal ? handleTeamPress : undefined}
                 />
                 <GameActionButton
-                  label={isCasino ? 'Confirmer' : canFinishRound ? 'Mène terminée' : 'Points manquants'}
+                  label={isCasino || isContrat ? 'Confirmer' : canFinishRound ? 'Mène terminée' : 'Points manquants'}
                   onPress={handleFinishRound}
                   disabled={!canFinishRound}
                   testID="end-round-button"

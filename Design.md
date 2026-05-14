@@ -260,6 +260,9 @@ Game Fantasy Specific InGame Prediction: https://www.figma.com/design/nfmjDHM2oI
 Game Fantasy Specific InGame Totem d'immunité: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=28-1169&t=qil4nd06wX0YCs6f-11
 Game Fantasy Specific Rule Compact: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=33-1255&t=qil4nd06wX0YCs6f-11
 Game Fantasy Specific InGame Sortie de porc: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=39-1267&t=qil4nd06wX0YCs6f-11
+Game Fantasy Specific Config Contrat: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=46-1353&t=qil4nd06wX0YCs6f-11
+Game Fantasy Specific InGame Contrat: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=46-1456&t=qil4nd06wX0YCs6f-11
+Note Contrat: l'écran en partie a besoin d'un label court pour chaque mission.
 
 
 ---

@@ -222,6 +222,14 @@ export const CONTRAT_MISSIONS = [
   'Avoir la boule la plus éloignée mais encore en jeu',
 ];
 
+export const CONTRAT_MISSION_SHORT_LABELS = [
+  'Cochonnet déplacé',
+  'Carreau',
+  'Exactement 2 points',
+  '2 tirs réussis',
+  'Boule éloignée',
+];
+
 export function getRuleById(id: string): Rule | undefined {
   return ALL_RULES.find((r) => r.id === id);
 }

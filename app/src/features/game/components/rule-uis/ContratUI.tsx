@@ -1,37 +1,52 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useGameStore } from '../../state/gameStore';
-import { TeamButton } from '../../../../shared/components/TeamButton';
-import { CONTRAT_MISSIONS } from '../../../../data/rules/rules';
-import { Section, Props, styles, colors, figmaTextStyles, typography, radius, TEAM_COLORS } from './shared';
+import { Team } from '../../../../domain/game/models';
+import { GameTeamActionRow } from '../GameTeamActionRow';
+import { CONTRAT_MISSIONS, CONTRAT_MISSION_SHORT_LABELS } from '../../../../data/rules/rules';
+import { Props, colors, figmaTextStyles, TEAM_COLORS } from './shared';
 
 export function ContratSetupUI({ round }: Props) {
   const { selectContratMission, clearContratMission } = useGameStore();
-  const bothSelected = round.contratMission.blue !== null && round.contratMission.red !== null;
+
+  const handleMissionPress = (team: Team, missionIdx: number) => {
+    if (round.contratMission[team] === missionIdx) {
+      clearContratMission(team);
+      return;
+    }
+
+    selectContratMission(team, missionIdx);
+  };
 
   return (
-    <Section title="Mission">
+    <View style={localStyles.setupWrapper}>
       {CONTRAT_MISSIONS.map((mission, idx) => (
         <View key={idx} style={localStyles.missionRow}>
-          <TouchableOpacity
-            style={[localStyles.missionBtn, { backgroundColor: TEAM_COLORS.blue }, round.contratMission.blue === idx && localStyles.missionSelected, round.contratMission.blue !== null && round.contratMission.blue !== idx && styles.disabledEl]}
-            onPress={() => round.contratMission.blue === idx ? clearContratMission('blue') : selectContratMission('blue', idx)}
+          <MissionButton
+            team="blue"
+            selected={round.contratMission.blue === idx}
+            dimmed={round.contratMission.blue !== null && round.contratMission.blue !== idx}
+            onPress={() => handleMissionPress('blue', idx)}
+            testID={`contrat-mission-${idx}-blue`}
+          />
+          <Text
+            style={localStyles.missionText}
+            numberOfLines={2}
+            adjustsFontSizeToFit
+            minimumFontScale={0.85}
           >
-            <Text style={localStyles.missionBtnLabel}>B</Text>
-          </TouchableOpacity>
-          <Text style={localStyles.missionText}>{mission}</Text>
-          <TouchableOpacity
-            style={[localStyles.missionBtn, { backgroundColor: TEAM_COLORS.red }, round.contratMission.red === idx && localStyles.missionSelected, round.contratMission.red !== null && round.contratMission.red !== idx && styles.disabledEl]}
-            onPress={() => round.contratMission.red === idx ? clearContratMission('red') : selectContratMission('red', idx)}
-          >
-            <Text style={localStyles.missionBtnLabel}>R</Text>
-          </TouchableOpacity>
+            {mission}
+          </Text>
+          <MissionButton
+            team="red"
+            selected={round.contratMission.red === idx}
+            dimmed={round.contratMission.red !== null && round.contratMission.red !== idx}
+            onPress={() => handleMissionPress('red', idx)}
+            testID={`contrat-mission-${idx}-red`}
+          />
         </View>
       ))}
-      {bothSelected && (
-        <Text style={styles.note}>Les missions sont choisies. Les réussites seront cochées pendant la mène.</Text>
-      )}
-    </Section>
+    </View>
   );
 }
 
@@ -43,30 +58,127 @@ export function ContratResolutionUI({ round }: Props) {
   if (blueMission === null || redMission === null) return null;
 
   return (
-    <Section title="Mission">
-      <Text style={styles.note}>
-        Bleu : {CONTRAT_MISSIONS[blueMission]}{'\n'}
-        Rouge : {CONTRAT_MISSIONS[redMission]}
-      </Text>
-      <View style={styles.row}>
-        {(['blue', 'red'] as const).map((team) => (
-          <TeamButton
-            key={team}
-            team={team}
-            label={round.contratSuccess[team] ? 'Mission réussie' : 'Mission réussie +2'}
-            onPress={() => setContratSuccess(team, !round.contratSuccess[team])}
-          />
-        ))}
+    <View style={localStyles.resolutionWrapper}>
+      <View style={localStyles.shortMissionRow}>
+        <Text
+          style={[localStyles.shortMissionLabel, localStyles.blueShortMissionLabel]}
+          testID="contrat-short-label-blue"
+        >
+          {CONTRAT_MISSION_SHORT_LABELS[blueMission]}
+        </Text>
+        <Text
+          style={[localStyles.shortMissionLabel, localStyles.redShortMissionLabel]}
+          testID="contrat-short-label-red"
+        >
+          {CONTRAT_MISSION_SHORT_LABELS[redMission]}
+        </Text>
       </View>
-    </Section>
+      <GameTeamActionRow
+        label="Mission réussie"
+        activeTeams={round.contratSuccess}
+        onTeamPress={(team) => setContratSuccess(team, !round.contratSuccess[team])}
+        testIDPrefix="contrat-success"
+      />
+    </View>
   );
 }
-// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
+
+function MissionButton({
+  team,
+  selected,
+  dimmed,
+  onPress,
+  testID,
+}: {
+  team: Team;
+  selected: boolean;
+  dimmed: boolean;
+  onPress: () => void;
+  testID: string;
+}) {
+  return (
+    <Pressable
+      style={[
+        localStyles.missionBtn,
+        { backgroundColor: TEAM_COLORS[team] },
+        selected && localStyles.missionSelected,
+        dimmed && localStyles.missionDimmed,
+      ]}
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityState={{ selected }}
+      testID={testID}
+    >
+      <Text style={localStyles.missionBtnLabel}>{team === 'blue' ? 'B' : 'R'}</Text>
+    </Pressable>
+  );
+}
 
 const localStyles = StyleSheet.create({
-  missionRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 5 },
-  missionBtn: { width: 42, height: 42, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
-  missionSelected: { borderWidth: 3, borderColor: colors.white },
-  missionBtnLabel: { color: colors.white, fontWeight: typography.weight.bold, fontSize: typography.size.base },
-  missionText: { flex: 1, color: colors.white, ...figmaTextStyles.bodySm, marginHorizontal: 12 },
+  setupWrapper: {
+    width: '100%',
+    gap: 4,
+    marginTop: 'auto',
+  },
+  missionRow: {
+    width: '100%',
+    height: 80,
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    columnGap: 12,
+  },
+  missionBtn: {
+    width: 80,
+    height: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 24,
+  },
+  missionSelected: {
+    borderWidth: 2,
+    borderColor: colors.secondary,
+  },
+  missionDimmed: {
+    opacity: 0.35,
+  },
+  missionBtnLabel: {
+    ...figmaTextStyles.buttonActions,
+    color: colors.white,
+    textAlign: 'center',
+    includeFontPadding: false,
+  },
+  missionText: {
+    flex: 1,
+    alignSelf: 'center',
+    color: colors.white,
+    ...figmaTextStyles.bodySm,
+    textAlign: 'center',
+    includeFontPadding: false,
+  },
+  resolutionWrapper: {
+    width: '100%',
+    gap: 4,
+  },
+  shortMissionRow: {
+    width: '100%',
+    height: 80,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 8,
+    gap: 4,
+  },
+  shortMissionLabel: {
+    flex: 1,
+    ...figmaTextStyles.bodyMd,
+    textAlign: 'center',
+    includeFontPadding: false,
+  },
+  blueShortMissionLabel: {
+    color: TEAM_COLORS.blueText,
+  },
+  redShortMissionLabel: {
+    color: TEAM_COLORS.redText,
+  },
 });

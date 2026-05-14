@@ -115,6 +115,53 @@ describe('GameScreen fantasy inter-mene', () => {
     expect(screen.getByTestId('end-round-button')).toBeTruthy();
   });
 
+  it('runs Contrat through mission setup and toggles mission success in game', () => {
+    useGameStore.getState().startGame({ mode: 'fantasy', vetosEnabled: true });
+    useGameStore.getState().forceRule(ALL_RULES.find((rule) => rule.id === 'contrat')!);
+    render(<GameScreen />);
+
+    fireEvent.press(screen.getByTestId('begin-round-button'));
+
+    expect(useGameStore.getState().phase).toBe('rule-setup');
+    const setupStyle = StyleSheet.flatten(screen.getByTestId('rule-setup-scroll').props.contentContainerStyle);
+    expect(setupStyle.paddingTop).toBe(80);
+    expect(setupStyle.paddingHorizontal).toBe(0);
+    expect(screen.getByTestId('confirm-rule-setup-button').props.accessibilityState.disabled).toBe(true);
+    expect(screen.getByText('Toucher et déplacer le cochonnet')).toBeTruthy();
+    const firstBlueMissionButtonStyle = StyleSheet.flatten(screen.getByTestId('contrat-mission-0-blue').props.style);
+    expect(firstBlueMissionButtonStyle.width).toBe(80);
+    expect(firstBlueMissionButtonStyle.height).toBe(80);
+
+    fireEvent.press(screen.getByTestId('contrat-mission-0-blue'));
+    expect(useGameStore.getState().currentRound?.contratMission).toEqual({ blue: 0, red: null });
+    expect(screen.getByTestId('confirm-rule-setup-button').props.accessibilityState.disabled).toBe(true);
+
+    fireEvent.press(screen.getByTestId('contrat-mission-4-red'));
+    expect(useGameStore.getState().currentRound?.contratMission).toEqual({ blue: 0, red: 4 });
+    expect(screen.getByTestId('confirm-rule-setup-button').props.accessibilityState.disabled).toBe(false);
+
+    fireEvent.press(screen.getByTestId('confirm-rule-setup-button'));
+
+    expect(useGameStore.getState().phase).toBe('playing');
+    expect(screen.getByTestId('contrat-short-label-blue').props.children).toBe('Cochonnet déplacé');
+    expect(screen.getByTestId('contrat-short-label-red').props.children).toBe('Boule éloignée');
+    expect(screen.getAllByText('Mission réussie')).toHaveLength(2);
+    expect(screen.getByTestId('end-round-button').props.accessibilityState.disabled).toBe(true);
+
+    fireEvent.press(screen.getByTestId('contrat-success-blue-button'));
+    fireEvent.press(screen.getByTestId('contrat-success-red-button'));
+
+    expect(useGameStore.getState().currentRound?.contratSuccess).toEqual({ blue: true, red: true });
+    expect(screen.getByTestId('score-modifier-blue').props.children).toBe('+2');
+    expect(screen.getByTestId('score-modifier-red').props.children).toBe('+2');
+
+    fireEvent.press(screen.getByTestId('score-block-blue'));
+    expect(screen.getByTestId('end-round-button').props.accessibilityState.disabled).toBe(false);
+
+    fireEvent.press(screen.getByTestId('end-round-button'));
+
+    expect(useGameStore.getState().scores).toEqual({ blue: 3, red: 2 });
+  });
   it('runs Casino through bet setup before choosing the winner in game', () => {
     useGameStore.getState().startGame({ mode: 'fantasy', vetosEnabled: true });
     useGameStore.setState({ scores: { blue: 4, red: 2 } });
