@@ -36,7 +36,7 @@ export function DebugRulePicker({ visible, onClose }: Props) {
         <TextInput
           style={styles.searchInput}
           placeholder="Rechercher..."
-          placeholderTextColor={colors.textSecondary}
+          placeholderTextColor={colors.textSmooth}
           value={search}
           onChangeText={setSearch}
           autoCapitalize="none"
@@ -44,7 +44,7 @@ export function DebugRulePicker({ visible, onClose }: Props) {
 
         {currentRound?.rule && (
           <Text style={styles.currentRule}>
-            Actuelle : <Text style={{ color: colors.accent }}>{currentRound.rule.name}</Text>
+            Actuelle : <Text style={{ color: colors.primary }}>{currentRound.rule.name}</Text>
           </Text>
         )}
 
@@ -70,28 +70,29 @@ export function DebugRulePicker({ visible, onClose }: Props) {
     </Modal>
   );
 }
+// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, paddingTop: 16 },
+  container: { flex: 1, backgroundColor: colors.dark, paddingTop: 16 },
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: 20, paddingBottom: 16,
   },
-  title: { color: colors.accent, fontSize: typography.size.lg, fontWeight: typography.weight.extrabold },
-  closeBtn: { padding: 10, backgroundColor: colors.surface2, borderRadius: radius.md },
-  closeBtnLabel: { color: colors.textPrimary, fontSize: typography.size.base, fontWeight: typography.weight.bold },
+  title: { color: colors.primary, fontSize: typography.size.lg, fontWeight: typography.weight.extrabold },
+  closeBtn: { padding: 10, backgroundColor: colors.darkSmooth, borderRadius: radius.md },
+  closeBtnLabel: { color: colors.white, fontSize: typography.size.base, fontWeight: typography.weight.bold },
   searchInput: {
-    backgroundColor: colors.surface, color: colors.textPrimary,
+    backgroundColor: colors.darkSmooth, color: colors.white,
     fontSize: typography.size.base, paddingHorizontal: 16, paddingVertical: 13,
     marginHorizontal: 20, marginBottom: 12, borderRadius: radius.md,
   },
-  currentRule: { color: colors.textSecondary, fontSize: typography.size.base, marginHorizontal: 20, marginBottom: 12 },
+  currentRule: { color: colors.textSmooth, fontSize: typography.size.base, marginHorizontal: 20, marginBottom: 12 },
   ruleItem: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 14 },
-  ruleBar: { width: 3, alignSelf: 'stretch', borderRadius: 2, backgroundColor: colors.surface2, marginRight: 14, marginTop: 3 },
-  ruleBarActive: { backgroundColor: colors.accent },
+  ruleBar: { width: 3, alignSelf: 'stretch', borderRadius: 2, backgroundColor: colors.darkSmooth, marginRight: 14, marginTop: 3 },
+  ruleBarActive: { backgroundColor: colors.primary },
   ruleItemContent: { flex: 1 },
-  ruleName: { color: colors.textPrimary, fontSize: typography.size.base, fontWeight: typography.weight.bold, marginBottom: 4 },
-  ruleNameActive: { color: colors.accent },
-  ruleDesc: { color: colors.textSecondary, fontSize: typography.size.base, lineHeight: 24 },
-  separator: { height: 1, backgroundColor: colors.surface2 },
+  ruleName: { color: colors.white, fontSize: typography.size.base, fontWeight: typography.weight.bold, marginBottom: 4 },
+  ruleNameActive: { color: colors.primary },
+  ruleDesc: { color: colors.textSmooth, fontSize: typography.size.base, lineHeight: 24 },
+  separator: { height: 1, backgroundColor: colors.darkSmooth },
 });

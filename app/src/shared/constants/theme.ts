@@ -1,79 +1,56 @@
+// Figma design tokens — source: Design.md (node-id=26:1950)
+// RULE: Never add a color here that doesn't exist in Design.md.
 const palette = {
-  // Figma brand palette
-  brandDark: '#28261F',
-  brandDarkSmooth: '#3B382E',
-  brandPrimary: '#E7C241',
-  brandSecondary: '#41E79A',
-  brandWhite: '#ECEBE8',
-  brandShadow: '#1F1D15',
-
-  // Nocturne background
-  neutral950: '#111118',
-  neutral900: '#1D1C2A',
-  neutral800: '#28273A',
-  neutral700: '#363548',
-  neutral500: '#8885A5',
-  neutral100: '#F0EEF8',
-
-  // Gold
-  gold: '#F0B020',
-  goldLight: '#F5C840',
-
-  // Feedback
-  positive: '#78DFA0',
-  negative: '#F07878',
-
-  // Team Blue
-  blue: '#1E6FD9',
-  blueLight: '#4B9CF5',
-  blueDark: '#0D4FA0',
-
-  // Team Red
-  red: '#D93B3B',
-  redLight: '#F56B6B',
-  redDark: '#A02020',
+  primary:        '#E7C241',
+  secondary:      '#41E79A',
+  dark:           '#28261F',
+  darkSmooth:     '#3B382E',
+  darkSmoother:   'rgba(59, 56, 46, 0.20)',
+  disabled:       '#453F2D',
+  textSmooth:     '#949084',
+  white:          '#ECEBE8',
+  redTeamSurface: '#DC3939',
+  redTeamText:    '#E86868',
+  redTeamDark:    '#A92828',
+  blueTeamSurface:'#395ADC',
+  blueTeamText:   '#778EED',
+  blueTeamDark:   '#1D3287',
+  shadow:         '#1F1D15',
 } as const;
 
 export const colors = {
-  background: palette.neutral950,
-  surface: palette.neutral900,
-  surface2: palette.neutral800,
-  border: palette.neutral700,
-  textPrimary: palette.neutral100,
-  textSecondary: palette.neutral500,
-  accent: palette.gold,
-  accentLight: palette.goldLight,
-
-  brand: {
-    dark: palette.brandDark,
-    darkSmooth: palette.brandDarkSmooth,
-    primary: palette.brandPrimary,
-    secondary: palette.brandSecondary,
-    white: palette.brandWhite,
-    shadow: palette.brandShadow,
-  },
-
+  primary:      palette.primary,
+  secondary:    palette.secondary,
+  dark:         palette.dark,
+  darkSmooth:   palette.darkSmooth,
+  darkSmoother: palette.darkSmoother,
+  disabled:     palette.disabled,
+  textSmooth:   palette.textSmooth,
+  white:        palette.white,
+  shadow:       palette.shadow,
   team: {
-    blue: palette.blue,
-    blueLight: palette.blueLight,
-    blueDark: palette.blueDark,
-    red: palette.red,
-    redLight: palette.redLight,
-    redDark: palette.redDark,
+    blue:     palette.blueTeamSurface,
+    red:      palette.redTeamSurface,
+    blueText: palette.blueTeamText,
+    redText:  palette.redTeamText,
+    blueDark: palette.blueTeamDark,
+    redDark:  palette.redTeamDark,
   },
-
-  positive: palette.positive,
-  negative: palette.negative,
 } as const;
 
 // Minimum 18px — rien en dessous
 export const typography = {
   family: {
+    // Source Figma / Design.md typography tokens.
+    // TODO A REMPLACER ou documenter comme exception dans Design.md.
     display: 'RoadRage_400Regular',
     body: 'GoogleSansFlex_400Regular',
     bodySemibold: 'GoogleSansFlex_600SemiBold',
     bodyBold: 'GoogleSansFlex_700Bold',
+    number: 'CascadiaMono_400Regular',
+    numberBold: 'CascadiaMono_700Bold',
   },
+  // TODO A REMPLACER: legacy scale. Use figmaTextStyles instead of raw sizes.
   size: {
     base: 18,  // minimum absolu — body, labels, notes
     md: 20,    // corps mis en avant
@@ -94,9 +71,89 @@ export const typography = {
 
 // Presets typographiques complets — toutes les propriétés de police en un seul endroit.
 // Usage dans StyleSheet : { ...textStyles.ctaLabel, color: ... }
+// Figma typography tokens - source: Design.md (node-id=26:1951).
+// RULE: New UI work must use these styles, then map them per screen in Design.md.
+export const figmaTextStyles = {
+  pageTitles: {
+    fontFamily: typography.family.bodyBold,
+    fontSize: 28,
+    lineHeight: 47.6,
+    fontWeight: typography.weight.bold,
+    letterSpacing: -1.12,
+  },
+  buttonCTA: {
+    fontFamily: typography.family.bodySemibold,
+    fontSize: 28,
+    lineHeight: 47.6,
+    fontWeight: typography.weight.semibold,
+    letterSpacing: -0.84,
+    textTransform: 'uppercase' as const,
+  },
+  buttonActions: {
+    fontFamily: typography.family.bodySemibold,
+    fontSize: 21,
+    lineHeight: 31.5,
+    fontWeight: typography.weight.semibold,
+    letterSpacing: -0.84,
+  },
+  bodyMd: {
+    fontFamily: typography.family.body,
+    fontSize: 21,
+    lineHeight: 35.7,
+    fontWeight: typography.weight.regular,
+    letterSpacing: -0.84,
+  },
+  bodySm: {
+    fontFamily: typography.family.body,
+    fontSize: 18,
+    lineHeight: 30.6,
+    fontWeight: typography.weight.regular,
+    letterSpacing: -0.72,
+  },
+  labels: {
+    fontFamily: typography.family.bodyBold,
+    fontSize: 18,
+    lineHeight: 18,
+    fontWeight: typography.weight.bold,
+    letterSpacing: -0.72,
+    textTransform: 'uppercase' as const,
+  },
+  numberLg100: {
+    fontFamily: typography.family.number,
+    fontSize: 60,
+    lineHeight: 102,
+    fontWeight: typography.weight.regular,
+    letterSpacing: -2.4,
+  },
+  numberMd80: {
+    fontFamily: typography.family.number,
+    fontSize: 48,
+    lineHeight: 81.6,
+    fontWeight: typography.weight.regular,
+    letterSpacing: -1.92,
+  },
+  numberSm60: {
+    fontFamily: typography.family.number,
+    fontSize: 40,
+    lineHeight: 68,
+    fontWeight: typography.weight.regular,
+    letterSpacing: -1.6,
+  },
+  numberXs40: {
+    fontFamily: typography.family.numberBold,
+    fontSize: 24,
+    lineHeight: 40.8,
+    fontWeight: typography.weight.bold,
+    letterSpacing: -0.96,
+  },
+} as const;
+
+// TODO A REMPLACER: legacy typography aliases.
+// Keep temporarily so the app remains stable while screens migrate one by one.
 export const textStyles = {
   // Libellés de boutons CTA pleine largeur (letterSpacing resserré pour l'impact visuel)
   // → FullWidthCtaButton, SetupScreen (choiceLabel, bottomButtonLabel), CancelGameSheet (cancelLabel, confirmLabel)
+  // TODO A REMPLACER par figmaTextStyles.buttonCTA.
   ctaLabel: {
     fontFamily: typography.family.bodySemibold,
     fontSize: 28,
@@ -106,6 +163,7 @@ export const textStyles = {
   },
   // Titres et boutons dans le contexte de jeu (letterSpacing neutre)
   // → GameActionButton, AppHeader (titre), RuleDisplay (nom de règle), GameScoreBoard (modificateur +/-)
+  // TODO A REMPLACER par figmaTextStyles.pageTitles ou figmaTextStyles.buttonCTA selon l'ecran.
   titleLg: {
     fontFamily: typography.family.bodySemibold,
     fontSize: 28,
@@ -115,6 +173,7 @@ export const textStyles = {
   },
   // Valeurs numériques moyennes — scores et totaux
   // → GameScoreBoard (total sous la mène), GameHistoryList (score par mène)
+  // TODO A REMPLACER par figmaTextStyles.numberXs40.
   labelMd: {
     fontFamily: typography.family.bodySemibold,
     fontSize: 24,
@@ -124,6 +183,7 @@ export const textStyles = {
   },
   // Texte de marque et unités de mesure (letterSpacing légèrement resserré)
   // → BrandTagline ("Le jeu qui vous fera perdre..."), SetupScreen (unité du picker ex: "pts")
+  // TODO A REMPLACER apres mapping ecran Home dans Design.md.
   tagline: {
     fontFamily: typography.family.body,
     fontSize: 21,
@@ -133,6 +193,7 @@ export const textStyles = {
   },
   // Libellés des boutons d'action par équipe et des steppers
   // → GameTeamActionRow (label équipe), CasinoUI (betLabel), PredictionUI (readonlyLabel), TeamStepper (label)
+  // TODO A REMPLACER par figmaTextStyles.buttonActions.
   actionLabel: {
     fontFamily: typography.family.bodySemibold,
     fontSize: 18,
@@ -142,6 +203,7 @@ export const textStyles = {
   },
   // Corps de texte long — description des règles
   // → RuleDisplay (description, paragraphes)
+  // TODO A REMPLACER par figmaTextStyles.bodyMd.
   bodyMd: {
     fontFamily: typography.family.body,
     fontSize: 18,
@@ -151,6 +213,7 @@ export const textStyles = {
   },
   // Texte secondaire — notes, annotations, numéros de mène
   // → RuleDisplay (note de bas de règle, texte immunité), GameHistoryList (label "Mène XX")
+  // TODO A REMPLACER par figmaTextStyles.bodySm.
   bodySm: {
     fontFamily: typography.family.body,
     fontSize: 15,
@@ -160,6 +223,7 @@ export const textStyles = {
   },
   // Texte display décoratif (police RoadRage)
   // → DebugModeBadge ("Debug MODE")
+  // TODO A REMPLACER ou documenter comme exception dans Design.md.
   displaySm: {
     fontFamily: typography.family.display,
     fontSize: 45,
@@ -169,6 +233,7 @@ export const textStyles = {
   },
   // Grandes valeurs numériques interactives dans les règles
   // → TeamStepper (valeur centrale), CasinoUI (mise en lecture seule), PredictionUI (prédiction en lecture seule)
+  // TODO A REMPLACER par figmaTextStyles.numberSm60 ou figmaTextStyles.numberXs40 selon l'ecran.
   uiValueLg: {
     fontFamily: typography.family.bodySemibold,
     fontSize: 32,
@@ -178,6 +243,7 @@ export const textStyles = {
   },
   // Options du picker Setup — état non sélectionné (letterspacing progressif via animation)
   // → SetupScreen (pickerText, base de l'interpolation animée)
+  // TODO A REMPLACER par figmaTextStyles.numberMd80.
   pickerText: {
     fontFamily: typography.family.bodyBold,
     fontSize: 48,
@@ -187,6 +253,7 @@ export const textStyles = {
   },
   // Options du picker Setup — état sélectionné (valeur centrale en évidence)
   // → SetupScreen (pickerSelectedText, cible de l'interpolation animée)
+  // TODO A REMPLACER par figmaTextStyles.numberLg100.
   pickerSelected: {
     fontFamily: typography.family.bodyBold,
     fontSize: 60,
@@ -222,7 +289,7 @@ export const opacity = {
 
 export const shadows = {
   title: {
-    shadowColor: palette.brandShadow,
+    shadowColor: palette.shadow,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 1,
     shadowRadius: 16,

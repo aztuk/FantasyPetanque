@@ -31,6 +31,7 @@ export function FullWidthCtaButton({
     </TouchableOpacity>
   );
 }
+// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
 
 const styles = StyleSheet.create({
   button: {
@@ -40,14 +41,14 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.brand.primary,
+    backgroundColor: colors.primary,
   },
   disabled: {
     opacity: opacity.disabled,
   },
   label: {
     ...textStyles.ctaLabel,
-    color: colors.brand.dark,
+    color: colors.dark,
     includeFontPadding: false,
     textAlign: 'center',
     textTransform: 'uppercase',

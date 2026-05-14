@@ -126,6 +126,32 @@ src/
 
 ## Règles de travail obligatoires
 
+### Design system obligatoire
+
+> **Contrainte bloquante — s'applique à toute tâche touchant à l'UI.**
+
+**Avant de coder quoi que ce soit de visuel, lire les sections pertinentes de `Design.md`.**
+
+`Design.md` est la source de vérité design (issue de Figma). Le code doit se conformer à `Design.md`, pas l'inverse.
+
+Sections à lire selon la tâche :
+
+| Si la tâche touche à… | Lire dans `Design.md` |
+|---|---|
+| Une couleur, un fond, une bordure | `## TOKENS — Couleurs` |
+| Un texte, une police, une taille | `## TOKENS — Typographie` |
+| Un padding, un gap, un margin | `## TOKENS — Espacements` |
+| Un coin arrondi | `## TOKENS — Rayons de bordure` |
+| Un composant partagé existant | `## COMPOSANTS — Partagés` |
+| Un écran | `## ÉCRANS` (node-id Figma correspondant) |
+| Un flow de navigation | `## FLOWS` |
+
+**Violations bloquantes — ces actions sont interdites sans exception :**
+- Écrire une valeur hex couleur directement dans un style — utiliser `colors.*`
+- Inventer des valeurs de `fontSize`, `lineHeight`, `letterSpacing` — utiliser un preset de `textStyles`
+- Implémenter un écran sans avoir vérifié son entrée dans la section `## ÉCRANS` de `Design.md`
+- Ignorer une divergence constatée entre le code et `Design.md` — la signaler à l'utilisateur
+
 ### Interdiction du checkup visuel seul
 
 Ne jamais conclure qu'une fonctionnalité est correcte uniquement parce qu'elle "semble bonne visuellement".
@@ -226,7 +252,8 @@ npm run lint            # Lint
 
 | Fichier | Rôle |
 |---|---|
-| `fantasy-petanque.md` | Spec — source de vérité |
+| `fantasy-petanque.md` | Spec — source de vérité gameplay |
+| `Design.md` | Source de vérité design — tokens, composants, écrans, flows |
 | `src/data/rules/rules.ts` | Banque de règles |
 | `src/domain/game/engine/` | Moteur de tirage et résolution |
 | `src/domain/game/scoring/` | Moteur de score |
@@ -237,6 +264,8 @@ npm run lint            # Lint
 
 ## Interdictions
 
+- **Coder une tâche UI sans avoir lu les sections pertinentes de `Design.md` au préalable**
+- **Utiliser une valeur hex directe ou des valeurs typographiques inventées — utiliser exclusivement `colors.*` et `textStyles.*`**
 - Conclure une fonctionnalité terminée sur la seule base d'un test visuel
 - Sauter les tests pour livrer plus vite
 - Mélanger plusieurs sujets dans un commit

@@ -34,7 +34,7 @@ export function ScoreBlock({
       {showLabel && <Text style={styles.label}>{TEAM_LABELS[team]}</Text>}
       <Text style={styles.score}>{score}</Text>
       {delta !== undefined && delta !== 0 && (
-        <Text style={[styles.delta, delta > 0 ? styles.pos : styles.neg]}>
+        <Text style={styles.delta}>
           {delta > 0 ? `+${delta}` : `${delta}`}
         </Text>
       )}
@@ -72,6 +72,7 @@ export function ScoreBlock({
     </View>
   );
 }
+// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
 
 const styles = StyleSheet.create({
   block: {
@@ -93,14 +94,14 @@ const styles = StyleSheet.create({
     opacity: opacity.disabled,
   },
   label: {
-    color: 'rgba(240,238,248,0.65)',
+    color: 'rgba(236,235,232,0.65)', // colors.white à 65% — pas de token Figma pour la variante transparente
     fontSize: typography.size.base,
     fontWeight: typography.weight.semibold,
     textTransform: 'uppercase',
     letterSpacing: 2,
   },
   score: {
-    color: colors.textPrimary,
+    color: colors.white,
     fontSize: typography.size.score,
     fontWeight: typography.weight.extrabold,
     lineHeight: 88,
@@ -110,17 +111,16 @@ const styles = StyleSheet.create({
     bottom: 16,
     fontSize: typography.size.lg,
     fontWeight: typography.weight.bold,
+    color: colors.secondary,
   },
   actionLabel: {
     position: 'absolute',
     bottom: 16,
     left: 10,
     right: 10,
-    color: colors.textPrimary,
+    color: colors.white,
     fontSize: typography.size.md,
     fontWeight: typography.weight.bold,
     textAlign: 'center',
   },
-  pos: { color: colors.positive },
-  neg: { color: colors.negative },
 });

@@ -61,11 +61,12 @@ export function ContratResolutionUI({ round }: Props) {
     </Section>
   );
 }
+// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
 
 const localStyles = StyleSheet.create({
   missionRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 5 },
   missionBtn: { width: 42, height: 42, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
-  missionSelected: { borderWidth: 3, borderColor: colors.textPrimary },
-  missionBtnLabel: { color: colors.textPrimary, fontWeight: typography.weight.bold, fontSize: typography.size.base },
-  missionText: { flex: 1, color: colors.textPrimary, fontSize: typography.size.base, marginHorizontal: 12, lineHeight: 24 },
+  missionSelected: { borderWidth: 3, borderColor: colors.white },
+  missionBtnLabel: { color: colors.white, fontWeight: typography.weight.bold, fontSize: typography.size.base },
+  missionText: { flex: 1, color: colors.white, fontSize: typography.size.base, marginHorizontal: 12, lineHeight: 24 },
 });

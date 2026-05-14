@@ -53,6 +53,7 @@ export function WheelPicker({ min, max, value, onChange }: WheelPickerProps) {
     </View>
   );
 }
+// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
 
 const styles = StyleSheet.create({
   container: {
@@ -69,7 +70,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   itemText: {
-    color: colors.textPrimary,
+    color: colors.white,
     fontSize: typography.size.xl,
     fontWeight: typography.weight.bold,
     letterSpacing: -0.5,
@@ -79,7 +80,7 @@ const styles = StyleSheet.create({
     left: 8,
     right: 8,
     height: 1,
-    backgroundColor: colors.accent,
+    backgroundColor: colors.primary,
     zIndex: 2,
   },
   fadeTop: {
@@ -88,7 +89,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: ITEM_HEIGHT,
-    backgroundColor: `${colors.background}CC`,
+    backgroundColor: `${colors.dark}CC`,
     zIndex: 1,
   },
   fadeBottom: {
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: ITEM_HEIGHT,
-    backgroundColor: `${colors.background}CC`,
+    backgroundColor: `${colors.dark}CC`,
     zIndex: 1,
   },
 });

@@ -49,11 +49,12 @@ export function HomeScreen() {
     </SafeAreaView>
   );
 }
+// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.brand.dark,
+    backgroundColor: colors.dark,
   },
   content: {
     flex: 1,

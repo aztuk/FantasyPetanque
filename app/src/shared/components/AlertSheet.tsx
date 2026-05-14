@@ -106,6 +106,7 @@ export function AlertSheet({
     </Modal>
   );
 }
+// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
 
 const styles = StyleSheet.create({
   container: {
@@ -117,10 +118,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.6)',
   },
   sheet: {
-    backgroundColor: colors.brand.darkSmooth,
+    backgroundColor: colors.darkSmooth,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    shadowColor: colors.brand.dark,
+    shadowColor: colors.dark,
     shadowOffset: { width: 0, height: -12 },
     shadowOpacity: 1,
     shadowRadius: 12,
@@ -142,9 +143,9 @@ const styles = StyleSheet.create({
     minHeight: 102,
   },
   cancelButton: {
-    backgroundColor: colors.brand.darkSmooth,
+    backgroundColor: colors.darkSmooth,
   },
   confirmButton: {
-    backgroundColor: colors.brand.primary,
+    backgroundColor: colors.primary,
   },
 });

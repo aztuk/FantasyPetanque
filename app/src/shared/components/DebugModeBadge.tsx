@@ -15,11 +15,12 @@ export function DebugModeBadge({ style, testID }: Props) {
     </Text>
   );
 }
+// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
 
 const styles = StyleSheet.create({
   badge: {
     ...textStyles.displaySm,
-    color: colors.brand.secondary,
+    color: colors.secondary,
     includeFontPadding: false,
     textAlign: 'center',
     textShadowColor: 'rgba(0, 0, 0, 0.35)',
@@ -28,6 +29,6 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   accent: {
-    color: colors.brand.primary,
+    color: colors.primary,
   },
 });

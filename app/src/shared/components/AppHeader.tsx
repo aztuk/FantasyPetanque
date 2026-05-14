@@ -29,9 +29,9 @@ export function AppHeader({
   onBack,
   title,
   children,
-  backgroundColor = colors.brand.dark,
-  iconColor = colors.textSecondary,
-  textColor = colors.brand.white,
+  backgroundColor = colors.dark,
+  iconColor = colors.textSmooth,
+  textColor = colors.white,
   backAccessibilityLabel = 'Retour',
   backButtonTestID,
   style,
@@ -58,6 +58,7 @@ export function AppHeader({
     </View>
   );
 }
+// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
 
 const styles = StyleSheet.create({
   header: {

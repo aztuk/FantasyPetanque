@@ -65,7 +65,7 @@ export function DebugRuleSelectScreen() {
       <TextInput
         style={styles.searchInput}
         placeholder="Rechercher..."
-        placeholderTextColor={colors.textSecondary}
+        placeholderTextColor={colors.textSmooth}
         value={search}
         onChangeText={setSearch}
         autoCapitalize="none"
@@ -98,22 +98,23 @@ export function DebugRuleSelectScreen() {
     </SafeAreaView>
   );
 }
+// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
+  safe: { flex: 1, backgroundColor: colors.dark },
   header: { paddingHorizontal: 24, paddingTop: 20, paddingBottom: 16 },
   eyebrow: {
-    color: colors.textSecondary,
+    color: colors.textSmooth,
     fontSize: typography.size.base,
     fontWeight: typography.weight.bold,
     textTransform: 'uppercase',
     letterSpacing: 2,
     marginBottom: 4,
   },
-  title: { color: colors.accent, fontSize: typography.size.xl, fontWeight: typography.weight.extrabold },
+  title: { color: colors.primary, fontSize: typography.size.xl, fontWeight: typography.weight.extrabold },
   searchInput: {
-    backgroundColor: colors.surface,
-    color: colors.textPrimary,
+    backgroundColor: colors.darkSmooth,
+    color: colors.white,
     fontSize: typography.size.base,
     paddingHorizontal: 16,
     paddingVertical: 14,
@@ -123,19 +124,19 @@ const styles = StyleSheet.create({
   },
   listContent: { paddingHorizontal: 24, paddingBottom: 100 },
   ruleItem: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 16 },
-  ruleBar: { width: 3, alignSelf: 'stretch', borderRadius: 2, backgroundColor: colors.surface2, marginRight: 16, marginTop: 3 },
-  ruleBarActive: { backgroundColor: colors.accent },
+  ruleBar: { width: 3, alignSelf: 'stretch', borderRadius: 2, backgroundColor: colors.darkSmooth, marginRight: 16, marginTop: 3 },
+  ruleBarActive: { backgroundColor: colors.primary },
   ruleText: { flex: 1 },
-  ruleName: { color: colors.textPrimary, fontSize: typography.size.base, fontWeight: typography.weight.extrabold, marginBottom: 4 },
-  ruleNameActive: { color: colors.accent },
-  ruleDesc: { color: colors.textSecondary, fontSize: typography.size.base, lineHeight: 24 },
-  separator: { height: 1, backgroundColor: colors.surface2 },
+  ruleName: { color: colors.white, fontSize: typography.size.base, fontWeight: typography.weight.extrabold, marginBottom: 4 },
+  ruleNameActive: { color: colors.primary },
+  ruleDesc: { color: colors.textSmooth, fontSize: typography.size.base, lineHeight: 24 },
+  separator: { height: 1, backgroundColor: colors.darkSmooth },
   bottomBar: {
     position: 'absolute', left: 0, right: 0, bottom: 0,
     paddingHorizontal: 20, paddingTop: 8, paddingBottom: 8,
-    backgroundColor: colors.background,
+    backgroundColor: colors.dark,
   },
   fullButton: { marginHorizontal: 0 },
   emptyContainer: { flex: 1, justifyContent: 'center', paddingHorizontal: 24 },
-  emptyText: { color: colors.textSecondary, fontSize: typography.size.base, textAlign: 'center', marginTop: 16 },
+  emptyText: { color: colors.textSmooth, fontSize: typography.size.base, textAlign: 'center', marginTop: 16 },
 });

@@ -15,6 +15,7 @@ export function BrandTagline({ style, testID }: Props) {
     </View>
   );
 }
+// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
 
 const styles = StyleSheet.create({
   container: {
@@ -22,10 +23,10 @@ const styles = StyleSheet.create({
   },
   line: {
     ...textStyles.tagline,
-    color: colors.brand.white,
+    color: colors.white,
     textAlign: 'center',
   },
   accent: {
-    color: colors.brand.primary,
+    color: colors.primary,
   },
 });

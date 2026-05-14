@@ -20,12 +20,12 @@ export function PrimaryButton({
   testID,
 }: Props) {
   const bg =
-    disabled ? colors.surface2 :
-    variant === 'secondary' ? colors.surface2 :
-    variant === 'danger' ? colors.team.redDark :
-    colors.accent;
+    disabled          ? colors.disabled :
+    variant === 'secondary' ? colors.darkSmooth :
+    variant === 'danger'    ? colors.team.redDark :
+    colors.primary;
 
-  const textColor = (!disabled && variant === 'primary') ? colors.background : colors.textPrimary;
+  const textColor = (!disabled && variant === 'primary') ? colors.dark : colors.white;
 
   return (
     <TouchableOpacity
@@ -41,6 +41,7 @@ export function PrimaryButton({
     </TouchableOpacity>
   );
 }
+// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
 
 const styles = StyleSheet.create({
   btn: {

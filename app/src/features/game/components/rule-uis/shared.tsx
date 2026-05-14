@@ -18,6 +18,7 @@ export function Section({ title, children }: { title: string; children: React.Re
     </View>
   );
 }
+// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
 
 export const styles = StyleSheet.create({
   section: {
@@ -26,7 +27,7 @@ export const styles = StyleSheet.create({
     marginVertical: 10,
     paddingBottom: 10,
     borderBottomWidth: 1,
-    borderBottomColor: colors.surface2,
+    borderBottomColor: colors.darkSmooth,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -37,11 +38,11 @@ export const styles = StyleSheet.create({
     width: 3,
     height: 18,
     borderRadius: 2,
-    backgroundColor: colors.accent,
+    backgroundColor: colors.primary,
     marginRight: 10,
   },
   sectionTitle: {
-    color: colors.accent,
+    color: colors.primary,
     fontSize: typography.size.base,
     fontWeight: typography.weight.bold,
     textTransform: 'uppercase',
@@ -51,7 +52,7 @@ export const styles = StyleSheet.create({
   teamRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 6 },
   teamLabel: { fontSize: typography.size.base, fontWeight: typography.weight.semibold, width: 100 },
   note: {
-    color: colors.textSecondary,
+    color: colors.textSmooth,
     fontSize: typography.size.base,
     lineHeight: 26,
     marginTop: 8,
@@ -59,12 +60,12 @@ export const styles = StyleSheet.create({
   undoBtn: {
     paddingHorizontal: 14,
     paddingVertical: 10,
-    backgroundColor: colors.surface2,
+    backgroundColor: colors.darkSmooth,
     borderRadius: radius.md,
     marginLeft: 8,
   },
   disabledEl: { opacity: 0.35 },
-  undoText: { color: colors.textSecondary, fontSize: typography.size.base },
+  undoText: { color: colors.textSmooth, fontSize: typography.size.base },
   countBadge: {
     fontSize: typography.size.lg,
     fontWeight: typography.weight.bold,

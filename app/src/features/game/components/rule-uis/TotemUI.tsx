@@ -20,31 +20,32 @@ export function TotemUI({ round }: Props) {
     </Section>
   );
 }
+// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
 
 const localStyles = StyleSheet.create({
   totemReveal: {
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: colors.surface2,
+    borderTopColor: colors.darkSmooth,
     alignItems: 'center',
   },
   totemLabel: {
-    color: colors.textSecondary,
+    color: colors.textSmooth,
     fontSize: typography.size.base,
     textTransform: 'uppercase',
     letterSpacing: 1.5,
     marginBottom: 8,
   },
   totemRuleName: {
-    color: colors.accent,
+    color: colors.primary,
     fontSize: typography.size.xl,
     fontWeight: typography.weight.extrabold,
     marginBottom: 6,
     textAlign: 'center',
   },
   totemRuleDesc: {
-    color: colors.textPrimary,
+    color: colors.white,
     fontSize: typography.size.base,
     textAlign: 'center',
     lineHeight: 24,

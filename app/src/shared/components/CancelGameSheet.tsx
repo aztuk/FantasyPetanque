@@ -27,11 +27,12 @@ export function CancelGameSheet({ visible, onConfirm, onCancel }: Props) {
     </AlertSheet>
   );
 }
+// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
 
 const styles = StyleSheet.create({
   title: {
     ...textStyles.ctaLabel,
-    color: colors.brand.white,
+    color: colors.white,
     fontFamily: typography.family.body,
     fontWeight: typography.weight.bold,
     includeFontPadding: false,
@@ -39,27 +40,27 @@ const styles = StyleSheet.create({
   },
   message: {
     ...textStyles.bodyMd,
-    color: colors.brand.white,
+    color: colors.white,
     includeFontPadding: false,
     textAlign: 'center',
     paddingTop: 24,
     paddingBottom: 24,
   },
   highlight: {
-    color: colors.brand.secondary,
+    color: colors.secondary,
     fontFamily: typography.family.body,
     fontWeight: typography.weight.bold,
   },
   cancelLabel: {
     ...textStyles.titleLg,
-    color: colors.brand.white,
+    color: colors.white,
     includeFontPadding: false,
     textAlign: 'center',
     textTransform: 'uppercase',
   },
   confirmLabel: {
     ...textStyles.titleLg,
-    color: colors.brand.dark,
+    color: colors.dark,
     includeFontPadding: false,
     textAlign: 'center',
     textTransform: 'uppercase',

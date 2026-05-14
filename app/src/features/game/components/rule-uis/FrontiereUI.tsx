@@ -47,8 +47,9 @@ export function FrontiereReminderUI({ round }: Props) {
     </Section>
   );
 }
+// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
 
 const localStyles = StyleSheet.create({
-  sideBtn: { paddingHorizontal: 14, paddingVertical: 12, backgroundColor: colors.surface2, borderRadius: radius.md, marginHorizontal: 4 },
-  sideBtnLabel: { color: colors.textPrimary, fontSize: typography.size.base, fontWeight: typography.weight.semibold },
+  sideBtn: { paddingHorizontal: 14, paddingVertical: 12, backgroundColor: colors.darkSmooth, borderRadius: radius.md, marginHorizontal: 4 },
+  sideBtnLabel: { color: colors.white, fontSize: typography.size.base, fontWeight: typography.weight.semibold },
 });

@@ -40,7 +40,7 @@ export function SummaryScreen() {
   const vetosUsed = { blue: !vetos.blue, red: !vetos.red };
   const { mostProfitable, mostPunishing } = getRuleStat(rounds);
 
-  const winnerColor = winner ? TEAM_COLORS[winner] : colors.surface2;
+  const winnerColor = winner ? TEAM_COLORS[winner] : colors.darkSmooth;
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
@@ -94,7 +94,7 @@ export function SummaryScreen() {
               </View>
 
               {(round.bonuses ?? []).map((b, i) => (
-                <Text key={i} style={[styles.bonusText, { color: b.value >= 0 ? colors.positive : colors.negative }]}>
+                <Text key={i} style={styles.bonusText}>
                   {b.team === 'blue' ? '🔵' : '🔴'} {b.reason} : {b.value >= 0 ? `+${b.value}` : b.value}
                 </Text>
               ))}
@@ -121,9 +121,10 @@ function StatRow({ label, value }: { label: string; value: string }) {
     </View>
   );
 }
+// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
+  safe: { flex: 1, backgroundColor: colors.dark },
   content: { paddingHorizontal: 24, paddingTop: 16 },
 
   winnerBlock: {
@@ -134,20 +135,20 @@ const styles = StyleSheet.create({
     marginBottom: 36,
   },
   winnerLabel: {
-    color: colors.textPrimary,
+    color: colors.white,
     fontSize: typography.size.xxl,
     fontWeight: typography.weight.extrabold,
     lineHeight: 50,
   },
   finalScore: {
-    color: 'rgba(240,238,248,0.85)',
+    color: 'rgba(236,235,232,0.85)', // colors.white à 85% — pas de token Figma pour la variante transparente
     fontSize: typography.size.lg,
     fontWeight: typography.weight.bold,
     marginTop: 8,
   },
 
   sectionTitle: {
-    color: colors.accent,
+    color: colors.primary,
     fontSize: typography.size.base,
     fontWeight: typography.weight.bold,
     textTransform: 'uppercase',
@@ -161,22 +162,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: colors.surface2,
+    borderBottomColor: colors.darkSmooth,
   },
-  statLabel: { color: colors.textSecondary, fontSize: typography.size.base },
-  statValue: { color: colors.textPrimary, fontSize: typography.size.base, fontWeight: typography.weight.semibold },
+  statLabel: { color: colors.textSmooth, fontSize: typography.size.base },
+  statValue: { color: colors.white, fontSize: typography.size.base, fontWeight: typography.weight.semibold },
 
   roundRow: {
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: colors.surface2,
+    borderBottomColor: colors.darkSmooth,
   },
   roundHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  roundTitle: { color: colors.textPrimary, fontSize: typography.size.base, fontWeight: typography.weight.bold, flex: 1 },
-  vetoTag: { color: colors.textSecondary, fontSize: typography.size.base, marginLeft: 8 },
+  roundTitle: { color: colors.white, fontSize: typography.size.base, fontWeight: typography.weight.bold, flex: 1 },
+  vetoTag: { color: colors.textSmooth, fontSize: typography.size.base, marginLeft: 8 },
   roundDeltas: { flexDirection: 'row', gap: 20, marginBottom: 4 },
   teamDelta: { fontSize: typography.size.base, fontWeight: typography.weight.semibold },
-  bonusText: { fontSize: typography.size.base, marginTop: 4, lineHeight: 22 },
+  bonusText: { fontSize: typography.size.base, marginTop: 4, lineHeight: 22, color: colors.secondary },
 
   btn: { marginTop: 28, marginHorizontal: 0 },
 });

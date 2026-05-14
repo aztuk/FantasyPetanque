@@ -13,7 +13,7 @@ interface Props {
 }
 
 export function TeamButton({ team, label, onPress, disabled, style, small }: Props) {
-  const bg = disabled ? colors.surface2 : colors.team[team];
+  const bg = disabled ? colors.disabled : colors.team[team];
 
   return (
     <TouchableOpacity
@@ -26,6 +26,7 @@ export function TeamButton({ team, label, onPress, disabled, style, small }: Pro
     </TouchableOpacity>
   );
 }
+// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
 
 const styles = StyleSheet.create({
   btn: {
@@ -41,7 +42,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
   },
   label: {
-    color: colors.textPrimary,
+    color: colors.white,
     fontSize: typography.size.base,
     fontWeight: typography.weight.bold,
     textAlign: 'center',
