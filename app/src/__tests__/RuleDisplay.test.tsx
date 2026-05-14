@@ -4,6 +4,7 @@ import { render, screen } from '@testing-library/react-native';
 import { Rule } from '../domain/game/models';
 import { RuleDisplay, parseRuleDescription, parseRuleDisplayContent } from '../features/game/components/RuleDisplay';
 import { gameUiColors } from '../features/game/components/gameUiTheme';
+import { figmaTextStyles } from '../shared/constants';
 
 const baseRule: Rule = {
   id: 'test-rule',
@@ -102,7 +103,7 @@ describe('RuleDisplay', () => {
 
     expect(screen.getByText('Chaque joueur doit lancer.')).toBeTruthy();
     expect(noteStyle.color).toBe(gameUiColors.muted);
-    expect(noteStyle.fontSize).toBe(18);
+    expect(noteStyle.fontSize).toBe(figmaTextStyles.bodySm.fontSize);
   });
 
   it('renders no-normal-score rule note as muted note text', () => {
@@ -137,5 +138,29 @@ describe('RuleDisplay', () => {
     expect(screen.getByText(/R.gle test/)).toBeTruthy();
     expect(screen.getByText(/Chaque joueur doit lancer/)).toBeTruthy();
     expect(screen.queryByText(/Maximum 1 par/)).toBeNull();
+  });
+
+  it('renders compact rule cards with only the title and short description', () => {
+    render(
+      <RuleDisplay
+        rule={{
+          ...baseRule,
+          description: 'Description longue qui ne doit pas apparaitre.',
+          shortDescription: 'Description courte',
+          note: 'Note masquee',
+        }}
+        variant="compact"
+        testID="compact-rule"
+      />,
+    );
+
+    const cardStyle = StyleSheet.flatten(screen.getByTestId('compact-rule').props.style);
+    const titleStyle = StyleSheet.flatten(screen.getByText(/R.gle test/).props.style);
+
+    expect(screen.getByText('Description courte')).toBeTruthy();
+    expect(screen.queryByText(/Description longue/)).toBeNull();
+    expect(screen.queryByText(/Note masquee/)).toBeNull();
+    expect(cardStyle.backgroundColor).toBe(gameUiColors.darkOverlay);
+    expect(titleStyle.color).toBe(gameUiColors.secondary);
   });
 });

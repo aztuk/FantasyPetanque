@@ -189,6 +189,22 @@ describe('GameScreen fantasy inter-mene', () => {
     expect(state.scores.blue).toBe(7); // 5 + 2
     expect(state.scores.red).toBe(3);  // 5 - 2
   });
+
+  it('shows Totem next rule as a compact rule card during the round', () => {
+    useGameStore.getState().startGame({ mode: 'fantasy', vetosEnabled: true });
+    useGameStore.getState().forceRule(ALL_RULES.find((rule) => rule.id === 'totem-immunite')!);
+    const nextRule = useGameStore.getState().currentRound?.totemNextRule;
+
+    render(<GameScreen />);
+    fireEvent.press(screen.getByTestId('begin-round-button'));
+
+    expect(nextRule).toBeTruthy();
+    expect(screen.getByTestId('totem-next-rule-card')).toBeTruthy();
+    expect(screen.getByText(nextRule!.name)).toBeTruthy();
+    expect(screen.getByText(nextRule!.shortDescription)).toBeTruthy();
+    expect(screen.queryByText(/Prochaine/)).toBeNull();
+    expect(screen.queryByText(/Immunit/)).toBeNull();
+  });
 });
 
 describe('GameScreen simple bonus and malus rule controls', () => {

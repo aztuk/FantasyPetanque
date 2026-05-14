@@ -1,50 +1,29 @@
 import React from 'react';
-import { Text, StyleSheet } from 'react-native';
-import { View } from 'react-native';
-import { Section, Props, styles, colors, figmaTextStyles, typography } from './shared';
+import { StyleSheet, View } from 'react-native';
+import { spacing } from '../../../../shared/constants';
+import { RuleDisplay } from '../RuleDisplay';
+import { Props } from './shared';
 
 export function TotemUI({ round }: Props) {
+  if (!round.totemNextRule) {
+    return null;
+  }
+
   return (
-    <Section title="Immunité">
-      <Text style={styles.note}>
-        Cette mène est jouée normalement.{'\n\n'}
-        Le perdant de cette mène sera immunisé contre la prochaine règle.
-      </Text>
-      {round.totemNextRule && (
-        <View style={localStyles.totemReveal}>
-          <Text style={localStyles.totemLabel}>Prochaine règle</Text>
-          <Text style={localStyles.totemRuleName}>{round.totemNextRule.name}</Text>
-          <Text style={localStyles.totemRuleDesc}>{round.totemNextRule.shortDescription}</Text>
-        </View>
-      )}
-    </Section>
+    <View style={styles.wrapper}>
+      <RuleDisplay
+        rule={round.totemNextRule}
+        variant="compact"
+        testID="totem-next-rule-card"
+      />
+    </View>
   );
 }
-// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
 
-const localStyles = StyleSheet.create({
-  totemReveal: {
-    marginTop: 16,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: colors.darkSmooth,
-    alignItems: 'center',
-  },
-  totemLabel: {
-    color: colors.textSmooth,
-    ...figmaTextStyles.labels,
-    marginBottom: 8,
-  },
-  totemRuleName: {
-    color: colors.primary,
-    fontSize: typography.size.xl,
-    fontWeight: typography.weight.extrabold,
-    marginBottom: 6,
-    textAlign: 'center',
-  },
-  totemRuleDesc: {
-    color: colors.white,
-    ...figmaTextStyles.bodySm,
-    textAlign: 'center',
+const styles = StyleSheet.create({
+  wrapper: {
+    width: '100%',
+    marginTop: spacing[6],
+    paddingHorizontal: spacing[6],
   },
 });

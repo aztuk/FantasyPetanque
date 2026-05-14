@@ -1,14 +1,16 @@
 import React from 'react';
 import { StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import { Rule, Team } from '../../../domain/game/models';
-import { TEAM_LABELS, figmaTextStyles } from '../../../shared/constants';
+import { TEAM_LABELS, figmaTextStyles, radius, spacing } from '../../../shared/constants';
 import { gameUiColors } from './gameUiTheme';
 
 interface Props {
   rule: Rule;
   immuneTeam?: Team | null;
   showNote?: boolean;
+  variant?: 'default' | 'compact';
   style?: StyleProp<ViewStyle>;
+  testID?: string;
 }
 
 export interface RuleDescriptionSegment {
@@ -104,11 +106,27 @@ function renderSegments(segments: RuleDescriptionSegment[]) {
   ));
 }
 
-export function RuleDisplay({ rule, immuneTeam = null, showNote = true, style }: Props) {
+export function RuleDisplay({
+  rule,
+  immuneTeam = null,
+  showNote = true,
+  variant = 'default',
+  style,
+  testID,
+}: Props) {
+  if (variant === 'compact') {
+    return (
+      <View style={[styles.compactWrapper, style]} testID={testID}>
+        <Text style={styles.compactTitle}>{rule.name}</Text>
+        <Text style={styles.compactDescription}>{rule.shortDescription}</Text>
+      </View>
+    );
+  }
+
   const content = parseRuleDisplayContent(rule.description);
 
   return (
-    <View style={[styles.wrapper, style]}>
+    <View style={[styles.wrapper, style]} testID={testID}>
       <Text style={styles.title}>{rule.name}</Text>
       <View style={styles.descriptionGroup}>
         {content.paragraphs.map((paragraph, paragraphIndex) => (
@@ -170,5 +188,27 @@ const styles = StyleSheet.create({
     color: gameUiColors.muted,
     textAlign: 'center',
     marginTop: 12,
+  },
+  compactWrapper: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing[1],
+    paddingHorizontal: spacing[6],
+    paddingVertical: spacing[3],
+    borderRadius: radius.input,
+    backgroundColor: gameUiColors.darkOverlay,
+  },
+  compactTitle: {
+    ...figmaTextStyles.buttonActions,
+    width: '100%',
+    color: gameUiColors.secondary,
+    textAlign: 'center',
+  },
+  compactDescription: {
+    ...figmaTextStyles.bodySm,
+    width: '100%',
+    color: gameUiColors.white,
+    textAlign: 'center',
   },
 });

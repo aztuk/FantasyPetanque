@@ -140,6 +140,9 @@ Figma principal : <!-- URL fichier Figma principal -->
 - Les segments mis en valeur dans la spec (`<b>...</b>`) utilisent `--secondary`.
 - La note utilise `BodySm` en `--textsmooth`.
 - Ce composant ne contient pas de logique de règle : il rend uniquement le contenu fourni par le moteur ou la banque de règles.
+- Variante `Compact` : utilisée par Totem d'immunité pour révéler la prochaine règle. Référence Figma : [node-id=33:1255](https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=33-1255&t=qil4nd06wX0YCs6f-11).
+- `Compact` : fond `--darksmoother`, padding horizontal `24`, padding vertical `12`, rayon `10`, gap `4`.
+- `Compact` affiche uniquement le nom de la règle en `--secondary` et sa `shortDescription` en `--white`.
 
 ### HistoryItem et History
 
@@ -254,6 +257,8 @@ Game Fantasy Specific InGame TeamRowButtonSelected: https://www.figma.com/design
 Game Fantasy Specific Config ValueInput: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=16-1569&t=qil4nd06wX0YCs6f-11
 Game Fantasy Specific InGame Casino: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=17-1625&t=qil4nd06wX0YCs6f-11
 Game Fantasy Specific InGame Prediction: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=18-1701&t=qil4nd06wX0YCs6f-11
+Game Fantasy Specific InGame Totem d'immunité: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=28-1169&t=qil4nd06wX0YCs6f-11
+Game Fantasy Specific Rule Compact: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=33-1255&t=qil4nd06wX0YCs6f-11
 
 
 ---
