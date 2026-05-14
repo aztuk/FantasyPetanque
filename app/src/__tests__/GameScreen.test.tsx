@@ -1,6 +1,8 @@
 import React from 'react';
+import { StyleSheet } from 'react-native';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { ALL_RULES } from '../data/rules/rules';
+import { gameUiColors } from '../features/game/components/gameUiTheme';
 import { GameScreen } from '../features/game/screens/GameScreen';
 import { useGameStore } from '../features/game/state/gameStore';
 
@@ -139,9 +141,23 @@ describe('GameScreen fantasy inter-mene', () => {
     expect(screen.getByTestId('casino-bet-red-readonly')).toBeTruthy();
     expect(useGameStore.getState().currentRound?.casinoBets).toEqual({ blue: 2, red: 1 });
     expect(screen.getByTestId('end-round-button').props.accessibilityState.disabled).toBe(true);
+    expect(
+      StyleSheet.flatten(screen.getByTestId('casino-winner-blue-button').props.style).backgroundColor,
+    ).toBe(gameUiColors.divider);
+    expect(
+      StyleSheet.flatten(screen.getByTestId('casino-winner-red-button').props.style).backgroundColor,
+    ).toBe(gameUiColors.divider);
 
     fireEvent.press(screen.getByTestId('casino-winner-blue-button'));
 
+    expect(screen.getByText('Perdant')).toBeTruthy();
+    expect(screen.getAllByText('Gagnant')).toHaveLength(1);
+    expect(
+      StyleSheet.flatten(screen.getByTestId('casino-winner-blue-button').props.style).backgroundColor,
+    ).toBe(gameUiColors.blueSurface);
+    expect(
+      StyleSheet.flatten(screen.getByTestId('casino-winner-red-button').props.style).backgroundColor,
+    ).toBe(gameUiColors.divider);
     expect(screen.getByTestId('end-round-button').props.accessibilityState.disabled).toBe(false);
 
     fireEvent.press(screen.getByTestId('end-round-button'));

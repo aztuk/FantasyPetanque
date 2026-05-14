@@ -87,10 +87,14 @@ export function PlayingView() {
   const scoringTeam: Team | null = bluePoints > 0 ? 'blue' : redPoints > 0 ? 'red' : null;
   const skipNormal = shouldSkipNormalScore(round);
   const isCasino = round.rule?.id === 'casino';
+  const isSortieDePorc = round.rule?.id === 'sortie-de-porc';
+  const usesWinnerConfirmation = isCasino || isSortieDePorc;
+  const hasWinnerSelection = isCasino ? round.casinoWinner !== null : round.sortieDePorc !== null;
   const renderRuleUIInDrawer =
+    round.rule?.uiType === 'cochonnet-sorti' ||
     round.rule?.uiType === 'bonus-buttons' ||
     round.rule?.uiType === 'malus-buttons';
-  const canFinishRound = isCasino ? round.casinoWinner !== null : skipNormal || scoringTeam !== null;
+  const canFinishRound = usesWinnerConfirmation ? hasWinnerSelection : skipNormal || scoringTeam !== null;
 
   const handleTeamPress = (team: Team) => {
     const otherTeam = team === 'blue' ? 'red' : 'blue';
@@ -116,12 +120,12 @@ export function PlayingView() {
       />
       <GameTopBar onCancel={() => setShowCancelSheet(true)} />
       <View style={gameScreenStyles.fantasyContent}>
-        <View style={gameScreenStyles.ruleArea} onTouchStart={() => { if (!isCasino) animateDrawer(false); }}>
+        <View style={gameScreenStyles.ruleArea} onTouchStart={() => { if (!usesWinnerConfirmation) animateDrawer(false); }}>
           <ScrollView
             style={StyleSheet.absoluteFill}
             contentContainerStyle={[
               gameScreenStyles.ruleScrollContent,
-              isCasino && gameScreenStyles.casinoRuleScrollContent,
+              usesWinnerConfirmation && gameScreenStyles.casinoRuleScrollContent,
             ]}
             showsVerticalScrollIndicator={false}
           >
@@ -142,7 +146,7 @@ export function PlayingView() {
         <Animated.View
           style={[gameScreenStyles.drawer, { transform: [{ translateY: drawerTranslate }] }]}
           onLayout={handleDrawerLayout}
-          onTouchStart={() => { if (!isCasino) animateDrawer(true); }}
+          onTouchStart={() => { if (!usesWinnerConfirmation) animateDrawer(true); }}
         >
           <View pointerEvents={drawerExpanded ? 'auto' : 'none'}>
             {isCasino && (
@@ -150,25 +154,45 @@ export function PlayingView() {
                 label="Gagnant"
                 onTeamPress={setCasinoWinner}
                 selectedTeam={round.casinoWinner}
+                unselectedLabelWhenSelected="Perdant"
+                teamColorOnlyWhenSelected
                 testIDPrefix="casino-winner"
               />
             )}
             {renderRuleUIInDrawer && <RuleUI round={round} />}
             {(isCasino || renderRuleUIInDrawer) && <View style={gameScreenStyles.actionScoreGap} />}
-            <GameScoreBoard
-              scores={scores}
-              roundPoints={!isCasino && drawerExpanded ? { blue: bluePoints, red: redPoints } : undefined}
-              modifierPoints={!isCasino && drawerExpanded ? modifierPoints : undefined}
-              roundNumber={round.number}
-              showRoundBar={!isCasino}
-              onTeamPress={drawerExpanded && !skipNormal ? handleTeamPress : undefined}
-            />
-            <GameActionButton
-              label={isCasino ? 'Confirmer' : canFinishRound ? 'Mène terminée' : 'Points manquants'}
-              onPress={handleFinishRound}
-              disabled={!canFinishRound}
-              testID="end-round-button"
-            />
+            {isSortieDePorc ? (
+              <>
+                <GameScoreBoard
+                  scores={scores}
+                  roundNumber={round.number}
+                  showRoundBar={false}
+                />
+                <GameActionButton
+                  label="Confirmer"
+                  onPress={handleFinishRound}
+                  disabled={!canFinishRound}
+                  testID="end-round-button"
+                />
+              </>
+            ) : (
+              <>
+                <GameScoreBoard
+                  scores={scores}
+                  roundPoints={!isCasino && drawerExpanded ? { blue: bluePoints, red: redPoints } : undefined}
+                  modifierPoints={!isCasino && drawerExpanded ? modifierPoints : undefined}
+                  roundNumber={round.number}
+                  showRoundBar={!isCasino}
+                  onTeamPress={drawerExpanded && !skipNormal ? handleTeamPress : undefined}
+                />
+                <GameActionButton
+                  label={isCasino ? 'Confirmer' : canFinishRound ? 'Mène terminée' : 'Points manquants'}
+                  onPress={handleFinishRound}
+                  disabled={!canFinishRound}
+                  testID="end-round-button"
+                />
+              </>
+            )}
           </View>
         </Animated.View>
       </View>

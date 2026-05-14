@@ -16,5 +16,6 @@
 - Casino utilise un flow en deux temps : setup avant mène pour choisir les mises, puis résolution pendant la mène avec une action `Gagnant` attachée au bloc scoreboard, pas au contenu scrollable.
 - Les mises Casino valent 1 par défaut, sont bornées entre 1 et 6, et ne peuvent jamais dépasser le score de l'adversaire. Casino n'est tirable que si les deux équipes ont au moins 1 point.
 - Les actions d'équipe liées au score pendant une mène doivent être attachées à la zone scoreboard via un composant partagé, afin de rester cohérentes avec les futures UI bonus/malus.
+- Les choix de résolution `Gagnant` / `Perdant` (Casino, Sortie de porc) utilisent des boutons `Default` tant qu'aucune équipe n'est sélectionnée ; après sélection, seul le gagnant prend la couleur de son équipe et l'autre affiche `Perdant`.
 - Les UI bonus/malus simples utilisent le même composant d'action d'équipe que Casino, attaché au scoreboard. Pour les bonus/malus à maximum 1, un second tap annule l'action ; pour les compteurs, un long press décrémente.
 - Totem d'immunité révèle la prochaine règle via la variante compacte de `RuleDisplay` sous la règle courante. Même si la maquette mentionne l'équipe gagnante, `fantasy-petanque.md` prime : le perdant de la mène Totem est immunisé.

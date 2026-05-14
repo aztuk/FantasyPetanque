@@ -64,7 +64,7 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 - [fait] UI spécifique règle Prédiction : refonte selon maquette Figma. - Difficulté 3/5 - Claude
 - [fait] UI spécifique règle Totem d'immunité : refonte selon maquette Figma. - Difficulté 2/5 - Codex
 - [fait] UI spécifique règles bonus/malus simples : Gauche caviar, Les extrêmes, Censure, La boule maudite, King of the Hill. Mockups disponibles dans `UI_RULES_CADRAGE.md` pour toutes les règles sauf King of the Hill. Le pattern `bonus-buttons` / `malus-buttons` est partagé : une seule implémentation couvre tous les types. Test manuel obligatoire sur TOUTES les règles concernées (l'agent listera les règles à ouvrir au moment du test). - Difficulté 3/5 - Codex
-- [ ] UI spécifique règle Sortie de porc : refonte selon maquette Figma.
+- [fait] UI spécifique règle Sortie de porc : refonte selon maquette Figma. - Difficulté 2/5 - Codex
 - [ ] UI spécifique règle Contrat : refonte selon maquette Figma.
 - [ ] UI spécifique règle Assurance vie : refonte selon maquette Figma.
 - [ ] UI spécifique règle Frontière : refonte selon maquette Figma.

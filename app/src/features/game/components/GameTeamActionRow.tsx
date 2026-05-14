@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Team } from '../../../domain/game/models';
-import { textStyles } from '../../../shared/constants';
+import { figmaTextStyles } from '../../../shared/constants';
 import { gameUiColors } from './gameUiTheme';
 
 interface Props {
@@ -9,6 +9,8 @@ interface Props {
   onTeamPress: (team: Team) => void;
   onTeamLongPress?: (team: Team) => void;
   selectedTeam?: Team | null;
+  unselectedLabelWhenSelected?: string;
+  teamColorOnlyWhenSelected?: boolean;
   activeTeams?: Partial<Record<Team, boolean>>;
   disabledTeams?: Partial<Record<Team, boolean>>;
   testIDPrefix?: string;
@@ -29,6 +31,8 @@ export function GameTeamActionRow({
   onTeamPress,
   onTeamLongPress,
   selectedTeam = null,
+  unselectedLabelWhenSelected,
+  teamColorOnlyWhenSelected = false,
   activeTeams,
   disabledTeams,
   testIDPrefix,
@@ -39,15 +43,21 @@ export function GameTeamActionRow({
         const selected = selectedTeam === team;
         const active = activeTeams?.[team] ?? selected;
         const disabled = disabledTeams?.[team] ?? false;
-        const teamLabel = typeof label === 'string' ? label : label[team];
+        const baseLabel = typeof label === 'string' ? label : label[team];
+        const teamLabel = selectedTeam !== null && !selected && unselectedLabelWhenSelected
+          ? unselectedLabelWhenSelected
+          : baseLabel;
+        const backgroundColor = teamColorOnlyWhenSelected
+          ? (selected ? TEAM_SURFACE[team] : gameUiColors.divider)
+          : TEAM_SURFACE[team];
 
         return (
           <Pressable
             key={team}
             style={[
               styles.button,
-              { backgroundColor: TEAM_SURFACE[team] },
-              active && styles.buttonActive,
+              { backgroundColor },
+              active && !teamColorOnlyWhenSelected && styles.buttonActive,
               selected && styles.buttonSelected,
               disabled && styles.buttonDisabled,
             ]}
@@ -58,7 +68,10 @@ export function GameTeamActionRow({
             accessibilityState={{ selected, disabled }}
             testID={testIDPrefix ? `${testIDPrefix}-${team}-button` : undefined}
           >
-            <Text style={[styles.label, active && { color: TEAM_TEXT[team] }]} numberOfLines={2}>
+            <Text
+              style={[styles.label, active && !teamColorOnlyWhenSelected && { color: TEAM_TEXT[team] }]}
+              numberOfLines={2}
+            >
               {teamLabel}
             </Text>
           </Pressable>
@@ -67,7 +80,6 @@ export function GameTeamActionRow({
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   row: {
     width: '100%',
@@ -92,8 +104,9 @@ const styles = StyleSheet.create({
     opacity: 0.55,
   },
   label: {
-    ...textStyles.actionLabel,
+    ...figmaTextStyles.buttonActions,
     color: gameUiColors.white,
     textAlign: 'center',
+    includeFontPadding: false,
   },
 });
