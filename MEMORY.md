@@ -2,6 +2,8 @@
 
 ## Décisions produit
 
+- Les options du flow Setup utilisent trois variantes Figma : `default` (`darkSmooth` + texte blanc), `primary` (`primary` + texte sombre) et `fantasy` (gradient `primary` vers `secondary` + texte sombre).
+- `AppHeader` peut être rendu en mode `floating` pour les headers overlay : le wrapper ne porte alors aucun fond, seul `ButtonIcon` conserve son fond translucide.
 - Les animations premium de l'UI game doivent utiliser le token `gameUiMotion.curves.premium` afin de garder une courbe cohérente entre ouverture, translation, fondu et reflets.
 - Les "mènes de comptage classique" correspondent à toutes les mènes où `shouldSkipNormalScore(round)` vaut `false` : mode simple et règles fantasy qui utilisent le score normal.
 - Les écrans principaux utilisent `react-native-safe-area-context` pour respecter la barre d'état / l'encoche. En partie, `GameTopBar` porte l'annulation de partie et les actions hautes comme les vétos.
