@@ -1,22 +1,13 @@
-import React, { useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../../../app/navigation/types';
+import React from 'react';
 import { shouldSkipNormalScore } from '../../../../domain/game/engine';
 import { Team } from '../../../../domain/game/models';
-import { CancelGameSheet } from '../../../../shared/components/CancelGameSheet';
 import { GameActionButton } from '../../components/GameActionButton';
 import { GameHistoryList } from '../../components/GameHistoryList';
 import { GameScoreBoard } from '../../components/GameScoreBoard';
-import { GameTopBar } from '../../components/GameTopBar';
 import { useGameStore } from '../../state/gameStore';
-import { gameScreenStyles } from './gameScreenStyles';
-
-type Nav = NativeStackNavigationProp<RootStackParamList, 'Game'>;
+import { GameScreenLayout } from '../GameScreenLayout';
 
 export function SimpleModeView() {
-  const navigation = useNavigation<Nav>();
   const {
     scores,
     currentRound,
@@ -25,10 +16,7 @@ export function SimpleModeView() {
     undoNormalPoint,
     finishRound,
     startNewRound,
-    resetGame,
   } = useGameStore();
-
-  const [showCancelSheet, setShowCancelSheet] = useState(false);
 
   const round = currentRound!;
   const bluePoints = round.normalPoints.blue;
@@ -53,26 +41,25 @@ export function SimpleModeView() {
   };
 
   return (
-    <SafeAreaView style={gameScreenStyles.safe} edges={['top', 'bottom']}>
-      <CancelGameSheet
-        visible={showCancelSheet}
-        onConfirm={() => { resetGame(); navigation.replace('Home'); }}
-        onCancel={() => setShowCancelSheet(false)}
-      />
-      <GameTopBar onCancel={() => setShowCancelSheet(true)} />
-      <GameHistoryList rounds={rounds} orientation="bottom" style={gameScreenStyles.simpleHistory} />
-      <GameScoreBoard
-        scores={scores}
-        roundPoints={{ blue: bluePoints, red: redPoints }}
-        roundNumber={round.number}
-        onTeamPress={handleTeamPress}
-      />
-      <GameActionButton
-        label={canFinishRound ? 'Mène terminée' : 'Points manquants'}
-        onPress={handleFinishRound}
-        disabled={!canFinishRound}
-        testID="end-round-button"
-      />
-    </SafeAreaView>
+    <GameScreenLayout
+      drawerTotalScore={
+        <GameScoreBoard
+          scores={scores}
+          roundPoints={{ blue: bluePoints, red: redPoints }}
+          roundNumber={round.number}
+          onTeamPress={handleTeamPress}
+        />
+      }
+      drawerConfirmButton={
+        <GameActionButton
+          label={canFinishRound ? 'Mène terminée' : 'Points manquants'}
+          onPress={handleFinishRound}
+          disabled={!canFinishRound}
+          testID="end-round-button"
+        />
+      }
+    >
+      <GameHistoryList rounds={rounds} orientation="bottom" />
+    </GameScreenLayout>
   );
 }
