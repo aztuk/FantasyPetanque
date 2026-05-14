@@ -19,7 +19,7 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 
 <!-- fonctionnalités importantes mais non bloquantes -->
 
-- [en cours] Créer `Design.md` : dictionnaire des styles (tokens de couleur, typographie, espacements), liste des écrans avec leurs liens Figma. Servira de référence centrale pour tous les agents.
+- [fait] Créer `Design.md` : dictionnaire des styles (tokens de couleur, typographie, espacements), liste des écrans avec leurs liens Figma. Servira de référence centrale pour tous les agents. - Difficulté 2/5 - Claude
 - [ ] Skill `/design-check` : skill Claude Code qui lit `Design.md`, parcourt les fichiers de style du code (`theme.ts`, composants) et produit un rapport de divergences (tokens non conformes, presets typographiques manquants, couleurs hex directes détectées). Dépend de `Design.md` stable (liens Figma remplis).
 
 - [fait] Écran post-mène : après la fin d'une mène, afficher un écran intermédiaire qui anime l'incrément du score et résume les mini-objectifs/bonus/malus accomplis durant la mène. - Difficulté 3/5 - Claude
