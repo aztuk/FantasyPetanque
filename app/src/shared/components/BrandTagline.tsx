@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
-import { colors, textStyles } from '../constants';
+import { colors, figmaTextStyles } from '../constants';
 
 interface Props {
   style?: ViewStyle;
@@ -15,14 +15,13 @@ export function BrandTagline({ style, testID }: Props) {
     </View>
   );
 }
-// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
 
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
   },
   line: {
-    ...textStyles.tagline,
+    ...figmaTextStyles.bodyMd,
     color: colors.white,
     textAlign: 'center',
   },

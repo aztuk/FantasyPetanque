@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, ViewStyle } from 'react-native';
-import { colors, opacity, textStyles } from '../constants';
+import { colors, figmaTextStyles, opacity } from '../constants';
 
 interface Props {
   label: string;
@@ -31,8 +31,6 @@ export function FullWidthCtaButton({
     </TouchableOpacity>
   );
 }
-// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
-
 const styles = StyleSheet.create({
   button: {
     width: '100%',
@@ -47,10 +45,9 @@ const styles = StyleSheet.create({
     opacity: opacity.disabled,
   },
   label: {
-    ...textStyles.ctaLabel,
+    ...figmaTextStyles.buttonCTA,
     color: colors.dark,
     includeFontPadding: false,
     textAlign: 'center',
-    textTransform: 'uppercase',
   },
 });
