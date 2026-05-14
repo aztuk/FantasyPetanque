@@ -1,7 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
 import { Team } from '../../domain/game/models';
-import { colors, typography, radius } from '../constants';
+import { colors, figmaTextStyles, radius, spacing } from '../constants';
 
 interface Props {
   team: Team;
@@ -26,28 +26,27 @@ export function TeamButton({ team, label, onPress, disabled, style, small }: Pro
     </TouchableOpacity>
   );
 }
-// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
-
 const styles = StyleSheet.create({
   btn: {
     flex: 1,
-    paddingVertical: 18,
+    paddingHorizontal: spacing[4],
+    paddingVertical: spacing[6],
     borderRadius: radius.lg,
     alignItems: 'center',
     justifyContent: 'center',
-    marginHorizontal: 4,
+    marginHorizontal: spacing[1],
   },
   small: {
-    paddingVertical: 12,
+    paddingVertical: spacing[4],
     borderRadius: radius.md,
   },
   label: {
+    ...figmaTextStyles.buttonActions,
     color: colors.white,
-    fontSize: typography.size.base,
-    fontWeight: typography.weight.bold,
     textAlign: 'center',
+    includeFontPadding: false,
   },
   smallLabel: {
-    fontSize: typography.size.base,
+    ...figmaTextStyles.labels,
   },
 });

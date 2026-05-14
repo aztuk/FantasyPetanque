@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { RoundState } from '../../../domain/game/models';
-import { textStyles, typography } from '../../../shared/constants';
+import { componentSizes, figmaTextStyles } from '../../../shared/constants';
 import { gameUiColors, gameUiMotion } from './gameUiTheme';
 
 interface Props {
@@ -22,7 +22,7 @@ interface Props {
   animateNewItems?: boolean;
 }
 
-const HISTORY_ITEM_HEIGHT = 51;
+const HISTORY_ITEM_HEIGHT = componentSizes.historyItemHeight;
 const premiumEasing = Easing.bezier(...gameUiMotion.curves.premium);
 
 function getRoundScore(round: RoundState, rounds: RoundState[]) {
@@ -155,11 +155,11 @@ export function GameHistoryItem({ round, rounds, animateEntry = false }: GameHis
           <Animated.View pointerEvents="none" style={[styles.itemReflection, reflectionStyle]}>
             <LinearGradient
               colors={[
-                'rgba(231,194,65,0)',
-                'rgba(231,194,65,0.22)',
-                'rgba(255,238,170,0.34)',
-                'rgba(231,194,65,0.22)',
-                'rgba(231,194,65,0)',
+                gameUiColors.primaryTransparent,
+                gameUiColors.primaryGlow,
+                gameUiColors.primaryReflection,
+                gameUiColors.primaryGlow,
+                gameUiColors.primaryTransparent,
               ]}
               locations={[0, 0.28, 0.5, 0.72, 1]}
               start={{ x: 0, y: 0.5 }}
@@ -249,16 +249,23 @@ export function GameHistoryList({
       </ScrollView>
       {shouldKeepLatestVisible && (
         <LinearGradient
-          colors={[gameUiColors.background, 'rgba(40,38,31,0)']}
+          colors={[gameUiColors.background, gameUiColors.backgroundTransparent]}
           pointerEvents="none"
           style={styles.topFade}
           testID="game-history-top-fade"
         />
       )}
+      {!shouldKeepLatestVisible && (
+        <LinearGradient
+          colors={[gameUiColors.backgroundTransparent, gameUiColors.background]}
+          pointerEvents="none"
+          style={styles.bottomFade}
+          testID="game-history-bottom-fade"
+        />
+      )}
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     width: '100%',
@@ -286,7 +293,14 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: 44,
+    height: 64,
+  },
+  bottomFade: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 64,
   },
   itemClip: {
     height: HISTORY_ITEM_HEIGHT,
@@ -315,7 +329,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   score: {
-    ...textStyles.labelMd,
+    ...figmaTextStyles.numberXs40,
     flex: 1,
     textAlign: 'center',
   },
@@ -326,12 +340,11 @@ const styles = StyleSheet.create({
     color: gameUiColors.redText,
   },
   roundLabel: {
-    ...textStyles.bodySm,
+    ...figmaTextStyles.bodySm,
     position: 'absolute',
     left: 0,
     right: 0,
     color: gameUiColors.muted,
-    fontWeight: typography.weight.medium,
     textAlign: 'center',
   },
 });

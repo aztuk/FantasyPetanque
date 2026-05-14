@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import { Rule, Team } from '../../../domain/game/models';
-import { TEAM_LABELS, textStyles, typography } from '../../../shared/constants';
+import { TEAM_LABELS, figmaTextStyles } from '../../../shared/constants';
 import { gameUiColors } from './gameUiTheme';
 
 interface Props {
@@ -130,7 +130,6 @@ export function RuleDisplay({ rule, immuneTeam = null, showNote = true, style }:
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   wrapper: {
     width: '100%',
@@ -140,10 +139,9 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   title: {
-    ...textStyles.titleLg,
+    ...figmaTextStyles.pageTitles,
     width: '100%',
     color: gameUiColors.primary,
-    fontWeight: typography.weight.bold,
     textAlign: 'center',
   },
   descriptionGroup: {
@@ -152,24 +150,22 @@ const styles = StyleSheet.create({
     gap: 24,
   },
   description: {
-    ...textStyles.bodyMd,
+    ...figmaTextStyles.bodyMd,
     width: '100%',
     color: gameUiColors.white,
     textAlign: 'center',
   },
   note: {
-    ...textStyles.bodySm,
+    ...figmaTextStyles.bodySm,
     width: '100%',
     color: gameUiColors.muted,
     textAlign: 'center',
   },
   highlightText: {
     color: gameUiColors.secondary,
-    fontFamily: typography.family.bodySemibold,
-    fontWeight: typography.weight.bold,
   },
   immunity: {
-    ...textStyles.bodySm,
+    ...figmaTextStyles.bodySm,
     width: '100%',
     color: gameUiColors.muted,
     textAlign: 'center',

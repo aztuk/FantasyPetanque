@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { AlertSheet } from './AlertSheet';
-import { colors, textStyles, typography } from '../constants';
+import { colors, figmaTextStyles } from '../constants';
 
 interface Props {
   visible: boolean;
@@ -27,39 +27,31 @@ export function CancelGameSheet({ visible, onConfirm, onCancel }: Props) {
     </AlertSheet>
   );
 }
-// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
-
 const styles = StyleSheet.create({
   title: {
-    ...textStyles.ctaLabel,
+    ...figmaTextStyles.pageTitles,
     color: colors.white,
-    fontFamily: typography.family.body,
-    fontWeight: typography.weight.bold,
     includeFontPadding: false,
     textAlign: 'center',
   },
   message: {
-    ...textStyles.bodyMd,
+    ...figmaTextStyles.bodyMd,
     color: colors.white,
     includeFontPadding: false,
     textAlign: 'center',
-    paddingTop: 24,
-    paddingBottom: 24,
   },
   highlight: {
     color: colors.secondary,
-    fontFamily: typography.family.body,
-    fontWeight: typography.weight.bold,
   },
   cancelLabel: {
-    ...textStyles.titleLg,
+    ...figmaTextStyles.buttonCTA,
     color: colors.white,
     includeFontPadding: false,
     textAlign: 'center',
     textTransform: 'uppercase',
   },
   confirmLabel: {
-    ...textStyles.titleLg,
+    ...figmaTextStyles.buttonCTA,
     color: colors.dark,
     includeFontPadding: false,
     textAlign: 'center',

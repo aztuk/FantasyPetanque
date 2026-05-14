@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, ViewStyle } from 'react-native';
-import { textStyles } from '../../../shared/constants';
+import { colors, componentSizes, figmaTextStyles } from '../../../shared/constants';
 import { gameUiColors } from './gameUiTheme';
 
 interface Props {
@@ -21,10 +21,10 @@ export function GameActionButton({
   testID,
 }: Props) {
   const backgroundColor =
-    disabled ? gameUiColors.muted :
+    disabled ? colors.disabled :
     variant === 'blue' ? gameUiColors.blueSurface :
     variant === 'red' ? gameUiColors.redSurface :
-    variant === 'muted' ? gameUiColors.muted :
+    variant === 'muted' ? gameUiColors.divider :
     gameUiColors.primary;
   const color = variant === 'blue' || variant === 'red' || variant === 'muted'
     ? gameUiColors.white
@@ -40,24 +40,31 @@ export function GameActionButton({
       accessibilityState={{ disabled }}
       testID={testID}
     >
-      <Text style={[styles.label, { color }]} numberOfLines={1} adjustsFontSizeToFit>
+      <Text
+        style={[
+          styles.label,
+          { color: disabled ? colors.textSmooth : color },
+        ]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+      >
         {label.toUpperCase()}
       </Text>
     </TouchableOpacity>
   );
 }
-
 const styles = StyleSheet.create({
   button: {
-    minHeight: 102,
+    minHeight: componentSizes.buttonHeight,
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 10,
-    paddingVertical: 24,
+    paddingVertical: 16,
   },
   label: {
-    ...textStyles.titleLg,
+    ...figmaTextStyles.buttonCTA,
     textAlign: 'center',
+    includeFontPadding: false,
   },
 });

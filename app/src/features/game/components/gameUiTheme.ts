@@ -1,16 +1,22 @@
+import { colors } from '../../../shared/constants';
+
 export const gameUiColors = {
-  background: '#28261F',
-  divider: '#3B382E',
-  muted: '#949084',
-  primary: '#E7C241',
-  secondary: '#41E79A',
-  white: '#ECEBE8',
-  green: '#41E79A',
-  blueSurface: '#395ADC',
-  blueText: '#778EED',
-  redSurface: '#DC3939',
-  redText: '#E86868',
-  darkOverlay: 'rgba(0,0,0,0.2)',
+  background: colors.dark,
+  backgroundTransparent: 'rgba(40,38,31,0)',
+  divider: colors.darkSmooth,
+  muted: colors.textSmooth,
+  primary: colors.primary,
+  secondary: colors.secondary,
+  primaryTransparent: 'rgba(231,194,65,0)',
+  primaryGlow: 'rgba(231,194,65,0.22)',
+  primaryReflection: 'rgba(255,238,170,0.34)',
+  white: colors.white,
+  green: colors.secondary,
+  blueSurface: colors.team.blue,
+  blueText: colors.team.blueText,
+  redSurface: colors.team.red,
+  redText: colors.team.redText,
+  darkOverlay: colors.darkSmoother,
 } as const;
 
 export const gameUiMotion = {
