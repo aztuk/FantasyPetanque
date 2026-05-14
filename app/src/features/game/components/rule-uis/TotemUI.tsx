@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, StyleSheet } from 'react-native';
 import { View } from 'react-native';
-import { Section, Props, styles, colors, typography } from './shared';
+import { Section, Props, styles, colors, figmaTextStyles, typography } from './shared';
 
 export function TotemUI({ round }: Props) {
   return (
@@ -32,9 +32,7 @@ const localStyles = StyleSheet.create({
   },
   totemLabel: {
     color: colors.textSmooth,
-    fontSize: typography.size.base,
-    textTransform: 'uppercase',
-    letterSpacing: 1.5,
+    ...figmaTextStyles.labels,
     marginBottom: 8,
   },
   totemRuleName: {
@@ -46,8 +44,7 @@ const localStyles = StyleSheet.create({
   },
   totemRuleDesc: {
     color: colors.white,
-    fontSize: typography.size.base,
+    ...figmaTextStyles.bodySm,
     textAlign: 'center',
-    lineHeight: 24,
   },
 });

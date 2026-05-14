@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { RoundState } from '../../../../domain/game/models';
-import { colors, typography, radius, TEAM_COLORS } from '../../../../shared/constants';
+import { colors, figmaTextStyles, typography, radius, TEAM_COLORS } from '../../../../shared/constants';
 
 export interface Props {
   round: RoundState;
@@ -43,18 +43,14 @@ export const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: colors.primary,
-    fontSize: typography.size.base,
-    fontWeight: typography.weight.bold,
-    textTransform: 'uppercase',
-    letterSpacing: 1.5,
+    ...figmaTextStyles.labels,
   },
   row: { flexDirection: 'row', marginTop: 8 },
   teamRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 6 },
   teamLabel: { fontSize: typography.size.base, fontWeight: typography.weight.semibold, width: 100 },
   note: {
     color: colors.textSmooth,
-    fontSize: typography.size.base,
-    lineHeight: 26,
+    ...figmaTextStyles.bodySm,
     marginTop: 8,
   },
   undoBtn: {
@@ -75,4 +71,4 @@ export const styles = StyleSheet.create({
   },
 });
 
-export { colors, typography, radius, TEAM_COLORS };
+export { colors, figmaTextStyles, typography, radius, TEAM_COLORS };

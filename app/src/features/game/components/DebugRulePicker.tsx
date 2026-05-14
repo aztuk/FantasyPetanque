@@ -5,7 +5,7 @@ import {
 import { Rule } from '../../../domain/game/models';
 import { ALL_RULES } from '../../../data/rules/rules';
 import { useGameStore } from '../state/gameStore';
-import { colors, typography, radius } from '../../../shared/constants';
+import { colors, figmaTextStyles, typography, radius } from '../../../shared/constants';
 
 interface Props {
   visible: boolean;
@@ -93,6 +93,6 @@ const styles = StyleSheet.create({
   ruleItemContent: { flex: 1 },
   ruleName: { color: colors.white, fontSize: typography.size.base, fontWeight: typography.weight.bold, marginBottom: 4 },
   ruleNameActive: { color: colors.primary },
-  ruleDesc: { color: colors.textSmooth, fontSize: typography.size.base, lineHeight: 24 },
+  ruleDesc: { color: colors.textSmooth, ...figmaTextStyles.bodySm },
   separator: { height: 1, backgroundColor: colors.darkSmooth },
 });

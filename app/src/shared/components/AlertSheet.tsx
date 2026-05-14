@@ -7,7 +7,7 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import { colors } from '../constants';
+import { colors, componentSizes, radius, shadows, spacing } from '../constants';
 
 interface Props {
   visible: boolean;
@@ -106,8 +106,6 @@ export function AlertSheet({
     </Modal>
   );
 }
-// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -115,32 +113,29 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: colors.overlayBackdrop,
   },
   sheet: {
     backgroundColor: colors.darkSmooth,
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    shadowColor: colors.dark,
-    shadowOffset: { width: 0, height: -12 },
-    shadowOpacity: 1,
-    shadowRadius: 12,
-    elevation: 12,
+    borderTopLeftRadius: radius.sheet,
+    borderTopRightRadius: radius.sheet,
+    ...shadows.alertBox,
   },
   content: {
-    padding: 24,
-    gap: 4,
+    padding: spacing[6],
+    gap: spacing[1],
   },
   footer: {
     flexDirection: 'row',
+    gap: spacing[1],
   },
   footerButton: {
     flex: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 24,
+    paddingHorizontal: spacing.control,
+    paddingVertical: spacing[4],
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 102,
+    minHeight: componentSizes.buttonHeight,
   },
   cancelButton: {
     backgroundColor: colors.darkSmooth,

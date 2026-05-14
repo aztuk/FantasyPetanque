@@ -16,6 +16,7 @@ const palette = {
   blueTeamText:   '#778EED',
   blueTeamDark:   '#1D3287',
   shadow:         '#1F1D15',
+  overlayBackdrop: 'rgba(0,0,0,0.6)',
 } as const;
 
 export const colors = {
@@ -28,6 +29,7 @@ export const colors = {
   textSmooth:   palette.textSmooth,
   white:        palette.white,
   shadow:       palette.shadow,
+  overlayBackdrop: palette.overlayBackdrop,
   team: {
     blue:     palette.blueTeamSurface,
     red:      palette.redTeamSurface,

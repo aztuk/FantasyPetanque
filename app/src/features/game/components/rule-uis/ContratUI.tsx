@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useGameStore } from '../../state/gameStore';
 import { TeamButton } from '../../../../shared/components/TeamButton';
 import { CONTRAT_MISSIONS } from '../../../../data/rules/rules';
-import { Section, Props, styles, colors, typography, radius, TEAM_COLORS } from './shared';
+import { Section, Props, styles, colors, figmaTextStyles, typography, radius, TEAM_COLORS } from './shared';
 
 export function ContratSetupUI({ round }: Props) {
   const { selectContratMission, clearContratMission } = useGameStore();
@@ -68,5 +68,5 @@ const localStyles = StyleSheet.create({
   missionBtn: { width: 42, height: 42, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
   missionSelected: { borderWidth: 3, borderColor: colors.white },
   missionBtnLabel: { color: colors.white, fontWeight: typography.weight.bold, fontSize: typography.size.base },
-  missionText: { flex: 1, color: colors.white, fontSize: typography.size.base, marginHorizontal: 12, lineHeight: 24 },
+  missionText: { flex: 1, color: colors.white, ...figmaTextStyles.bodySm, marginHorizontal: 12 },
 });

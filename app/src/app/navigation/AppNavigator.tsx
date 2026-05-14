@@ -5,9 +5,8 @@ import { HomeScreen } from '../../features/game/screens/HomeScreen';
 import { SetupScreen } from '../../features/game/screens/SetupScreen';
 import { GameScreen } from '../../features/game/screens/GameScreen';
 import { DebugRuleSelectScreen } from '../../features/game/screens/DebugRuleSelectScreen';
-import { SummaryScreen } from '../../features/game/screens/SummaryScreen';
 import { RootStackParamList } from './types';
-import { BACKGROUND, TEXT_PRIMARY } from '../../shared/constants';
+import { BACKGROUND, TEXT_PRIMARY, typography } from '../../shared/constants';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -18,7 +17,7 @@ export function AppNavigator() {
         screenOptions={{
           headerStyle: { backgroundColor: BACKGROUND },
           headerTintColor: TEXT_PRIMARY,
-          headerTitleStyle: { fontWeight: '700' },
+          headerTitleStyle: { fontWeight: typography.weight.bold },
           contentStyle: { backgroundColor: BACKGROUND },
         }}
       >
@@ -41,11 +40,6 @@ export function AppNavigator() {
           name="DebugRuleSelect"
           component={DebugRuleSelectScreen}
           options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Summary"
-          component={SummaryScreen}
-          options={{ title: 'Résumé de partie' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

@@ -11,7 +11,7 @@ import { RootStackParamList } from '../../../app/navigation/types';
 import { CancelGameSheet } from '../../../shared/components/CancelGameSheet';
 import { PrimaryButton } from '../../../shared/components/PrimaryButton';
 import { GameTopBar } from '../components/GameTopBar';
-import { colors, typography, radius } from '../../../shared/constants';
+import { colors, figmaTextStyles, typography, radius } from '../../../shared/constants';
 import { useGameStore } from '../state/gameStore';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'DebugRuleSelect'>;
@@ -105,10 +105,7 @@ const styles = StyleSheet.create({
   header: { paddingHorizontal: 24, paddingTop: 20, paddingBottom: 16 },
   eyebrow: {
     color: colors.textSmooth,
-    fontSize: typography.size.base,
-    fontWeight: typography.weight.bold,
-    textTransform: 'uppercase',
-    letterSpacing: 2,
+    ...figmaTextStyles.labels,
     marginBottom: 4,
   },
   title: { color: colors.primary, fontSize: typography.size.xl, fontWeight: typography.weight.extrabold },
@@ -129,7 +126,7 @@ const styles = StyleSheet.create({
   ruleText: { flex: 1 },
   ruleName: { color: colors.white, fontSize: typography.size.base, fontWeight: typography.weight.extrabold, marginBottom: 4 },
   ruleNameActive: { color: colors.primary },
-  ruleDesc: { color: colors.textSmooth, fontSize: typography.size.base, lineHeight: 24 },
+  ruleDesc: { color: colors.textSmooth, ...figmaTextStyles.bodySm },
   separator: { height: 1, backgroundColor: colors.darkSmooth },
   bottomBar: {
     position: 'absolute', left: 0, right: 0, bottom: 0,
