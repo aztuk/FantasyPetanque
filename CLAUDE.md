@@ -239,9 +239,21 @@ Sections à lire selon la tâche :
 
 **Violations bloquantes — ces actions sont interdites sans exception :**
 - Écrire une valeur hex couleur directement dans un style (ex. `color: '#E7C241'`) — utiliser `colors.*`
-- Inventer des valeurs de `fontSize`, `lineHeight`, `letterSpacing` — utiliser un preset de `textStyles`
+- Inventer des valeurs de `fontSize`, `lineHeight`, `letterSpacing` — utiliser un preset de `figmaTextStyles`
 - Implémenter un écran sans avoir vérifié son entrée dans la section `## ÉCRANS` de `Design.md`
 - Ignorer une divergence constatée entre le code et `Design.md` — la signaler à l'utilisateur
+
+### Skill `/design-check`
+
+Quand l'utilisateur demande `/design-check`, "design check", "audit design", "vérifie la conformité Figma/Design.md", "vérifie les tokens", "vérifie les composants", ou équivalent, utiliser la commande `.claude/commands/design-check.md`.
+
+Le rapport doit couvrir :
+- la parité des tokens entre `Design.md`, `theme.ts` et les fichiers UI ;
+- les couleurs ou valeurs typographiques hardcodées ;
+- les usages legacy de `textStyles.*` ou `typography.*` ;
+- la parité d'utilisation des composants partagés sur les pages référencées dans `Design.md` : chaque écran doit utiliser les composants listés dans `COMPOSANTS — Partagés` quand son rôle correspond, au lieu de réimplémenter localement bouton, header, score board, historique, stepper, readonly, alert box, etc.
+
+Un `/design-check` simple produit un rapport uniquement : ne pas corriger le code, ne pas modifier `ROADMAP.md`, ne pas committer, sauf demande explicite de l'utilisateur après le rapport.
 
 ### Pas de checkup visuel seul
 
@@ -348,7 +360,7 @@ npm run lint
 ## Interdictions
 
 - **Ne jamais coder une tâche UI sans avoir lu les sections pertinentes de `Design.md` au préalable**
-- **Ne jamais utiliser une valeur hex directe ou des valeurs typographiques inventées — utiliser exclusivement les tokens `colors.*` et presets `textStyles.*` définis dans `Design.md`**
+- **Ne jamais utiliser une valeur hex directe ou des valeurs typographiques inventées — utiliser exclusivement les tokens `colors.*` et presets `figmaTextStyles.*` définis dans `Design.md`**
 - Ne jamais conclure une fonctionnalité terminée sur la seule base d'un test visuel
 - Ne jamais sauter les tests pour livrer plus vite
 - Ne jamais mélanger plusieurs sujets dans un commit

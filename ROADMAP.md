@@ -20,7 +20,13 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 <!-- fonctionnalités importantes mais non bloquantes -->
 
 - [fait] Créer `Design.md` : dictionnaire des styles (tokens de couleur, typographie, espacements), liste des écrans avec leurs liens Figma. Servira de référence centrale pour tous les agents. - Difficulté 2/5 - Claude
-- [ ] Skill `/design-check` : skill Claude Code qui lit `Design.md`, parcourt les fichiers de style du code (`theme.ts`, composants) et produit un rapport de divergences (tokens non conformes, presets typographiques manquants, couleurs hex directes détectées). Dépend de `Design.md` stable (liens Figma remplis).
+- [fait] Skill `/design-check` : skill Claude Code qui lit `Design.md`, parcourt les fichiers de style du code (`theme.ts`, composants), vérifie la parité d'utilisation des composants partagés sur les pages référencées, et produit un rapport de divergences. Modifier aussi `CLAUDE.md` et `AGENTS.md` pour demander l'usage de ce skill quand l'utilisateur le demande. Dépend de `Design.md` stable (liens Figma remplis). - Difficulté 1/5 - Codex
+- [en cours] Design check — Tokens globaux : scanner tous les fichiers UI (`*.tsx`, `*.ts` dans `src/`) et vérifier qu'aucune couleur hex ni valeur typographique (fontSize, lineHeight, letterSpacing, fontWeight) n'est hardcodée — tout doit passer par `colors.*` et `figmaTextStyles.*`. Lister toutes les violations trouvées et les corriger.
+- [ ] Design check — Composants partagés : comparer chacun des 14 composants listés dans `COMPOSANTS — Partagés` de `Design.md` avec son équivalent Figma. Vérifier récursivement : couleurs, typographie, tailles, paddings, gaps, rayons, états. Couvrir : ScoreBoard, Rule, HistoryItem, History, Button, ButtonIcon, Head, AlertBox, Logo, WheelPicker, SetupOption, IncrementalInput, Readonly, BonusButton.
+- [ ] Design check — Écrans Home : vérifier la conformité Figma des écrans Home (`node-id=1-2`) et Home Debug (`node-id=1-74`). Couleurs, typo, layout, espaces, alignements, composants utilisés.
+- [ ] Design check — Écrans Setup : vérifier la conformité Figma des 4 étapes Setup — Mode Choice (`node-id=1-5`), End Condition (`node-id=4-116`), Target Value (`node-id=4-124`), Veto Toggle (`node-id=4-234`). Même protocole : couleurs, typo, layout, espaces.
+- [ ] Design check — Écrans Game : vérifier la conformité Figma de tous les états de jeu — Classic ingame (`node-id=1-12`), Fantasy scoreState (`node-id=4-638`), Fantasy ruleState (`node-id=8-1013`), Inter-mène (`node-id=4-742`), Post-mène (`node-id=18-1857`), End Game (`node-id=7-783`).
+- [ ] Design check — UIs règles spécifiques : vérifier la conformité Figma des UIs de règles — TeamRowButton (`node-id=15-1468`, `15-1509`), Config ValueInput (`node-id=16-1569`), Casino (`node-id=17-1625`), Prediction (`node-id=18-1701`).
 
 - [fait] Écran post-mène : après la fin d'une mène, afficher un écran intermédiaire qui anime l'incrément du score et résume les mini-objectifs/bonus/malus accomplis durant la mène. - Difficulté 3/5 - Claude
 - [fait] BUG — Drawer score en partie en cours : ouvrir le drawer clique accidentellement les boutons bonus/malus en-dessous (les boutons se togglent). Identifier et neutraliser les touch events pendant l'ouverture du drawer. - Difficulté 1/5 - Claude
@@ -70,7 +76,32 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 - [ ] Design system / bouton disabled : ajouter le token de couleur disabled et appliquer le style du bouton disabled depuis la maquette Figma `node-id=4-276`.
 - [fait] Créer un design system tokénisé et en profiter pour créer une identité visuelle à l'application. (commit `7b186e8`)
 - [fait] Typographie centralisée : créer un fichier de design system pour toutes les propriétés de chaque style de police (taille, graisse, line height, letter spacing, etc.) afin de pouvoir les ajuster en un seul endroit. - Difficulté 3/5 - Claude
-- [ ] QA manuelle des règles une par une : vérifier pour chacune des 24 règles la description, l'interface, la logique de jeu et l'équilibrage. Créer une checklist de validation par règle.
+- [fait] QA manuelle des règles une par une : vérifier pour chacune des 24 règles la description, l'interface, la logique de jeu et l'équilibrage. Créer une checklist de validation par règle. - Difficulté 1/5 - Codex
+  - Checklist QA intégrée — à cocher règle par règle, idéalement via le mode debug :
+    - [ ] Gauche caviar — Texte mauvaise main lisible ; boutons bonus par équipe ; maximum +1 par équipe ; second tap/annulation ok ; historique bonus correct.
+    - [ ] Les extrêmes — Texte zone bord/cochonnet lisible ; boutons bonus par équipe ; maximum +1 par équipe ; annulation ok ; historique bonus correct.
+    - [ ] Censure — Texte début/fin de silence lisible ; boutons malus par équipe ; maximum -3 par équipe ; score jamais sous 0 ; historique malus correct.
+    - [ ] Dôme de fer — Rappel auto-arbitrage lisible ; aucune UI dédiée parasite ; scoring normal inchangé ; règle compatible Totem ; historique sans bonus/malus inattendu.
+    - [ ] Apollo boule — Rappel lancer en cloche lisible ; aucune UI dédiée parasite ; scoring normal inchangé ; règle compatible Totem ; historique propre.
+    - [ ] Drunk simulator — Rappel 3 tours lisible ; aucune UI dédiée parasite ; scoring normal inchangé ; règle compatible Totem ; historique propre.
+    - [ ] Footanque — Rappel jouer au pied lisible ; aucune UI dédiée parasite ; scoring normal inchangé ; règle compatible Totem ; historique propre.
+    - [ ] Sortie de porc — Boutons cochonnet sorti par équipe ; +6 direct uniquement si déclenché ; score normal sauté après déclenchement ; annulation/erreur vérifiée ; historique effet spécial correct.
+    - [ ] Dos Santos — Rappel lancer dos au terrain lisible ; aucune UI dédiée parasite ; scoring normal inchangé ; règle compatible Totem ; historique propre.
+    - [ ] Perte d'aura — Rappel prise d'élan lisible ; aucune UI dédiée parasite ; scoring normal inchangé ; règle compatible Totem ; historique propre.
+    - [ ] L'impair contre-attaque — Aide au scoring automatique lisible ; saisie score normal classique ; pair gagnant => gagnant 0 / perdant +1 ; impair gagnant => score normal conservé ; historique résolution correct.
+    - [ ] Make Pétanque Great Again — Rappel Trump lisible ; aucune sélection obligatoire si non prévue ; scoring normal manuel inchangé ; contrainte claire pour auto-arbitrage ; historique propre.
+    - [ ] Deuxième service — Rappel deuxième boule lisible ; aucune UI dédiée parasite ; scoring normal manuel inchangé ; contrainte claire pour auto-arbitrage ; historique propre.
+    - [ ] Ctrl + Z — Rappel relance unique lisible ; aucune UI dédiée parasite ; scoring normal inchangé ; règle compatible Totem ; historique propre.
+    - [ ] Permis de construire — Rappel obstacle lisible ; flow setup/pre-mène cohérent ; aucune UI dédiée parasite ; scoring normal inchangé ; historique propre.
+    - [ ] Contrat — Setup missions pour les deux équipes ; même mission autorisée ; validation bloquée tant que nécessaire ; réussite +2 max une fois par équipe ; annulation et historique bonus corrects.
+    - [ ] La boule maudite — Texte boule neutre lisible ; boutons malus par équipe ; maximum -1 par équipe ; score jamais sous 0 ; historique malus correct.
+    - [ ] King of the Hill — Texte zone/cercle lisible ; boutons bonus par équipe ; compteur jusqu'à +6 par équipe ; décrément/annulation ok ; historique bonus correct.
+    - [ ] Le duel — Rappel champions lisible ; aucune UI dédiée parasite ; scoring normal inchangé ; règle compatible Totem ; historique propre.
+    - [ ] Assurance vie — Setup assurance par équipe ; activation/désactivation avant mène ; perdant assuré +1 ; gagnant assuré -1 sans descendre sous 0 sur la mène ; historique résolution correct.
+    - [ ] Frontière — Setup choix gauche/droite par équipe ; validation des deux choix ; rappel pendant la mène ; scoring normal manuel inchangé ; historique propre.
+    - [ ] Casino — Condition d'apparition à score non nul ; setup mises bornées selon décision produit en vigueur ; pas de score normal ; gagnant/perdant appliqués correctement ; historique gains/pertes correct.
+    - [ ] Prédiction — Condition d'apparition à score non nul ; setup prédictions 1-6 ; résolution auto si prédiction réussie ; score adverse jamais sous 0 ; historique malus correct.
+    - [ ] Totem d'immunité — Règle suivante révélée une seule fois ; règle révélée totem-compatible ; perdant immunisé sauf mène nulle ; règle suivante chargée automatiquement ; affichage immunité/historique correct.
 - [ ] Home — tagline : réduire la police de la tagline à 21 px.
 - [ ] Inter-mène UI — règle alignée en haut : dans l'écran inter-mène (affichage règle + vétos), aligner le contenu de la règle en haut de l'écran plutôt qu'en bas.
 - [ ] Config règles — padding excessif : réduire le padding autour des règles dans les écrans de config (mode CONFIG).
