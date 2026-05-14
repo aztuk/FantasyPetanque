@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import { StyleSheet } from 'react-native';
 import { SetupScreen } from '../features/game/screens/SetupScreen';
 import { useGameStore } from '../features/game/state/gameStore';
+import { colors, componentSizes } from '../shared/constants';
 
 const mockNavigate = jest.fn();
 const mockGoBack = jest.fn();
@@ -91,6 +92,19 @@ describe('SetupScreen', () => {
     expect(useGameStore.getState().maxRounds).toBe(10);
   });
 
+  it('uses the shared full-width CTA styling to confirm the target value', () => {
+    render(<SetupScreen />);
+
+    fireEvent.press(screen.getByTestId('setup-mode-simple-option'));
+    fireEvent.press(screen.getByTestId('setup-end-rounds-option'));
+
+    const confirmStyle = StyleSheet.flatten(screen.getByTestId('setup-confirm-button').props.style);
+
+    expect(confirmStyle.width).toBe('100%');
+    expect(confirmStyle.height).toBe(componentSizes.buttonHeight);
+    expect(confirmStyle.backgroundColor).toBe(colors.primary);
+  });
+
   it('can disable vetos for fantasy games', () => {
     render(<SetupScreen />);
 
@@ -131,6 +145,7 @@ describe('SetupScreen', () => {
     expect(safeAreaStyle.top).toBe(0);
     expect(safeAreaStyle.left).toBe(0);
     expect(headStyle.padding).toBe(16);
+    expect(headStyle.backgroundColor).toBeUndefined();
   });
 
   it('stretches setup choice options across the available screen height', () => {

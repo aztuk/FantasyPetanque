@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Pressable,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,10 +9,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useGameStore } from '../state/gameStore';
 import { GameMode } from '../../../domain/game/models';
 import { RootStackParamList } from '../../../app/navigation/types';
-import { ButtonIcon } from '../../../shared/components/ButtonIcon';
+import { AppHeader } from '../../../shared/components/AppHeader';
+import { FullWidthCtaButton } from '../../../shared/components/FullWidthCtaButton';
 import { SetupOption } from '../../../shared/components/SetupOption';
 import { WheelPicker } from '../../../shared/components/WheelPicker';
-import { colors, componentSizes, figmaTextStyles, spacing } from '../../../shared/constants';
+import { colors, componentSizes } from '../../../shared/constants';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'Setup'>;
 type Step = 1 | 2 | 3 | 4;
@@ -92,6 +91,7 @@ export function SetupScreen() {
             title="Pétanque Fantasy"
             description="Ajoutez des règles spéciales tirées à chaque mène"
             onPress={() => selectMode('fantasy')}
+            variant="fantasy"
             style={styles.choiceOption}
             testID="setup-mode-fantasy-option"
           />
@@ -111,6 +111,7 @@ export function SetupScreen() {
             title="Score à atteindre"
             description="La première équipe au score cible gagne la partie"
             onPress={() => selectEndCondition('score')}
+            variant="primary"
             style={styles.choiceOption}
             testID="setup-end-score-option"
           />
@@ -126,7 +127,11 @@ export function SetupScreen() {
               onChange={setValue}
             />
           </View>
-          <BottomButton label="Valider" onPress={confirmValue} />
+          <FullWidthCtaButton
+            label="Valider"
+            onPress={confirmValue}
+            testID="setup-confirm-button"
+          />
         </>
       )}
 
@@ -143,6 +148,7 @@ export function SetupScreen() {
             title="Oui"
             description="Autoriser les équipes à refuser une règle"
             onPress={() => selectVetos(true)}
+            variant="primary"
             style={styles.choiceOption}
             testID="setup-veto-enabled-option"
           />
@@ -163,25 +169,16 @@ export function SetupScreen() {
 
 function SetupBackButton({ onPress }: { onPress: () => void }) {
   return (
-    <View style={styles.header} testID="setup-head">
-      <ButtonIcon
-        onPress={onPress}
-        accessibilityLabel="Retour"
-        testID="setup-back-button"
-      />
-    </View>
-  );
-}
-
-function BottomButton({ label, onPress }: { label: string; onPress: () => void }) {
-  return (
-    <Pressable
-      style={styles.bottomButton}
-      onPress={onPress}
-      accessibilityRole="button"
+    <AppHeader
+      onBack={onPress}
+      floating
+      backAccessibilityLabel="Retour"
+      backButtonTestID="setup-back-button"
+      style={styles.header}
+      testID="setup-head"
     >
-      <Text style={styles.bottomButtonLabel}>{label}</Text>
-    </Pressable>
+      {null}
+    </AppHeader>
   );
 }
 
@@ -215,10 +212,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     left: 0,
+    right: 0,
     zIndex: 4,
   },
   header: {
-    padding: spacing[4],
+    width: componentSizes.headerNoTitleHeight,
   },
   choiceContent: {
     flex: 1,
@@ -233,20 +231,5 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  bottomButton: {
-    width: '100%',
-    height: componentSizes.buttonHeight,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 16,
-    backgroundColor: colors.primary,
-  },
-  bottomButtonLabel: {
-    ...figmaTextStyles.buttonCTA,
-    color: colors.dark,
-    textAlign: 'center',
-    includeFontPadding: false,
   },
 });

@@ -204,9 +204,12 @@ Figma principal : <!-- URL fichier Figma principal -->
 > Référence Figma : [node-id=31:1213](https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=31-1213&t=qil4nd06wX0YCs6f-11)
 
 - Dimensions Figma : `1230 x 284`.
-- Fond : `--darksmooth`.
+- Fonds selon usage écran :
+  - option par défaut : `--darksmooth`, texte `--white`;
+  - option principale : `--primary`, texte `--dark`;
+  - option fantasy : gradient horizontal `--primary` vers `--secondary`, texte `--dark`.
 - Layout : colonne centrée horizontalement et verticalement, padding `24`.
-- Texte : centré, `--white`.
+- Texte : centré.
 - Titre : `ButtonCTA`, uppercase.
 - Description : `BodyMd`.
 - Sert aux options du flow Setup : choix de mode, condition de fin, activation du véto.

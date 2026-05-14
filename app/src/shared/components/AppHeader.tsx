@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Pressable,
   StyleProp,
   StyleSheet,
   Text,
@@ -8,18 +7,20 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import { ArrowLeftIcon } from 'phosphor-react-native';
-import { colors, textStyles } from '../constants';
+import { ButtonIcon } from './ButtonIcon';
+import { colors, componentSizes, figmaTextStyles, spacing } from '../constants';
 
 interface AppHeaderProps {
   onBack: () => void;
   title?: string;
   children?: React.ReactNode;
   backgroundColor?: string;
+  floating?: boolean;
   iconColor?: string;
   textColor?: string;
   backAccessibilityLabel?: string;
   backButtonTestID?: string;
+  testID?: string;
   style?: StyleProp<ViewStyle>;
   titleStyle?: StyleProp<TextStyle>;
   actionsStyle?: StyleProp<ViewStyle>;
@@ -30,27 +31,36 @@ export function AppHeader({
   title,
   children,
   backgroundColor = colors.dark,
+  floating = false,
   iconColor = colors.textSmooth,
   textColor = colors.white,
   backAccessibilityLabel = 'Retour',
   backButtonTestID,
+  testID,
   style,
   titleStyle,
   actionsStyle,
 }: AppHeaderProps) {
-  return (
-    <View style={[styles.header, { backgroundColor }, style]}>
-      <Pressable
-        style={styles.backButton}
-        onPress={onBack}
-        accessibilityRole="button"
-        accessibilityLabel={backAccessibilityLabel}
-        testID={backButtonTestID}
-      >
-        <ArrowLeftIcon color={iconColor} size={32} weight="regular" />
-      </Pressable>
+  const hasTitle = Boolean(title);
 
-      {title ? (
+  return (
+    <View
+      testID={testID}
+      style={[
+        styles.header,
+        hasTitle ? styles.withTitle : styles.noTitle,
+        !floating && { backgroundColor },
+        style,
+      ]}
+    >
+      <ButtonIcon
+        onPress={onBack}
+        accessibilityLabel={backAccessibilityLabel}
+        iconColor={iconColor}
+        testID={backButtonTestID}
+      />
+
+      {hasTitle ? (
         <Text style={[styles.title, { color: textColor }, titleStyle]}>{title}</Text>
       ) : (
         <View style={[styles.actions, actionsStyle]}>{children}</View>
@@ -58,25 +68,24 @@ export function AppHeader({
     </View>
   );
 }
-// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
-
 const styles = StyleSheet.create({
   header: {
-    height: 80,
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
+    gap: spacing[4],
   },
-  backButton: {
-    width: 80,
-    height: 80,
-    alignItems: 'center',
-    justifyContent: 'center',
+  withTitle: {
+    minHeight: componentSizes.headerHeight,
+    padding: spacing[2],
+  },
+  noTitle: {
+    minHeight: componentSizes.headerNoTitleHeight,
+    padding: spacing[4],
   },
   title: {
-    ...textStyles.titleLg,
+    ...figmaTextStyles.pageTitles,
     flex: 1,
-    fontWeight: '700',
     includeFontPadding: false,
   },
   actions: {
