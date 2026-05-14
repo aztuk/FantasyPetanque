@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, ViewStyle } from 'react-native';
-import { colors, figmaTextStyles, opacity } from '../constants';
+import { colors, componentSizes, figmaTextStyles } from '../constants';
 
 interface Props {
   label: string;
@@ -27,27 +27,30 @@ export function FullWidthCtaButton({
       accessibilityState={{ disabled }}
       testID={testID}
     >
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.label, disabled && styles.disabledLabel]}>{label}</Text>
     </TouchableOpacity>
   );
 }
 const styles = StyleSheet.create({
   button: {
     width: '100%',
-    height: 102,
+    height: componentSizes.buttonHeight,
     paddingHorizontal: 10,
-    paddingVertical: 24,
+    paddingVertical: 12,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.primary,
   },
   disabled: {
-    opacity: opacity.disabled,
+    backgroundColor: colors.disabled,
   },
   label: {
     ...figmaTextStyles.buttonCTA,
     color: colors.dark,
     includeFontPadding: false,
     textAlign: 'center',
+  },
+  disabledLabel: {
+    color: colors.textSmooth,
   },
 });

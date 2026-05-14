@@ -148,6 +148,16 @@ export const figmaTextStyles = {
     fontWeight: typography.weight.bold,
     letterSpacing: -0.96,
   },
+  // Road Rage display font — exception Figma, hors table typographie Design.md.
+  // Usage unique : DebugModeBadge. letterSpacing = -5% de 45px (valeur Figma exacte).
+  displayBrand: {
+    fontFamily: typography.family.display,
+    fontSize: 45,
+    lineHeight: 54,
+    fontWeight: typography.weight.regular,
+    letterSpacing: -2.25,
+    textTransform: 'uppercase' as const,
+  },
 } as const;
 
 // TODO A REMPLACER: legacy typography aliases.

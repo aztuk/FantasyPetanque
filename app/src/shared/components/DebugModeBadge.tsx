@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TextStyle } from 'react-native';
-import { colors, textStyles } from '../constants';
+import { colors, figmaTextStyles } from '../constants';
 
 interface Props {
   style?: TextStyle;
@@ -15,18 +15,15 @@ export function DebugModeBadge({ style, testID }: Props) {
     </Text>
   );
 }
-// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
-
 const styles = StyleSheet.create({
   badge: {
-    ...textStyles.displaySm,
+    ...figmaTextStyles.displayBrand,
     color: colors.secondary,
     includeFontPadding: false,
     textAlign: 'center',
     textShadowColor: 'rgba(0, 0, 0, 0.35)',
     textShadowOffset: { width: 0, height: 4 },
     textShadowRadius: 8,
-    textTransform: 'uppercase',
   },
   accent: {
     color: colors.primary,

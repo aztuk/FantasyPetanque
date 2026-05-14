@@ -153,7 +153,7 @@ Figma principal : <!-- URL fichier Figma principal -->
 ### Button
 
 - Largeur Figma : `393`. Hauteur de référence : `86` pour `Primary`, `Default`, `Secondary`, `Disabled`; `80` pour `Fantasy`.
-- Padding interne : horizontal `10`, vertical `16`.
+- Padding interne : horizontal `10`, vertical `12`.
 - Typographie : `ButtonCTA`, uppercase, centrée.
 - `Primary` : fond `--primary`, texte `--dark`.
 - `Fantasy` : gradient horizontal `--primary` vers `--secondary`, texte `--dark`.

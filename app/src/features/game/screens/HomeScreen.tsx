@@ -66,6 +66,6 @@ const styles = StyleSheet.create({
   },
   debugBadge: {
     position: 'absolute',
-    top: 54,
+    top: 86,
   },
 });
