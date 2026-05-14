@@ -1,5 +1,5 @@
 export * from './theme';
-export { colors, typography, figmaTextStyles, textStyles, spacing, radius, opacity, shadows } from './theme';
+export { colors, typography, figmaTextStyles, textStyles, spacing, radius, opacity, shadows, componentSizes } from './theme';
 
 import { colors } from './theme';
 

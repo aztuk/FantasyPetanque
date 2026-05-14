@@ -265,6 +265,8 @@ export const textStyles = {
 
 
 export const spacing = {
+  half: 2,
+  control: 10,
   1: 4,
   2: 8,
   3: 12,
@@ -279,8 +281,28 @@ export const spacing = {
 export const radius = {
   sm: 4,
   md: 8,
+  input: 10,
   lg: 12,
   xl: 16,
+  sheet: 30,
+  pill: 40,
+  round: 70,
+} as const;
+
+export const componentSizes = {
+  buttonHeight: 86,
+  buttonFantasyHeight: 80,
+  iconButton: 56,
+  headerHeight: 72,
+  headerNoTitleHeight: 88,
+  scoreBoardHeight: 215,
+  compactScoreHeight: 59,
+  historyItemHeight: 49,
+  setupOptionHeight: 284,
+  wheelPickerWidth: 121,
+  wheelPickerHeight: 480,
+  wheelPickerItemHeight: 100,
+  wheelPickerSelectedHeight: 120,
 } as const;
 
 export const opacity = {
@@ -295,8 +317,15 @@ export const shadows = {
     shadowRadius: 16,
     elevation: 8,
   },
+  alertBox: {
+    shadowColor: palette.dark,
+    shadowOffset: { width: 0, height: -12 },
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    elevation: 12,
+  },
   debug: {
-    shadowColor: '#000000',
+    shadowColor: palette.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.35,
     shadowRadius: 8,

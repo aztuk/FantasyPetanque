@@ -1,5 +1,6 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { StyleSheet } from 'react-native';
 import { SetupScreen } from '../features/game/screens/SetupScreen';
 import { useGameStore } from '../features/game/state/gameStore';
 
@@ -40,11 +41,12 @@ describe('SetupScreen', () => {
 
     fireEvent.press(screen.getByText('Pétanque Fantasy'));
 
-    expect(screen.getByText('Et la fin?')).toBeTruthy();
+    expect(screen.getByText('Nombre de mènes')).toBeTruthy();
+    expect(screen.getByText('Score à atteindre')).toBeTruthy();
 
     fireEvent.press(screen.getByText('Score à atteindre'));
 
-    expect(screen.getByText('Combien?')).toBeTruthy();
+    expect(screen.getByText('Valider')).toBeTruthy();
     expect(screen.getAllByText('13').length).toBeGreaterThan(0);
 
     fireEvent.press(screen.getByText('Valider'));
@@ -107,11 +109,39 @@ describe('SetupScreen', () => {
     render(<SetupScreen />);
 
     fireEvent.press(screen.getByText('Pétanque Fantasy'));
-    expect(screen.getByText('Et la fin?')).toBeTruthy();
+    expect(screen.getByText('Nombre de mènes')).toBeTruthy();
+    expect(screen.getByText('Score à atteindre')).toBeTruthy();
 
     fireEvent.press(screen.getByTestId('setup-back-button'));
 
-    expect(screen.getByText('On joue à quoi?')).toBeTruthy();
+    expect(screen.getByText('Pétanque normale')).toBeTruthy();
+    expect(screen.getByText('Pétanque Fantasy')).toBeTruthy();
     expect(mockGoBack).not.toHaveBeenCalled();
+  });
+
+  it('keeps the setup head in a safe-area overlay', () => {
+    render(<SetupScreen />);
+
+    const safeAreaStyle = StyleSheet.flatten(screen.getByTestId('setup-head-safe-area').props.style);
+    const headStyle = StyleSheet.flatten(screen.getByTestId('setup-head').props.style);
+
+    expect(screen.getByTestId('setup-head-safe-area').props.edges.top).toBe('additive');
+    expect(screen.getByTestId('setup-head-safe-area').props.edges.bottom).toBe('off');
+    expect(safeAreaStyle.position).toBe('absolute');
+    expect(safeAreaStyle.top).toBe(0);
+    expect(safeAreaStyle.left).toBe(0);
+    expect(headStyle.padding).toBe(16);
+  });
+
+  it('stretches setup choice options across the available screen height', () => {
+    render(<SetupScreen />);
+
+    const simpleOptionStyle = StyleSheet.flatten(screen.getByTestId('setup-mode-simple-option').props.style);
+    const fantasyOptionStyle = StyleSheet.flatten(screen.getByTestId('setup-mode-fantasy-option').props.style);
+
+    expect(simpleOptionStyle.flex).toBe(1);
+    expect(simpleOptionStyle.minHeight).toBe(0);
+    expect(fantasyOptionStyle.flex).toBe(1);
+    expect(fantasyOptionStyle.minHeight).toBe(0);
   });
 });

@@ -1,52 +1,27 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import {
-  Animated,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   View,
-  ViewStyle,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useGameStore } from '../state/gameStore';
 import { GameMode } from '../../../domain/game/models';
 import { RootStackParamList } from '../../../app/navigation/types';
-import { AppHeader } from '../../../shared/components/AppHeader';
-import { textStyles, typography } from '../../../shared/constants';
+import { ButtonIcon } from '../../../shared/components/ButtonIcon';
+import { SetupOption } from '../../../shared/components/SetupOption';
+import { WheelPicker } from '../../../shared/components/WheelPicker';
+import { colors, componentSizes, figmaTextStyles, spacing } from '../../../shared/constants';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'Setup'>;
 type Step = 1 | 2 | 3 | 4;
 type EndCondition = 'score' | 'rounds';
-type ChoiceTone = 'primary' | 'secondary' | 'dark' | 'gradient';
 
 const MIN_VALUE = 6;
 const MAX_VALUE = 20;
-const PICKER_ITEM_HEIGHT = 100;
-const PICKER_HEIGHT = 480;
-const PICKER_SELECTED_HEIGHT = 120;
-const PICKER_VERTICAL_PADDING = (PICKER_HEIGHT - PICKER_ITEM_HEIGHT) / 2;
-const PICKER_LINE_TOP = (PICKER_HEIGHT - PICKER_SELECTED_HEIGHT) / 2;
-const PICKER_SELECTED_ROW_TOP = (PICKER_HEIGHT - PICKER_ITEM_HEIGHT) / 2;
-const PICKER_UNIT_TOP = PICKER_SELECTED_ROW_TOP + 43;
-const PICKER_UNIT_LEFT = 168;
-const PICKER_VALUES = Array.from(
-  { length: MAX_VALUE - MIN_VALUE + 1 },
-  (_, index) => MIN_VALUE + index,
-);
-const SETUP_COLORS = {
-  dark: '#28261F',
-  darkSmooth: '#3B382E',
-  primary: '#E7C241',
-  secondary: '#41E79A',
-  white: '#ECEBE8',
-  textSmooth: '#949084',
-} as const;
 
 export function SetupScreen() {
   const navigation = useNavigation<Nav>();
@@ -57,19 +32,6 @@ export function SetupScreen() {
   const [endCondition, setEndCondition] = useState<EndCondition>('score');
   const [value, setValue] = useState(13);
   const [vetosEnabled, setVetosEnabled] = useState(true);
-
-  const title = useMemo(() => {
-    switch (step) {
-      case 1:
-        return 'On joue à quoi?';
-      case 2:
-        return 'Et la fin?';
-      case 3:
-        return 'Combien?';
-      case 4:
-        return 'Vétos activés?';
-    }
-  }, [step]);
 
   const goBack = () => {
     if (step === 1) {
@@ -116,39 +78,41 @@ export function SetupScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
-      <SetupHeader title={title} onBack={goBack} />
-
+    <View style={styles.screen}>
       {step === 1 && (
         <View style={styles.choiceContent}>
-          <ChoiceButton
-            label="Pétanque normale"
-            tone="dark"
-            textTone="light"
+          <SetupOption
+            title="Pétanque normale"
+            description="Aidez vous de l’application pour compter les points"
             onPress={() => selectMode('simple')}
+            style={styles.choiceOption}
+            testID="setup-mode-simple-option"
           />
-          <ChoiceButton
-            label="Pétanque Fantasy"
-            tone="gradient"
-            textTone="dark"
+          <SetupOption
+            title="Pétanque Fantasy"
+            description="Ajoutez des règles spéciales tirées à chaque mène"
             onPress={() => selectMode('fantasy')}
+            style={styles.choiceOption}
+            testID="setup-mode-fantasy-option"
           />
         </View>
       )}
 
       {step === 2 && (
         <View style={styles.choiceContent}>
-          <ChoiceButton
-            label="Score à atteindre"
-            tone="primary"
-            textTone="dark"
-            onPress={() => selectEndCondition('score')}
-          />
-          <ChoiceButton
-            label="Nombre de mènes"
-            tone="secondary"
-            textTone="dark"
+          <SetupOption
+            title="Nombre de mènes"
+            description="La partie se termine après un nombre de mènes défini"
             onPress={() => selectEndCondition('rounds')}
+            style={styles.choiceOption}
+            testID="setup-end-rounds-option"
+          />
+          <SetupOption
+            title="Score à atteindre"
+            description="La première équipe au score cible gagne la partie"
+            onPress={() => selectEndCondition('score')}
+            style={styles.choiceOption}
+            testID="setup-end-score-option"
           />
         </View>
       )}
@@ -168,82 +132,44 @@ export function SetupScreen() {
 
       {step === 4 && (
         <View style={styles.choiceContent}>
-          <ChoiceButton
-            label="Oui"
-            tone="primary"
-            textTone="dark"
-            onPress={() => selectVetos(true)}
-          />
-          <ChoiceButton
-            label="Non"
-            tone="dark"
-            textTone="light"
+          <SetupOption
+            title="Non"
+            description="Jouer sans véto pendant la partie"
             onPress={() => selectVetos(false)}
+            style={styles.choiceOption}
+            testID="setup-veto-disabled-option"
+          />
+          <SetupOption
+            title="Oui"
+            description="Autoriser les équipes à refuser une règle"
+            onPress={() => selectVetos(true)}
+            style={styles.choiceOption}
+            testID="setup-veto-enabled-option"
           />
         </View>
       )}
-    </SafeAreaView>
-  );
-}
 
-function SetupHeader({ title, onBack }: { title: string; onBack: () => void }) {
-  return (
-    <AppHeader
-      onBack={onBack}
-      title={title}
-      backgroundColor={SETUP_COLORS.dark}
-      iconColor={SETUP_COLORS.textSmooth}
-      textColor={SETUP_COLORS.white}
-      backButtonTestID="setup-back-button"
-      titleStyle={styles.headerTitle}
-    />
-  );
-}
-
-function ChoiceButton({
-  label,
-  tone,
-  textTone,
-  onPress,
-}: {
-  label: string;
-  tone: ChoiceTone;
-  textTone: 'dark' | 'light';
-  onPress: () => void;
-}) {
-  const content = (
-    <Text style={[styles.choiceLabel, textTone === 'light' && styles.choiceLabelLight]}>
-      {label}
-    </Text>
-  );
-
-  if (tone === 'gradient') {
-    return (
-      <Pressable
-        style={styles.choiceGradientButton}
-        onPress={onPress}
-        accessibilityRole="button"
+      <SafeAreaView
+        style={styles.headerSafeArea}
+        edges={['top']}
+        pointerEvents="box-none"
+        testID="setup-head-safe-area"
       >
-        <LinearGradient
-          colors={[SETUP_COLORS.primary, SETUP_COLORS.secondary]}
-          start={{ x: 0, y: 0.5 }}
-          end={{ x: 1, y: 0.5 }}
-          style={styles.choiceButton}
-        >
-          {content}
-        </LinearGradient>
-      </Pressable>
-    );
-  }
+        <SetupBackButton onPress={goBack} />
+      </SafeAreaView>
+    </View>
+  );
+}
 
+function SetupBackButton({ onPress }: { onPress: () => void }) {
   return (
-    <Pressable
-      style={[styles.choiceButton, choiceToneStyles[tone]]}
-      onPress={onPress}
-      accessibilityRole="button"
-    >
-      {content}
-    </Pressable>
+    <View style={styles.header} testID="setup-head">
+      <ButtonIcon
+        onPress={onPress}
+        accessibilityLabel="Retour"
+        testID="setup-back-button"
+      />
+    </View>
   );
 }
 
@@ -268,245 +194,59 @@ function SetupValuePicker({
   unit: string;
   onChange: (nextValue: number) => void;
 }) {
-  const scrollRef = useRef<ScrollView>(null);
-  const scrollY = useRef(new Animated.Value((value - MIN_VALUE) * PICKER_ITEM_HEIGHT)).current;
-
-  useEffect(() => {
-    const offsetY = (value - MIN_VALUE) * PICKER_ITEM_HEIGHT;
-    const timer = setTimeout(() => {
-      scrollRef.current?.scrollTo({ y: offsetY, animated: false });
-    }, 0);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const handleScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const rawIndex = Math.round(event.nativeEvent.contentOffset.y / PICKER_ITEM_HEIGHT);
-    const index = Math.max(0, Math.min(rawIndex, PICKER_VALUES.length - 1));
-    const nextValue = PICKER_VALUES[index];
-    if (nextValue !== value) {
-      onChange(nextValue);
-    }
-  };
-
   return (
-    <View style={styles.picker}>
-      <View style={[styles.pickerLine, styles.pickerTopLine]} pointerEvents="none" />
-      <View style={[styles.pickerLine, styles.pickerBottomLine]} pointerEvents="none" />
-      <View
-        style={styles.pickerUnitOverlay}
-        pointerEvents="none"
-        accessibilityElementsHidden
-        importantForAccessibility="no-hide-descendants"
-      >
-        <Text style={styles.pickerUnit}>{unit}</Text>
-      </View>
-      <Animated.ScrollView
-        ref={scrollRef}
-        testID="setup-value-picker"
-        style={styles.pickerScroll}
-        contentContainerStyle={styles.pickerContent}
-        showsVerticalScrollIndicator={false}
-        snapToInterval={PICKER_ITEM_HEIGHT}
-        decelerationRate="fast"
-        scrollEventThrottle={16}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false },
-        )}
-        onMomentumScrollEnd={handleScrollEnd}
-      >
-        {PICKER_VALUES.map((itemValue) => {
-          const itemOffset = (itemValue - MIN_VALUE) * PICKER_ITEM_HEIGHT;
-          const inputRange = [
-            itemOffset - PICKER_ITEM_HEIGHT * 2,
-            itemOffset - PICKER_ITEM_HEIGHT,
-            itemOffset,
-            itemOffset + PICKER_ITEM_HEIGHT,
-            itemOffset + PICKER_ITEM_HEIGHT * 2,
-          ];
-          const color = scrollY.interpolate({
-            inputRange,
-            outputRange: [
-              SETUP_COLORS.textSmooth,
-              SETUP_COLORS.textSmooth,
-              SETUP_COLORS.white,
-              SETUP_COLORS.textSmooth,
-              SETUP_COLORS.textSmooth,
-            ],
-            extrapolate: 'clamp',
-          });
-          const fontSize = scrollY.interpolate({
-            inputRange,
-            outputRange: [40, 48, 60, 48, 40],
-            extrapolate: 'clamp',
-          });
-          const lineHeight = scrollY.interpolate({
-            inputRange,
-            outputRange: [68, 82, 102, 82, 68],
-            extrapolate: 'clamp',
-          });
-          const opacity = scrollY.interpolate({
-            inputRange,
-            outputRange: [0.5, 1, 1, 1, 0.5],
-            extrapolate: 'clamp',
-          });
-          const letterSpacing = scrollY.interpolate({
-            inputRange,
-            outputRange: [-1.6, -1.92, -2.4, -1.92, -1.6],
-            extrapolate: 'clamp',
-          });
-
-          return (
-            <View
-              key={itemValue}
-              style={styles.pickerOption}
-            >
-              <View style={styles.pickerSelectedRow}>
-                <Animated.Text
-                  style={[
-                    styles.pickerText,
-                    { color, fontSize, lineHeight, letterSpacing, opacity },
-                  ]}
-                >
-                  {itemValue}
-                </Animated.Text>
-              </View>
-            </View>
-          );
-        })}
-      </Animated.ScrollView>
-    </View>
+    <WheelPicker
+      min={MIN_VALUE}
+      max={MAX_VALUE}
+      value={value}
+      unit={unit}
+      onChange={onChange}
+      testID="setup-value-picker"
+    />
   );
 }
 
-const choiceToneStyles: Record<Exclude<ChoiceTone, 'gradient'>, ViewStyle> = {
-  primary: { backgroundColor: SETUP_COLORS.primary },
-  secondary: { backgroundColor: SETUP_COLORS.secondary },
-  dark: { backgroundColor: SETUP_COLORS.darkSmooth },
-};
-
 const styles = StyleSheet.create({
-  safe: {
+  screen: {
     flex: 1,
-    backgroundColor: SETUP_COLORS.dark,
+    backgroundColor: colors.dark,
   },
-  headerTitle: {
-    fontFamily: typography.family.bodyBold,
-    letterSpacing: -1.28,
+  headerSafeArea: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    zIndex: 4,
+  },
+  header: {
+    padding: spacing[4],
   },
   choiceContent: {
     flex: 1,
     width: '100%',
   },
-  choiceButton: {
+  choiceOption: {
     flex: 1,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 24,
-  },
-  choiceGradientButton: {
-    flex: 1,
-    width: '100%',
-  },
-  choiceLabel: {
-    ...textStyles.ctaLabel,
-    color: SETUP_COLORS.dark,
-    textAlign: 'center',
-    textTransform: 'uppercase',
-    includeFontPadding: false,
-  },
-  choiceLabelLight: {
-    color: SETUP_COLORS.white,
+    minHeight: 0,
   },
   valueContent: {
     flex: 1,
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingBottom: 32,
-  },
-  picker: {
-    height: PICKER_HEIGHT,
-    width: 260,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  pickerScroll: {
-    height: PICKER_HEIGHT,
-    width: '100%',
-  },
-  pickerContent: {
-    paddingVertical: PICKER_VERTICAL_PADDING,
-  },
-  pickerOption: {
-    width: '100%',
-    height: PICKER_ITEM_HEIGHT,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  pickerText: {
-    ...textStyles.pickerText,
-    color: SETUP_COLORS.textSmooth,
-    textAlign: 'center',
-    includeFontPadding: false,
-  },
-  pickerLine: {
-    position: 'absolute',
-    left: 70,
-    width: 121,
-    height: 2,
-    backgroundColor: SETUP_COLORS.primary,
-    zIndex: 2,
-  },
-  pickerTopLine: {
-    top: PICKER_LINE_TOP,
-  },
-  pickerBottomLine: {
-    top: PICKER_LINE_TOP + PICKER_SELECTED_HEIGHT,
-  },
-  pickerSelectedRow: {
-    height: PICKER_ITEM_HEIGHT,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 24,
-  },
-  pickerSelectedText: {
-    ...textStyles.pickerSelected,
-    color: SETUP_COLORS.white,
-    textAlign: 'center',
-    includeFontPadding: false,
-  },
-  pickerUnitOverlay: {
-    position: 'absolute',
-    top: PICKER_UNIT_TOP,
-    left: PICKER_UNIT_LEFT,
-    zIndex: 3,
-  },
-  pickerUnit: {
-    ...textStyles.tagline,
-    color: SETUP_COLORS.textSmooth,
-    includeFontPadding: false,
   },
   bottomButton: {
     width: '100%',
-    height: 102,
+    height: componentSizes.buttonHeight,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 10,
-    paddingVertical: 24,
-    backgroundColor: SETUP_COLORS.primary,
+    paddingVertical: 16,
+    backgroundColor: colors.primary,
   },
   bottomButtonLabel: {
-    ...textStyles.ctaLabel,
-    color: SETUP_COLORS.dark,
+    ...figmaTextStyles.buttonCTA,
+    color: colors.dark,
     textAlign: 'center',
-    textTransform: 'uppercase',
     includeFontPadding: false,
   },
 });
