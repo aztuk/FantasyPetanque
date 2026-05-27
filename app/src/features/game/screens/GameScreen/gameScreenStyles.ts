@@ -1,12 +1,15 @@
 import { StyleSheet } from 'react-native';
+import { colors, componentSizes } from '../../../../shared/constants';
 import { gameUiColors } from '../../components/gameUiTheme';
 
-export const COMPACT_SCORE_HEIGHT = 59;
+// ScoreBoard section heights matching Figma
+export const MENE_HEIGHT = 150;   // big score bars only
+export const SCORE_TOTAL_HEIGHT = 59;  // dark total bar only (always visible)
 
 export const gameScreenStyles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: gameUiColors.background,
+    backgroundColor: colors.dark,
   },
   content: {
     flex: 1,
@@ -23,6 +26,19 @@ export const gameScreenStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  ruleTopContent: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  floatingHead: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+  },
   ruleSetupContent: {
     flex: 1,
     width: '100%',
@@ -30,9 +46,10 @@ export const gameScreenStyles = StyleSheet.create({
   ruleSetupScrollContent: {
     flexGrow: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     paddingHorizontal: 24,
-    paddingVertical: 20,
+    paddingTop: 20,
+    paddingBottom: 20,
   },
   contratRuleSetupScrollContent: {
     paddingHorizontal: 0,
@@ -54,34 +71,31 @@ export const gameScreenStyles = StyleSheet.create({
   ruleScrollContent: {
     flexGrow: 1,
     alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingVertical: 20,
-    paddingBottom: COMPACT_SCORE_HEIGHT + 20,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 80,
+    paddingBottom: 80,
   },
   casinoRuleScrollContent: {
-    paddingTop: 0,
-    paddingBottom: 260,
+    paddingBottom: 24,
   },
-  drawer: {
+  drawerGradient: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-  },
-  actionScoreGap: {
-    height: 2,
-    width: '100%',
-    backgroundColor: gameUiColors.background,
-  },
-  drawerGradient: {
-    position: 'absolute',
-    bottom: COMPACT_SCORE_HEIGHT,
-    left: 0,
-    right: 0,
     height: 80,
   },
+  meneWrapper: {
+    width: '100%',
+    overflow: 'hidden',
+  },
   preMeneRule: {
-    marginTop: -16,
+    marginTop: 0,
+  },
+  bottomActions: {
+    width: '100%',
+    gap: 4,
   },
   vetoRow: {
     width: '100%',

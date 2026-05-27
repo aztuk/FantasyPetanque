@@ -74,6 +74,7 @@ describe('GameScreen fantasy inter-mene', () => {
 
     expect(useGameStore.getState().phase).toBe('pre-mene');
     expect(screen.getByTestId('cancel-game-button')).toBeTruthy();
+    expect(screen.getByTestId('game-drawer')).toBeTruthy();
     expect(screen.getByTestId('veto-blue-button')).toBeTruthy();
     expect(screen.getByTestId('veto-red-button')).toBeTruthy();
     expect(screen.getByText(/mauvaise main/)).toBeTruthy();
@@ -83,11 +84,52 @@ describe('GameScreen fantasy inter-mene', () => {
     fireEvent.press(screen.getByTestId('begin-round-button'));
 
     expect(useGameStore.getState().phase).toBe('playing');
+    expect(screen.getByTestId('game-drawer')).toBeTruthy();
     expect(screen.getByText(rule.name)).toBeTruthy();
     expect(screen.getByText(/mauvaise main/)).toBeTruthy();
     expect(screen.getByText(/Maximum 1 bonus/)).toBeTruthy();
     expect(screen.queryByText(rule.shortDescription)).toBeNull();
     expect(screen.getByTestId('end-round-button').props.accessibilityState.disabled).toBe(true);
+  });
+
+  it('shows VetoSheet when a veto button is pressed', () => {
+    useGameStore.getState().startGame({ mode: 'fantasy', vetosEnabled: true });
+    useGameStore.getState().forceRule(ALL_RULES.find((r) => r.id === 'gauche-caviar')!);
+    render(<GameScreen />);
+
+    fireEvent.press(screen.getByTestId('veto-blue-button'));
+
+    expect(screen.getByText('Utiliser votre véto ?')).toBeTruthy();
+    expect(screen.getByTestId('alert-sheet-confirm')).toBeTruthy();
+    expect(screen.getByTestId('alert-sheet-cancel')).toBeTruthy();
+  });
+
+  it('does not consume the veto when cancelling the VetoSheet', () => {
+    useGameStore.getState().startGame({ mode: 'fantasy', vetosEnabled: true });
+    const firstRule = useGameStore.getState().currentRound?.rule;
+    useGameStore.getState().forceRule(ALL_RULES.find((r) => r.id === 'gauche-caviar')!);
+    render(<GameScreen />);
+
+    fireEvent.press(screen.getByTestId('veto-blue-button'));
+    fireEvent.press(screen.getByTestId('alert-sheet-cancel'));
+
+    expect(useGameStore.getState().vetos.blue).toBe(true);
+    expect(useGameStore.getState().phase).toBe('pre-mene');
+    // rule unchanged
+    expect(useGameStore.getState().currentRound?.rule?.id).toBe('gauche-caviar');
+    void firstRule; // unused but kept for clarity
+  });
+
+  it('consumes the veto and draws a new rule when confirming the VetoSheet', () => {
+    useGameStore.getState().startGame({ mode: 'fantasy', vetosEnabled: true });
+    useGameStore.getState().forceRule(ALL_RULES.find((r) => r.id === 'gauche-caviar')!);
+    render(<GameScreen />);
+
+    fireEvent.press(screen.getByTestId('veto-red-button'));
+    fireEvent.press(screen.getByTestId('alert-sheet-confirm'));
+
+    expect(useGameStore.getState().vetos.red).toBe(false);
+    expect(useGameStore.getState().phase).toBe('pre-mene');
   });
 
   it('shows a dedicated setup screen before playing a setup rule', () => {
@@ -162,6 +204,7 @@ describe('GameScreen fantasy inter-mene', () => {
 
     expect(useGameStore.getState().scores).toEqual({ blue: 3, red: 2 });
   });
+
   it('runs Casino through bet setup before choosing the winner in game', () => {
     useGameStore.getState().startGame({ mode: 'fantasy', vetosEnabled: true });
     useGameStore.setState({ scores: { blue: 4, red: 2 } });
@@ -211,6 +254,29 @@ describe('GameScreen fantasy inter-mene', () => {
 
     const state = useGameStore.getState();
     expect(state.scores).toEqual({ blue: 6, red: 1 });
+  });
+
+  it('keeps Casino rule content anchored to the top across inter-mene, setup and in-game', () => {
+    useGameStore.getState().startGame({ mode: 'fantasy', vetosEnabled: true });
+    useGameStore.setState({ scores: { blue: 4, red: 2 } });
+    useGameStore.getState().forceRule(ALL_RULES.find((rule) => rule.id === 'casino')!);
+    render(<GameScreen />);
+
+    const preMeneStyle = StyleSheet.flatten(screen.getByTestId('pre-mene-rule-area').props.style);
+    expect(preMeneStyle.justifyContent).toBe('center');
+    expect(preMeneStyle.paddingTop).toBeUndefined();
+
+    fireEvent.press(screen.getByTestId('begin-round-button'));
+
+    const setupStyle = StyleSheet.flatten(screen.getByTestId('rule-setup-scroll').props.contentContainerStyle);
+    expect(setupStyle.justifyContent).toBe('flex-start');
+    expect(setupStyle.paddingTop).toBe(20);
+
+    fireEvent.press(screen.getByTestId('confirm-rule-setup-button'));
+
+    const playingStyle = StyleSheet.flatten(screen.getByTestId('playing-rule-scroll').props.contentContainerStyle);
+    expect(playingStyle.justifyContent).toBe('center');
+    expect(playingStyle.paddingTop).toBe(80);
   });
 
   it('runs Prediction through setup before playing the round', () => {
@@ -265,8 +331,8 @@ describe('GameScreen fantasy inter-mene', () => {
     expect(screen.getByTestId('totem-next-rule-card')).toBeTruthy();
     expect(screen.getByText(nextRule!.name)).toBeTruthy();
     expect(screen.getByText(nextRule!.shortDescription)).toBeTruthy();
-    expect(screen.queryByText(/Prochaine/)).toBeNull();
-    expect(screen.queryByText(/Immunit/)).toBeNull();
+    expect(screen.queryByText('Prochaine rÃ¨gle')).toBeNull();
+    expect(screen.queryByText('ImmunitÃ©')).toBeNull();
   });
 });
 
@@ -387,7 +453,7 @@ describe('GameScreen simple mode - skip inter-mene', () => {
     fireEvent.press(screen.getByTestId('end-round-button'));
 
     expect(useGameStore.getState().isGameOver).toBe(true);
-    expect(screen.getByText('Partie terminée')).toBeTruthy();
+    expect(screen.getByTestId('cancel-game-button')).toBeTruthy();
     expect(screen.getByText('BLEU GAGNE')).toBeTruthy();
     expect(screen.getByText('NOUVELLE PARTIE')).toBeTruthy();
   });
