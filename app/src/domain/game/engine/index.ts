@@ -1,6 +1,6 @@
 import { Rule, RuleUIType, Team, GameState, RoundState } from '../models';
 import { ALL_RULES } from '../../../data/rules/rules';
-export { resolveRound } from './roundResolver';
+export { resolveRound, shouldSkipNormalScore } from './roundResolver';
 
 const PRE_MENE_SETUP_UI_TYPES: RuleUIType[] = [
   'contrat',
@@ -102,19 +102,6 @@ export function createRound(
     totemImmuneTeam: null,
     impairResult: null,
   };
-}
-
-// Determine if normal score phase should be skipped
-export function shouldSkipNormalScore(round: RoundState): boolean {
-  if (!round.rule) return false;
-
-  // Casino always skips normal score
-  if (round.rule.id === 'casino') return true;
-
-  // Sortie de porc: only if cochonnet was actually exited
-  if (round.rule.id === 'sortie-de-porc' && round.sortieDePorc !== null) return true;
-
-  return false;
 }
 
 export function requiresPreMeneSetup(rule: Rule | null): boolean {

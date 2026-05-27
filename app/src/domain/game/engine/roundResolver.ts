@@ -7,7 +7,13 @@ import {
   resolvePrediction,
   buildBonusMalusFromRound,
 } from '../scoring';
-import { shouldSkipNormalScore } from '.';
+
+export function shouldSkipNormalScore(round: RoundState): boolean {
+  if (!round.rule) return false;
+  if (round.rule.id === 'casino') return true;
+  if (round.rule.id === 'sortie-de-porc' && round.sortieDePorc !== null) return true;
+  return false;
+}
 
 export interface RoundResolution {
   newScores: Record<Team, number>;
