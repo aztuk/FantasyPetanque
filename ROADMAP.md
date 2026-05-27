@@ -10,28 +10,75 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 
 <!-- tâches critiques pour le fonctionnement de base -->
 
-- [fait] Vérifier les instructions Claude et Codex (`CLAUDE.md` / `AGENTS.md`) et les harmoniser pour qu'elles appliquent le même protocole. - Difficulté 1/5 - Codex
-- [fait] Fix warnings Expo / edge-to-edge : retirer `newArchEnabled: false` de `app.json` et supprimer ou adapter les appels non supportés `setPositionAsync` / `setBehaviorAsync` quand l'edge-to-edge est activé.
-- [fait] Bug — Totem d'immunité (et potentiellement d'autres règles) : la règle s'affiche deux fois sur l'écran de mène. Identifier la cause et vérifier que le problème ne touche pas d'autres règles. (commit `83bb4a2`)
-- [fait] Top bar / bouton retour en haut à gauche (tous les modes) : ajouter un bouton permettant d'annuler la partie en cours. Une alerte de confirmation prévient que la partie sera perdue si l'utilisateur confirme. Corriger aussi le placement de la top bar pour respecter la barre d'état / safe area du téléphone : aucun élément de l'app ne doit passer sous l'heure, les icônes système ou l'encoche. (commit `2e54068`)
+*(aucune tâche en cours ou à faire)*
 
 ## Priorité moyenne
 
 <!-- fonctionnalités importantes mais non bloquantes -->
 
+- [fait] Design check — Composants partagés : comparer chacun des 14 composants listés dans `COMPOSANTS — Partagés` de `Design.md` avec son équivalent Figma. Vérifier récursivement : couleurs, typographie, tailles, paddings, gaps, rayons, états. Couvrir : ScoreBoard, Rule, HistoryItem, History, Button, ButtonIcon, Head, AlertBox, Logo, WheelPicker, SetupOption, IncrementalInput, Readonly, BonusButton. - Difficulté 2/5 - Codex
+- [fait] Design check — Écrans Setup : vérifier la conformité Figma des 4 étapes Setup — Mode Choice (`node-id=1-5`), End Condition (`node-id=4-116`), Target Value (`node-id=4-124`), Veto Toggle (`node-id=4-234`). Même protocole : couleurs, typo, layout, espaces. - Difficulté 2/5 - Codex
+- [fait] Design check — Écrans Game : vérifier la conformité Figma de tous les états de jeu — Classic ingame (`node-id=1-12`), Fantasy scoreState (`node-id=4-638`), Fantasy ruleState (`node-id=8-1013`), Inter-mène (`node-id=4-742`), Post-mène (`node-id=18-1857`), End Game (`node-id=7-783`). Inclut création de `GameScreenLayout` master template (drawer collapsible, back button fixe, scrollView unifié) et migration de PlayingView / PreMeneView / SimpleModeView. - Difficulté 4/5 - Claude
+- [fait] AlertBox confirmation Véto : avant d'appliquer un véto, afficher une AlertBox de confirmation ("Utiliser votre véto sur cette règle ?") avec les boutons Confirmer / Annuler. Le véto ne doit être consommé qu'après confirmation explicite. - Difficulté 1/5 - Claude
+- [fait] Ranking — Setup Supabase + modèle de données : créer le projet Supabase, configurer le client dans l'app, définir les tables `players` (id, name, elo_petanque, elo_flechettes) et `matches` (id, sport, date, participants, result). Ajouter les variables d'environnement nécessaires. - Difficulté 2/5 - Codex
+- [fait] Ranking — Navigation : ajouter une section "Ranking" accessible depuis la Home (bouton ou tab). Créer le skeleton de navigation (RankingScreen, sous-pages) avec les deux sports Pétanque et Fléchettes. - Difficulté 2/5 - Codex
+- [en cours] Ranking — Page classement : afficher la liste des joueurs triés par ELO décroissant pour chaque sport (onglets Pétanque / Fléchettes). Deux boutons en bas : "Ajouter un joueur" et "Ajouter un match".
+- [en cours] Ranking — Ajouter un joueur : formulaire simple (champ nom), création du joueur en base avec ELO initial par défaut (1000). Retour automatique à la page classement.
+- [en cours] Ranking — Ajouter un match Pétanque : sélection des joueurs participants, désignation des gagnants, calcul et mise à jour des ELO selon l'algorithme standard, sauvegarde en base.
+- [en cours] Ranking — Ajouter un match Fléchettes : sélection des joueurs participants, saisie de l'ordre d'arrivée, calcul et mise à jour des ELO, sauvegarde en base.
+- [ ] Ranking — Bouton "Enregistrer la partie" (End Game) : ajouter un bouton Default "Enregistrer la partie" sur l'écran End Game (`node-id=7-783`), redirigant vers le flow d'ajout d'un match Pétanque dans le classement.
+- [ ] Ranking — Fléchettes : écran résultat par ordre de classement : remplacer l'écran "qui a gagné" (sélection) par un tri drag/drop des joueurs par ordre d'arrivée. Le premier est labellisé "gagnant", le dernier "perdant".
+
+## Priorité basse
+
+<!-- améliorations, polish, nice-to-have -->
+
+- [fait] UI spécifique règle Totem d'immunité : refonte selon maquette Figma. - Difficulté 2/5 - Codex
+- [fait] UI spécifique règle Sortie de porc : refonte selon maquette Figma. - Difficulté 2/5 - Codex
+- [fait] UI spécifique règle Contrat : refonte selon maquette Figma. - Difficulté 2/5 - Codex
+- [fait] EndGame screen — vérifier padding : inspecter l'écran de fin de partie et corriger tout padding excessif ou manquant selon `Design.md` (`node-id=7-783`). - Difficulté 1/5 - Claude
+- [ ] UI spécifique règle Assurance vie : refonte selon maquette Figma.
+- [ ] UI spécifique règle Frontière : refonte selon maquette Figma.
+- [ ] UI spécifique règle L'impair contre-attaque : vérifier/refondre l'affichage d'aide au scoring automatique.
+- [ ] Animation UI — lévitation point bonus : le badge "+X" vert dans le bloc score de la mène doit avoir une animation de lévitation (flottement léger en boucle).
+- [fait] Animation UI — chiffres du score : modifier l'animation des chiffres pour qu'on voie clairement l'incrémentation chiffre après chiffre. L'unité doit réagir sans délai perceptible au touché ; utiliser une courbe d'accélération plus directe (moins d'ease-in). - Difficulté 1/5 - Claude
+- [ ] UI polish — supprimer les bordures des scores de mène dans l'écran de jeu en cours.
+- [ ] Polish UI — tailles de textes : réduire la taille du score de mène dans l'interface partie en cours ; réduire globalement les tailles de textes d'un cran.
+- [ ] Design system / bouton disabled : ajouter le token de couleur disabled et appliquer le style du bouton disabled depuis la maquette Figma `node-id=4-276`.
+- [ ] Home — tagline : réduire la police de la tagline à 21 px.
+- [ ] Inter-mène UI — règle alignée en haut : dans l'écran inter-mène (affichage règle + vétos), aligner le contenu de la règle en haut de l'écran plutôt qu'en bas.
+- [ ] Config règles — padding excessif : réduire le padding autour des règles dans les écrans de config (mode CONFIG).
+- [ ] Harmoniser les espaces dans le scoreboard et autour des boutons conditionnels (bonus/malus/véto) qui peuvent apparaître dynamiquement.
+- [ ] Mène classique UI : ajouter un espace de 4 px entre le score board et le bouton.
+- [ ] Mène classique UI : ajouter un masque gradient ou progressive blur en haut sous le header et dans l'historique pour un effet smooth.
+- [ ] Fin de partie UI : ajouter un masque gradient ou progressive blur en bas au-dessus du bouton et dans l'historique pour un effet smooth.
+- [ ] Inter-mène fantasy UI : ajouter un espace entre les vétos et le bouton.
+- [ ] Transitions animées au début de mène — séquence en 6 temps : (A) titre + description de règle apparaissent progressivement style "ChatGPT" ; (B) le bloc remonte en haut de l'écran, toujours visible ; (C) blocs de score total apparaissent en bas puis le label au-dessus ; (D) éléments spécifiques à la mène apparaissent au milieu ; (E) boutons véto apparaissent sous les blocs score, décalant le score vers le haut ; (F) bouton "Terminer la mène" apparaît grisé en bas, décalant le score vers le haut. Dépend de la tâche "Refonte UI GameScreen".
+- [ ] Cadrage animations/transitions Game : à reprendre seulement quand le flow de partie est stabilisé ; demander où les transitions doivent avoir lieu, évaluer si une librairie est nécessaire, puis créer une tâche par transition avec un brief précis validé par l'utilisateur.
+- [ ] Design check — UIs règles spécifiques : vérifier la conformité Figma des UIs de règles — TeamRowButton (`node-id=15-1468`, `15-1509`), Config ValueInput (`node-id=16-1569`), Casino (`node-id=17-1625`), Prediction (`node-id=18-1701`). À faire après la refonte des UIs spécifiques de toutes les règles.
+
+---
+
+## Fait
+
+<!-- tâches terminées — archivées ici pour mémoire -->
+
+### Priorité haute (historique)
+
+- [fait] Vérifier les instructions Claude et Codex (`CLAUDE.md` / `AGENTS.md`) et les harmoniser pour qu'elles appliquent le même protocole. - Difficulté 1/5 - Codex
+- [fait] Fix warnings Expo / edge-to-edge : retirer `newArchEnabled: false` de `app.json` et supprimer ou adapter les appels non supportés `setPositionAsync` / `setBehaviorAsync` quand l'edge-to-edge est activé.
+- [fait] Bug — Totem d'immunité (et potentiellement d'autres règles) : la règle s'affiche deux fois sur l'écran de mène. Identifier la cause et vérifier que le problème ne touche pas d'autres règles. (commit `83bb4a2`)
+- [fait] Top bar / bouton retour en haut à gauche (tous les modes) : ajouter un bouton permettant d'annuler la partie en cours. Une alerte de confirmation prévient que la partie sera perdue si l'utilisateur confirme. Corriger aussi le placement de la top bar pour respecter la barre d'état / safe area du téléphone : aucun élément de l'app ne doit passer sous l'heure, les icônes système ou l'encoche. (commit `2e54068`)
+
+### Priorité moyenne (historique)
+
 - [fait] Créer `Design.md` : dictionnaire des styles (tokens de couleur, typographie, espacements), liste des écrans avec leurs liens Figma. Servira de référence centrale pour tous les agents. - Difficulté 2/5 - Claude
 - [fait] Skill `/design-check` : skill Claude Code qui lit `Design.md`, parcourt les fichiers de style du code (`theme.ts`, composants), vérifie la parité d'utilisation des composants partagés sur les pages référencées, et produit un rapport de divergences. Modifier aussi `CLAUDE.md` et `AGENTS.md` pour demander l'usage de ce skill quand l'utilisateur le demande. Dépend de `Design.md` stable (liens Figma remplis). - Difficulté 1/5 - Codex
-- [en cours] Design check — Tokens globaux : scanner tous les fichiers UI (`*.tsx`, `*.ts` dans `src/`) et vérifier qu'aucune couleur hex ni valeur typographique (fontSize, lineHeight, letterSpacing, fontWeight) n'est hardcodée — tout doit passer par `colors.*` et `figmaTextStyles.*`. Lister toutes les violations trouvées et les corriger.
-- [ ] Design check — Composants partagés : comparer chacun des 14 composants listés dans `COMPOSANTS — Partagés` de `Design.md` avec son équivalent Figma. Vérifier récursivement : couleurs, typographie, tailles, paddings, gaps, rayons, états. Couvrir : ScoreBoard, Rule, HistoryItem, History, Button, ButtonIcon, Head, AlertBox, Logo, WheelPicker, SetupOption, IncrementalInput, Readonly, BonusButton.
-- [ ] Design check — Écrans Home : vérifier la conformité Figma des écrans Home (`node-id=1-2`) et Home Debug (`node-id=1-74`). Couleurs, typo, layout, espaces, alignements, composants utilisés.
-- [fait] Design check — Écrans Setup : vérifier la conformité Figma des 4 étapes Setup — Mode Choice (`node-id=1-5`), End Condition (`node-id=4-116`), Target Value (`node-id=4-124`), Veto Toggle (`node-id=4-234`). Même protocole : couleurs, typo, layout, espaces. - Difficulté 2/5 - Codex
-- [ ] Design check — Écrans Game : vérifier la conformité Figma de tous les états de jeu — Classic ingame (`node-id=1-12`), Fantasy scoreState (`node-id=4-638`), Fantasy ruleState (`node-id=8-1013`), Inter-mène (`node-id=4-742`), Post-mène (`node-id=18-1857`), End Game (`node-id=7-783`).
-- [ ] Design check — UIs règles spécifiques : vérifier la conformité Figma des UIs de règles — TeamRowButton (`node-id=15-1468`, `15-1509`), Config ValueInput (`node-id=16-1569`), Casino (`node-id=17-1625`), Prediction (`node-id=18-1701`).
-
+- [fait] Design check — Tokens globaux : scanner tous les fichiers UI (`*.tsx`, `*.ts` dans `src/`) et vérifier qu'aucune couleur hex ni valeur typographique (fontSize, lineHeight, letterSpacing, fontWeight) n'est hardcodée — tout doit passer par `colors.*` et `figmaTextStyles.*`. Lister toutes les violations trouvées et les corriger. - Difficulté 2/5 - Claude
+- [fait] Design check — Écrans Home : vérifier la conformité Figma des écrans Home (`node-id=1-2`) et Home Debug (`node-id=1-74`). Couleurs, typo, layout, espaces, alignements, composants utilisés. - Difficulté 2/5 - Claude
 - [fait] Écran post-mène : après la fin d'une mène, afficher un écran intermédiaire qui anime l'incrément du score et résume les mini-objectifs/bonus/malus accomplis durant la mène. - Difficulté 3/5 - Claude
 - [fait] BUG — Drawer score en partie en cours : ouvrir le drawer clique accidentellement les boutons bonus/malus en-dessous (les boutons se togglent). Identifier et neutraliser les touch events pendant l'ouverture du drawer. - Difficulté 1/5 - Claude
 - [fait] Short description absente en mène : dans l'écran de mène (PlayingView), ne pas afficher la short description de la règle — elle doit apparaître uniquement en inter-mène (inter-round) et en écran de config. - Difficulté 2/5 - Codex
-
 - [fait] Bug AlertBox : l'AlertBox custom n'est pas utilisée lors de l'annulation d'une partie fantasy. - Difficulté 1/5 - Codex
 - [fait] Mode simple — ajustements layout : blocs en bas, historique ancré au-dessus (pousse vers le haut), skip inter-mène. (commit `142a1dc`)
 - [fait] Refonte HomeScreen selon les maquettes Figma fournies.
@@ -50,11 +97,9 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 - [fait] Refonte UI GameScreen (commit `5e83607`) : (1) supprimer les labels "Partie en cours" et "Mène X" ; (2) centrer et mettre en avant le nom + description de la règle ; (3) boutons véto positionnés tout en haut de l'écran (collés) ; (4) bouton "Terminer la mène" ancré en bas de l'écran.
 - [fait] Flow de création de partie (commit `e13c775`) : HomeScreen épuré (logo + JOUER, 5 taps debug), wizard 4 étapes (mode → condition de fin score/mènes → valeur WheelPicker → véto), bouton ancré en bas.
 - [fait] Mode debug : sélection manuelle de règle avant chaque mène via DebugRuleSelectScreen (commit `e13c775`).
-- [fait] Interaction classique d'ajout de point (commit `de53135`) : pour les mènes de comptage classique, remplacer les boutons "Rouge marque" et "Bleu marque" par une interaction sur les carrés de score total en haut. Appuyer sur le carré rouge ou bleu affiche un "+X" sous le score total. Le bouton pour terminer ne s'active que lorsqu'au moins un point est ajouté. Sur ces parties, le score total se déplace au milieu de l'écran avec le texte "Tapez le nombre de points marqués" au-dessus. Enlever le label ROUGE et BLEU dans les carrés.
+- [fait] Interaction classique d'ajout de point (commit `de53135`) : pour les mènes de comptage classique, remplacer les boutons "Rouge marque" et "Bleu marque" par une interaction sur les carrés de score total en haut.
 
-## Priorité basse
-
-<!-- améliorations, polish, nice-to-have -->
+### Priorité basse (historique)
 
 - [fait] UI règles : aligner le contenu des règles en haut de l'écran plutôt qu'au milieu. - Difficulté 1/5 - Claude
 - [fait] UI composant Rule : ajuster le composant selon la maquette Figma mise à jour (`node-id=4-730`). - Difficulté 2/5 - Codex
@@ -62,60 +107,13 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 - [fait] Cadrage UI règles spécifiques : lister les règles avec UI dédiée, associer chaque règle à sa maquette Figma, valider le découpage et identifier les conflits éventuels avec les composants partagés. - Difficulté 1/5 - Codex
 - [fait] UI spécifique règle Casino : refonte selon maquette Figma. - Difficulté 4/5 - Codex
 - [fait] UI spécifique règle Prédiction : refonte selon maquette Figma. - Difficulté 3/5 - Claude
-- [fait] UI spécifique règle Totem d'immunité : refonte selon maquette Figma. - Difficulté 2/5 - Codex
-- [fait] UI spécifique règles bonus/malus simples : Gauche caviar, Les extrêmes, Censure, La boule maudite, King of the Hill. Mockups disponibles dans `UI_RULES_CADRAGE.md` pour toutes les règles sauf King of the Hill. Le pattern `bonus-buttons` / `malus-buttons` est partagé : une seule implémentation couvre tous les types. Test manuel obligatoire sur TOUTES les règles concernées (l'agent listera les règles à ouvrir au moment du test). - Difficulté 3/5 - Codex
-- [fait] UI spécifique règle Sortie de porc : refonte selon maquette Figma. - Difficulté 2/5 - Codex
-- [fait] UI spécifique règle Contrat : refonte selon maquette Figma. - Difficulté 2/5 - Codex
-- [ ] UI spécifique règle Assurance vie : refonte selon maquette Figma.
-- [ ] UI spécifique règle Frontière : refonte selon maquette Figma.
-- [ ] UI spécifique règle L'impair contre-attaque : vérifier/refondre l'affichage d'aide au scoring automatique.
-- [fait] Score board UI : animer le changement de tous les chiffres style tableau de gare ; un chiffre qui s'incrémente part vers le haut, un chiffre qui décrémente part vers le bas, et les variations supérieures à 1 s'animent rapidement point par point. - Difficulté 2/5 - Claude
-- [ ] Animation UI — lévitation point bonus : le badge "+X" vert dans le bloc score de la mène doit avoir une animation de lévitation (flottement léger en boucle).
-- [ ] UI polish — supprimer les bordures des scores de mène dans l'écran de jeu en cours.
-- [ ] Polish UI — tailles de textes : réduire la taille du score de mène dans l'interface partie en cours ; réduire globalement les tailles de textes d'un cran.
-- [ ] Design system / bouton disabled : ajouter le token de couleur disabled et appliquer le style du bouton disabled depuis la maquette Figma `node-id=4-276`.
+- [fait] UI spécifique règles bonus/malus simples : Gauche caviar, Les extrêmes, Censure, La boule maudite, King of the Hill. - Difficulté 3/5 - Codex
+- [fait] Score board UI : animer le changement de tous les chiffres style tableau de gare. - Difficulté 2/5 - Claude
 - [fait] Créer un design system tokénisé et en profiter pour créer une identité visuelle à l'application. (commit `7b186e8`)
-- [fait] Typographie centralisée : créer un fichier de design system pour toutes les propriétés de chaque style de police (taille, graisse, line height, letter spacing, etc.) afin de pouvoir les ajuster en un seul endroit. - Difficulté 3/5 - Claude
-- [fait] QA manuelle des règles une par une : vérifier pour chacune des 24 règles la description, l'interface, la logique de jeu et l'équilibrage. Créer une checklist de validation par règle. - Difficulté 1/5 - Codex
-  - Checklist QA intégrée — à cocher règle par règle, idéalement via le mode debug :
-    - [ ] Gauche caviar — Texte mauvaise main lisible ; boutons bonus par équipe ; maximum +1 par équipe ; second tap/annulation ok ; historique bonus correct.
-    - [ ] Les extrêmes — Texte zone bord/cochonnet lisible ; boutons bonus par équipe ; maximum +1 par équipe ; annulation ok ; historique bonus correct.
-    - [ ] Censure — Texte début/fin de silence lisible ; boutons malus par équipe ; maximum -3 par équipe ; score jamais sous 0 ; historique malus correct.
-    - [ ] Dôme de fer — Rappel auto-arbitrage lisible ; aucune UI dédiée parasite ; scoring normal inchangé ; règle compatible Totem ; historique sans bonus/malus inattendu.
-    - [ ] Apollo boule — Rappel lancer en cloche lisible ; aucune UI dédiée parasite ; scoring normal inchangé ; règle compatible Totem ; historique propre.
-    - [ ] Drunk simulator — Rappel 3 tours lisible ; aucune UI dédiée parasite ; scoring normal inchangé ; règle compatible Totem ; historique propre.
-    - [ ] Footanque — Rappel jouer au pied lisible ; aucune UI dédiée parasite ; scoring normal inchangé ; règle compatible Totem ; historique propre.
-    - [ ] Sortie de porc — Boutons cochonnet sorti par équipe ; +6 direct uniquement si déclenché ; score normal sauté après déclenchement ; annulation/erreur vérifiée ; historique effet spécial correct.
-    - [ ] Dos Santos — Rappel lancer dos au terrain lisible ; aucune UI dédiée parasite ; scoring normal inchangé ; règle compatible Totem ; historique propre.
-    - [ ] Perte d'aura — Rappel prise d'élan lisible ; aucune UI dédiée parasite ; scoring normal inchangé ; règle compatible Totem ; historique propre.
-    - [ ] L'impair contre-attaque — Aide au scoring automatique lisible ; saisie score normal classique ; pair gagnant => gagnant 0 / perdant +1 ; impair gagnant => score normal conservé ; historique résolution correct.
-    - [ ] Make Pétanque Great Again — Rappel Trump lisible ; aucune sélection obligatoire si non prévue ; scoring normal manuel inchangé ; contrainte claire pour auto-arbitrage ; historique propre.
-    - [ ] Deuxième service — Rappel deuxième boule lisible ; aucune UI dédiée parasite ; scoring normal manuel inchangé ; contrainte claire pour auto-arbitrage ; historique propre.
-    - [ ] Ctrl + Z — Rappel relance unique lisible ; aucune UI dédiée parasite ; scoring normal inchangé ; règle compatible Totem ; historique propre.
-    - [ ] Permis de construire — Rappel obstacle lisible ; flow setup/pre-mène cohérent ; aucune UI dédiée parasite ; scoring normal inchangé ; historique propre.
-    - [ ] Contrat — Setup missions pour les deux équipes ; même mission autorisée ; validation bloquée tant que nécessaire ; réussite +2 max une fois par équipe ; annulation et historique bonus corrects.
-    - [ ] La boule maudite — Texte boule neutre lisible ; boutons malus par équipe ; maximum -1 par équipe ; score jamais sous 0 ; historique malus correct.
-    - [ ] King of the Hill — Texte zone/cercle lisible ; boutons bonus par équipe ; compteur jusqu'à +6 par équipe ; décrément/annulation ok ; historique bonus correct.
-    - [ ] Le duel — Rappel champions lisible ; aucune UI dédiée parasite ; scoring normal inchangé ; règle compatible Totem ; historique propre.
-    - [ ] Assurance vie — Setup assurance par équipe ; activation/désactivation avant mène ; perdant assuré +1 ; gagnant assuré -1 sans descendre sous 0 sur la mène ; historique résolution correct.
-    - [ ] Frontière — Setup choix gauche/droite par équipe ; validation des deux choix ; rappel pendant la mène ; scoring normal manuel inchangé ; historique propre.
-    - [ ] Casino — Condition d'apparition à score non nul ; setup mises bornées selon décision produit en vigueur ; pas de score normal ; gagnant/perdant appliqués correctement ; historique gains/pertes correct.
-    - [ ] Prédiction — Condition d'apparition à score non nul ; setup prédictions 1-6 ; résolution auto si prédiction réussie ; score adverse jamais sous 0 ; historique malus correct.
-    - [ ] Totem d'immunité — Règle suivante révélée une seule fois ; règle révélée totem-compatible ; perdant immunisé sauf mène nulle ; règle suivante chargée automatiquement ; affichage immunité/historique correct.
-- [ ] Home — tagline : réduire la police de la tagline à 21 px.
-- [ ] Inter-mène UI — règle alignée en haut : dans l'écran inter-mène (affichage règle + vétos), aligner le contenu de la règle en haut de l'écran plutôt qu'en bas.
-- [ ] Config règles — padding excessif : réduire le padding autour des règles dans les écrans de config (mode CONFIG).
-- [ ] Harmoniser les espaces dans le scoreboard et autour des boutons conditionnels (bonus/malus/véto) qui peuvent apparaître dynamiquement.
-- [ ] Mène classique UI : ajouter un espace de 4 px entre le score board et le bouton.
-- [ ] Mène classique UI : ajouter un masque gradient ou progressive blur en haut sous le header et dans l'historique pour un effet smooth.
-- [ ] Fin de partie UI : ajouter un masque gradient ou progressive blur en bas au-dessus du bouton et dans l'historique pour un effet smooth.
-- [ ] Inter-mène fantasy UI : ajouter un espace entre les vétos et le bouton.
-- [ ] Transitions animées au début de mène — séquence en 6 temps : (A) titre + description de règle apparaissent progressivement style "ChatGPT" ; (B) le bloc remonte en haut de l'écran, toujours visible ; (C) blocs de score total apparaissent en bas puis le label au-dessus ; (D) éléments spécifiques à la mène apparaissent au milieu ; (E) boutons véto apparaissent sous les blocs score, décalant le score vers le haut ; (F) bouton "Terminer la mène" apparaît grisé en bas, décalant le score vers le haut. Dépend de la tâche "Refonte UI GameScreen".
-- [ ] Cadrage animations/transitions Game : à reprendre seulement quand le flow de partie est stabilisé ; demander où les transitions doivent avoir lieu, évaluer si une librairie est nécessaire, puis créer une tâche par transition avec un brief précis validé par l'utilisateur.
+- [fait] Typographie centralisée : créer un fichier de design system pour toutes les propriétés de chaque style de police. - Difficulté 3/5 - Claude
+- [fait] QA manuelle des règles une par une : vérifier pour chacune des 24 règles la description, l'interface, la logique de jeu et l'équilibrage. - Difficulté 1/5 - Codex
 
-## Fait
-
-<!-- tâches terminées — archivées ici pour mémoire -->
+### Sans catégorie (historique)
 
 - [fait] Bootstrap architecture complète — 24 règles, moteur de jeu, store Zustand, 65 tests (commit `90708aa`)
 - [fait] Splash screen (commit `0aafe5d`)
