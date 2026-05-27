@@ -1,8 +1,8 @@
 import React from 'react';
-import { Pressable, StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { Easing, Pressable, StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import AnimatedNumber from 'react-native-animated-numbers';
 import { Team } from '../../../domain/game/models';
-import { textStyles, typography } from '../../../shared/constants';
+import { componentSizes, figmaTextStyles, radius } from '../../../shared/constants';
 import { gameUiColors } from './gameUiTheme';
 
 interface Props {
@@ -12,6 +12,7 @@ interface Props {
   roundNumber?: number;
   badgeLabel?: string;
   badgeTeam?: Team | null;
+  variant?: 'default' | 'drawer' | 'totalSummary';
   compact?: boolean;
   showTotals?: boolean;
   showRoundBar?: boolean;
@@ -22,11 +23,13 @@ interface Props {
 const TEAM_UI = {
   blue: {
     surface: gameUiColors.blueSurface,
+    dark: gameUiColors.blueDark,
     text: gameUiColors.blueText,
     testID: 'score-block-blue',
   },
   red: {
     surface: gameUiColors.redSurface,
+    dark: gameUiColors.redDark,
     text: gameUiColors.redText,
     testID: 'score-block-red',
   },
@@ -45,6 +48,7 @@ export function GameScoreBoard({
   roundNumber,
   badgeLabel,
   badgeTeam = null,
+  variant = 'default',
   compact = false,
   showTotals = true,
   showRoundBar = true,
@@ -52,22 +56,36 @@ export function GameScoreBoard({
   style,
 }: Props) {
   const badge = formatBadge(roundNumber, badgeLabel);
+  const isDrawer = variant === 'drawer';
+  const isTotalSummary = variant === 'totalSummary';
+  const shouldShowRoundBar = isDrawer ? true : isTotalSummary ? false : showRoundBar;
+  const shouldShowTotals = isDrawer ? false : isTotalSummary ? true : showTotals;
 
   return (
-    <View style={[styles.board, showRoundBar ? (compact ? styles.compact : styles.full) : undefined, style]}>
+    <View
+      testID="game-score-board"
+      style={[
+        styles.board,
+        shouldShowRoundBar ? (compact ? styles.compact : styles.full) : undefined,
+        isDrawer && styles.drawerBoard,
+        isTotalSummary && styles.totalSummaryBoard,
+        style,
+      ]}
+    >
       {(['blue', 'red'] as const).map((team) => {
         const ui = TEAM_UI[team];
         const meneValue = roundPoints ? roundPoints[team] : scores[team];
         const modifierValue = modifierPoints?.[team] ?? 0;
 
         const content = (
-          <View style={styles.teamColumn}>
-            {showRoundBar && (
-              <View style={[styles.mene, { backgroundColor: ui.surface }]}>
+          <View style={[styles.teamColumn, isDrawer && styles.drawerTeamColumn, isTotalSummary && styles.summaryTeamColumn]}>
+            {shouldShowRoundBar && (
+              <View style={[styles.mene, isDrawer && styles.drawerMene, { backgroundColor: ui.surface }]}>
                 <AnimatedNumber
                   animateToNumber={meneValue}
                   fontStyle={styles.meneText}
                   animationDuration={300}
+                  easing={Easing.out(Easing.cubic)}
                   containerStyle={styles.meneContainer}
                 />
                 {modifierValue !== 0 && (
@@ -83,12 +101,19 @@ export function GameScoreBoard({
                 )}
               </View>
             )}
-            {showTotals && (
-              <View style={[styles.total, { backgroundColor: ui.surface }]}>
+            {shouldShowTotals && (
+              <View
+                style={[
+                  styles.total,
+                  isTotalSummary ? styles.totalSummary : styles.totalDefault,
+                  { backgroundColor: ui.dark },
+                ]}
+              >
                 <AnimatedNumber
                   animateToNumber={scores[team]}
-                  fontStyle={styles.totalText}
-                  animationDuration={400}
+                  fontStyle={isTotalSummary ? styles.summaryTotalText : styles.totalText}
+                  animationDuration={300}
+                  easing={Easing.out(Easing.cubic)}
                   containerStyle={styles.totalContainer}
                 />
               </View>
@@ -101,7 +126,7 @@ export function GameScoreBoard({
             <Pressable
               key={team}
               style={styles.teamWrapper}
-              onPress={() => onTeamPress(team)}
+              onPressIn={() => onTeamPress(team)}
               accessibilityRole="button"
               accessibilityLabel={`${team === 'blue' ? 'Bleu' : 'Rouge'} score ${scores[team]}`}
               testID={ui.testID}
@@ -119,22 +144,23 @@ export function GameScoreBoard({
       })}
 
       {badge && (
-        <View style={styles.badge}>
-          <Text
-            style={[
-              styles.badgeText,
-              badgeTeam ? { color: TEAM_UI[badgeTeam].text } : null,
-            ]}
-            numberOfLines={1}
-          >
-            {badge.toUpperCase()}
-          </Text>
+        <View style={[styles.badge, isTotalSummary && styles.totalSummaryBadge]}>
+          <View style={styles.badgeInner}>
+            <Text
+              style={[
+                styles.badgeText,
+                badgeTeam ? { color: TEAM_UI[badgeTeam].text } : null,
+              ]}
+              numberOfLines={1}
+            >
+              {badge.toUpperCase()}
+            </Text>
+          </View>
         </View>
       )}
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   board: {
     width: '100%',
@@ -143,57 +169,76 @@ const styles = StyleSheet.create({
     position: 'relative',
     backgroundColor: gameUiColors.background,
   },
-  full: {
-    height: 252,
-  },
+  full: {},
   compact: {
-    height: 198,
+    height: componentSizes.compactScoreBoardHeight,
+  },
+  drawerBoard: {
+    height: componentSizes.drawerScoreBoardHeight,
+  },
+  totalSummaryBoard: {
+    height: componentSizes.totalSummaryScoreBoardHeight,
   },
   teamWrapper: {
     flex: 1,
   },
   teamColumn: {
-    flex: 1,
+    gap: 4,
+  },
+  drawerTeamColumn: {
+    height: '100%',
+  },
+  summaryTeamColumn: {
+    height: '100%',
   },
   total: {
     minHeight: 57,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  totalDefault: {
     paddingVertical: 8,
-    borderTopWidth: 2,
-    borderTopColor: gameUiColors.background,
-    opacity: 0.92,
+  },
+  totalSummary: {
+    flex: 1,
+    paddingTop: 80,
+    paddingBottom: 8,
   },
   totalContainer: {
     justifyContent: 'center',
     alignItems: 'center',
   },
   mene: {
-    flex: 1,
+    height: 150,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
+  },
+  drawerMene: {
+    flex: 1,
+    height: '100%',
   },
   meneContainer: {
     justifyContent: 'center',
     alignItems: 'center',
   },
   totalText: {
-    ...textStyles.labelMd,
+    ...figmaTextStyles.numberXs40,
+    color: gameUiColors.white,
+    textAlign: 'center',
+  },
+  summaryTotalText: {
+    ...figmaTextStyles.numberLg100,
     color: gameUiColors.white,
     textAlign: 'center',
   },
   meneText: {
+    ...figmaTextStyles.numberLg100,
     color: gameUiColors.white,
-    fontFamily: typography.family.bodySemibold,
-    fontSize: 60,
-    lineHeight: 102,
-    fontWeight: typography.weight.semibold,
     textAlign: 'center',
-    letterSpacing: 0,
   },
   modifierText: {
-    ...textStyles.titleLg,
+    ...figmaTextStyles.numberXs40,
     position: 'absolute',
     top: '50%',
     marginTop: -24,
@@ -209,11 +254,17 @@ const styles = StyleSheet.create({
   badge: {
     position: 'absolute',
     top: -15,
+    left: 0,
+    right: 0,
     alignSelf: 'center',
-    left: '50%',
-    transform: [{ translateX: -64 }],
+    alignItems: 'center',
+  },
+  totalSummaryBadge: {
+    top: 27,
+  },
+  badgeInner: {
     minWidth: 128,
-    borderRadius: 40,
+    borderRadius: radius.pill,
     backgroundColor: gameUiColors.background,
     alignItems: 'center',
     justifyContent: 'center',
@@ -222,12 +273,8 @@ const styles = StyleSheet.create({
     paddingBottom: 7,
   },
   badgeText: {
+    ...figmaTextStyles.labels,
     color: gameUiColors.muted,
-    fontFamily: typography.family.bodySemibold,
-    fontSize: 18,
-    lineHeight: 18,
-    fontWeight: typography.weight.bold,
     textAlign: 'center',
-    letterSpacing: 0,
   },
 });

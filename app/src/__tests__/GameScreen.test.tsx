@@ -197,7 +197,7 @@ describe('GameScreen fantasy inter-mene', () => {
     expect(screen.getByTestId('score-modifier-blue').props.children).toBe('+2');
     expect(screen.getByTestId('score-modifier-red').props.children).toBe('+2');
 
-    fireEvent.press(screen.getByTestId('score-block-blue'));
+    fireEvent(screen.getByTestId('score-block-blue'), 'pressIn');
     expect(screen.getByTestId('end-round-button').props.accessibilityState.disabled).toBe(false);
 
     fireEvent.press(screen.getByTestId('end-round-button'));
@@ -409,7 +409,7 @@ describe('GameScreen simple mode - skip inter-mene', () => {
 
     render(<GameScreen />);
 
-    fireEvent.press(screen.getByTestId('score-block-blue'));
+    fireEvent(screen.getByTestId('score-block-blue'), 'pressIn');
     fireEvent.press(screen.getByTestId('end-round-button'));
 
     const state = useGameStore.getState();
@@ -424,7 +424,7 @@ describe('GameScreen simple mode - skip inter-mene', () => {
 
     render(<GameScreen />);
 
-    fireEvent.press(screen.getByTestId('score-block-red'));
+    fireEvent(screen.getByTestId('score-block-red'), 'pressIn');
     fireEvent.press(screen.getByTestId('end-round-button'));
 
     expect(screen.getByText('Mène 01')).toBeTruthy();
@@ -437,7 +437,7 @@ describe('GameScreen simple mode - skip inter-mene', () => {
 
     render(<GameScreen />);
 
-    fireEvent.press(screen.getByTestId('score-block-blue'));
+    fireEvent(screen.getByTestId('score-block-blue'), 'pressIn');
     fireEvent.press(screen.getByTestId('end-round-button'));
 
     expect(screen.queryByText('NOUVELLE MÈNE')).toBeNull();
@@ -449,7 +449,7 @@ describe('GameScreen simple mode - skip inter-mene', () => {
 
     render(<GameScreen />);
 
-    fireEvent.press(screen.getByTestId('score-block-blue'));
+    fireEvent(screen.getByTestId('score-block-blue'), 'pressIn');
     fireEvent.press(screen.getByTestId('end-round-button'));
 
     expect(useGameStore.getState().isGameOver).toBe(true);
@@ -470,12 +470,12 @@ describe('GameScreen normal scoring interaction', () => {
     expect(screen.queryByText(/Rouge marque/)).toBeNull();
     expect(screen.getByTestId('end-round-button').props.accessibilityState.disabled).toBe(true);
 
-    fireEvent.press(screen.getByTestId('score-block-blue'));
+    fireEvent(screen.getByTestId('score-block-blue'), 'pressIn');
 
     expect(useGameStore.getState().currentRound?.normalPoints.blue).toBe(1);
     expect(screen.getByTestId('end-round-button').props.accessibilityState.disabled).toBe(false);
 
-    fireEvent.press(screen.getByTestId('score-block-red'));
+    fireEvent(screen.getByTestId('score-block-red'), 'pressIn');
 
     expect(useGameStore.getState().currentRound?.normalPoints.blue).toBe(0);
     expect(useGameStore.getState().currentRound?.normalPoints.red).toBe(0);
