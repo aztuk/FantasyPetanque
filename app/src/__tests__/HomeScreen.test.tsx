@@ -41,6 +41,9 @@ describe('HomeScreen', () => {
     expect(screen.getByText('toute dignité')).toBeTruthy();
     expect(screen.queryByTestId('home-debug-badge')).toBeNull();
 
+    fireEvent.press(screen.getByTestId('home-ranking-button'));
+    expect(mockNavigate).toHaveBeenCalledWith('Ranking');
+
     fireEvent.press(screen.getByTestId('home-play-button'));
 
     expect(mockNavigate).toHaveBeenCalledWith('Setup');

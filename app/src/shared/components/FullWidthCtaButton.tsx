@@ -6,6 +6,7 @@ interface Props {
   label: string;
   onPress: () => void;
   disabled?: boolean;
+  variant?: 'primary' | 'default' | 'secondary';
   style?: ViewStyle;
   testID?: string;
 }
@@ -14,12 +15,24 @@ export function FullWidthCtaButton({
   label,
   onPress,
   disabled = false,
+  variant = 'primary',
   style,
   testID,
 }: Props) {
+  const backgroundColor =
+    disabled ? colors.disabled :
+    variant === 'default' ? colors.darkSmooth :
+    variant === 'secondary' ? colors.secondary :
+    colors.primary;
+
+  const textColor =
+    disabled ? colors.textSmooth :
+    variant === 'primary' || variant === 'secondary' ? colors.dark :
+    colors.white;
+
   return (
     <TouchableOpacity
-      style={[styles.button, disabled && styles.disabled, style]}
+      style={[styles.button, { backgroundColor }, style]}
       onPress={onPress}
       disabled={disabled}
       activeOpacity={0.75}
@@ -27,7 +40,7 @@ export function FullWidthCtaButton({
       accessibilityState={{ disabled }}
       testID={testID}
     >
-      <Text style={[styles.label, disabled && styles.disabledLabel]}>{label}</Text>
+      <Text style={[styles.label, { color: textColor }]}>{label}</Text>
     </TouchableOpacity>
   );
 }
@@ -39,18 +52,10 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.primary,
-  },
-  disabled: {
-    backgroundColor: colors.disabled,
   },
   label: {
     ...figmaTextStyles.buttonCTA,
-    color: colors.dark,
     includeFontPadding: false,
     textAlign: 'center',
-  },
-  disabledLabel: {
-    color: colors.textSmooth,
   },
 });

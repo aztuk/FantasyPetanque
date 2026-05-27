@@ -5,6 +5,7 @@ import { HomeScreen } from '../../features/game/screens/HomeScreen';
 import { SetupScreen } from '../../features/game/screens/SetupScreen';
 import { GameScreen } from '../../features/game/screens/GameScreen';
 import { DebugRuleSelectScreen } from '../../features/game/screens/DebugRuleSelectScreen';
+import { RankingScreen } from '../../features/ranking/screens/RankingScreen';
 import { RootStackParamList } from './types';
 import { BACKGROUND, TEXT_PRIMARY, typography } from '../../shared/constants';
 
@@ -39,6 +40,11 @@ export function AppNavigator() {
         <Stack.Screen
           name="DebugRuleSelect"
           component={DebugRuleSelectScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Ranking"
+          component={RankingScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

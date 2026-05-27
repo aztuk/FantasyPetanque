@@ -21,3 +21,4 @@
 - Totem d'immunité révèle la prochaine règle via la variante compacte de `RuleDisplay` sous la règle courante. Même si la maquette mentionne l'équipe gagnante, `fantasy-petanque.md` prime : le perdant de la mène Totem est immunisé.
 - Contrat garde les cinq missions de `fantasy-petanque.md` comme source gameplay, y compris "Finir avec exactement 2 points" pour la mission 3. Les labels courts ajoutés pour l'écran en partie sont uniquement des résumés UI.
 - Le module Ranking utilise Supabase avec les variables Expo publiques `EXPO_PUBLIC_SUPABASE_URL` et `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Le schéma initial est versionné dans `app/supabase/schema.sql`; les policies RLS autorisent temporairement lecture, insertion et mise à jour publiques pour prototyper le classement sans authentification.
+- L'accès au module Ranking depuis la Home utilise le CTA `CLASSEMENTS` au-dessus de `JOUER`, conformément à la frame Figma Home `node-id=1-2`.

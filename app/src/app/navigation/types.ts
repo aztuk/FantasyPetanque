@@ -3,5 +3,5 @@ export type RootStackParamList = {
   Setup: undefined;
   Game: undefined;
   DebugRuleSelect: undefined;
-  Summary: undefined;
+  Ranking: undefined;
 };
