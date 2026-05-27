@@ -6,6 +6,7 @@ import { SetupScreen } from '../../features/game/screens/SetupScreen';
 import { GameScreen } from '../../features/game/screens/GameScreen';
 import { DebugRuleSelectScreen } from '../../features/game/screens/DebugRuleSelectScreen';
 import { RankingScreen } from '../../features/ranking/screens/RankingScreen';
+import { AddMatchScreen } from '../../features/ranking/screens/AddMatchScreen';
 import { RootStackParamList } from './types';
 import { BACKGROUND, TEXT_PRIMARY, typography } from '../../shared/constants';
 
@@ -45,6 +46,11 @@ export function AppNavigator() {
         <Stack.Screen
           name="Ranking"
           component={RankingScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="AddMatch"
+          component={AddMatchScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

@@ -1,42 +1,139 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen, within } from '@testing-library/react-native';
+import { StyleSheet } from 'react-native';
 import { RankingScreen } from '../features/ranking/screens/RankingScreen';
+import { createEmptyRankingRecords, fetchRankingData } from '../features/ranking/services/rankingPlayers';
+import { colors, figmaTextStyles, typography } from '../shared/constants';
 
 const mockGoBack = jest.fn();
 
-jest.mock('@react-navigation/native', () => ({
-  useNavigation: () => ({
-    goBack: mockGoBack,
-  }),
-}));
+jest.mock('@react-navigation/native', () => {
+  const React = require('react');
+  return {
+    useNavigation: () => ({
+      goBack: mockGoBack,
+      navigate: jest.fn(),
+    }),
+    useFocusEffect: (cb: () => (() => void) | void) => {
+      React.useEffect(() => cb(), []);
+    },
+  };
+});
+
+jest.mock('../features/ranking/services/rankingPlayers', () => {
+  const actual = jest.requireActual('../features/ranking/services/rankingPlayers');
+
+  return {
+    ...actual,
+    fetchRankingData: jest.fn(),
+  };
+});
+
+const mockFetchRankingData = fetchRankingData as jest.MockedFunction<typeof fetchRankingData>;
+
+const players = [
+  {
+    id: 'quentin',
+    name: 'Quentin',
+    eloPetanque: 1198,
+    eloFlechettes: 1120,
+  },
+  {
+    id: 'clement',
+    name: 'Clément',
+    eloPetanque: 1204,
+    eloFlechettes: 990,
+  },
+  {
+    id: 'lea',
+    name: 'Léa',
+    eloPetanque: 1000,
+    eloFlechettes: 1201,
+  },
+];
 
 beforeEach(() => {
   mockGoBack.mockClear();
+  const records = createEmptyRankingRecords();
+  records.petanque.clement = { wins: 13, losses: 8 };
+  records.petanque.quentin = { wins: 11, losses: 8 };
+  records.petanque.lea = { wins: 2, losses: 4 };
+  records.flechettes.lea = { wins: 9, losses: 1 };
+  records.flechettes.quentin = { wins: 7, losses: 3 };
+  records.flechettes.clement = { wins: 4, losses: 5 };
+  mockFetchRankingData.mockResolvedValue({ players, records });
 });
 
 describe('RankingScreen', () => {
-  it('renders the ranking skeleton with both sports', () => {
+  it('renders the sport choice page with leader summaries', async () => {
     render(<RankingScreen />);
 
-    expect(screen.getByText('Classements')).toBeTruthy();
+    expect(await screen.findByText('PÉTANQUE')).toBeTruthy();
+    expect(screen.getByText('FLECHETTE')).toBeTruthy();
+    expect(screen.getByText('Clément mène de 6 points')).toBeTruthy();
+    expect(screen.getByText('Léa mène de 81 points')).toBeTruthy();
+  });
+
+  it('renders petanque players sorted by descending ELO', async () => {
+    render(<RankingScreen />);
+
+    fireEvent.press(await screen.findByTestId('ranking-petanque-choice'));
+
     expect(screen.getByText('Pétanque')).toBeTruthy();
+    expect(screen.getByTestId('ranking-rank-clement').props.accessibilityLabel).toBe('01');
+    expect(screen.getByTestId('ranking-rank-quentin').props.accessibilityLabel).toBe('02');
+    expect(screen.getByTestId('ranking-rank-lea').props.accessibilityLabel).toBe('03');
+    expect(screen.getByTestId('ranking-elo-clement').props.accessibilityLabel).toBe('1204');
+    expect(
+      StyleSheet.flatten(screen.getByTestId('ranking-rank-clement-fill').props.style).fontFamily,
+    ).toBe(typography.family.numberBold);
+    expect(
+      StyleSheet.flatten(screen.getByTestId('ranking-elo-clement-fill').props.style).fontFamily,
+    ).toBe(typography.family.numberBold);
+    expect(
+      StyleSheet.flatten(screen.getByTestId('ranking-elo-clement-fill').props.style).fontWeight,
+    ).toBeUndefined();
+    expect(
+      StyleSheet.flatten(within(screen.getByTestId('ranking-player-quentin')).getByText('Quentin').props.style).color,
+    ).toBe(colors.silver);
+    expect(
+      StyleSheet.flatten(within(screen.getByTestId('ranking-player-lea')).getByText('Léa').props.style).color,
+    ).toBe(colors.copper);
+    expect(
+      StyleSheet.flatten(screen.getByTestId('ranking-player-record-clement').props.style)
+        .fontSize,
+    ).toBe(figmaTextStyles.bodyXs.fontSize);
+    expect(within(screen.getByTestId('ranking-player-clement')).getByText('8D')).toBeTruthy();
+    expect(screen.getByTestId('ranking-add-match-button')).toBeTruthy();
+  });
+
+  it('renders flechettes players sorted by descending ELO', async () => {
+    render(<RankingScreen />);
+
+    fireEvent.press(await screen.findByTestId('ranking-flechettes-choice'));
+
     expect(screen.getByText('Fléchettes')).toBeTruthy();
-    expect(screen.getByText('Classement Pétanque')).toBeTruthy();
+    expect(screen.getByTestId('ranking-rank-lea').props.accessibilityLabel).toBe('01');
+    expect(screen.getByTestId('ranking-rank-quentin').props.accessibilityLabel).toBe('02');
+    expect(screen.getByTestId('ranking-rank-clement').props.accessibilityLabel).toBe('03');
   });
 
-  it('switches the selected sport', () => {
+  it('goes back from the choice page header', async () => {
     render(<RankingScreen />);
 
-    fireEvent.press(screen.getByTestId('ranking-flechettes-tab'));
-
-    expect(screen.getByText('Classement Fléchettes')).toBeTruthy();
-  });
-
-  it('goes back from the header', () => {
-    render(<RankingScreen />);
-
+    await screen.findByText('PÉTANQUE');
     fireEvent.press(screen.getByTestId('ranking-back-button'));
 
     expect(mockGoBack).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns to sport choice from the ranking page header', async () => {
+    render(<RankingScreen />);
+
+    fireEvent.press(await screen.findByTestId('ranking-petanque-choice'));
+    fireEvent.press(screen.getByTestId('ranking-list-back-button'));
+
+    expect(screen.getByText('PÉTANQUE')).toBeTruthy();
+    expect(mockGoBack).not.toHaveBeenCalled();
   });
 });
