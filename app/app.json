@@ -34,7 +34,8 @@
           "visibility": "hidden",
           "behavior": "overlay-swipe"
         }
-      ]
+      ],
+      "expo-sqlite"
     ]
   }
 }

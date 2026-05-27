@@ -2,5 +2,8 @@ app/node_modules/
 app/.expo/
 app/dist/
 app/web-build/
+app/.env
+app/.env.local
+app/.env.*.local
 *.log
 .DS_Store
