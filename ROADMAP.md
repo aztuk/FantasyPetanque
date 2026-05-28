@@ -22,12 +22,14 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 - [fait] AlertBox confirmation Véto : avant d'appliquer un véto, afficher une AlertBox de confirmation ("Utiliser votre véto sur cette règle ?") avec les boutons Confirmer / Annuler. Le véto ne doit être consommé qu'après confirmation explicite. - Difficulté 1/5 - Claude
 - [fait] Ranking — Setup Supabase + modèle de données : créer le projet Supabase, configurer le client dans l'app, définir les tables `players` (id, name, elo_petanque, elo_flechettes) et `matches` (id, sport, date, participants, result). Ajouter les variables d'environnement nécessaires. - Difficulté 2/5 - Codex
 - [fait] Ranking — Navigation : ajouter une section "Ranking" accessible depuis la Home (bouton ou tab). Créer le skeleton de navigation (RankingScreen, sous-pages) avec les deux sports Pétanque et Fléchettes. - Difficulté 2/5 - Codex
-- [en cours] Ranking — Page classement : afficher la liste des joueurs triés par ELO décroissant pour chaque sport (onglets Pétanque / Fléchettes). Deux boutons en bas : "Ajouter un joueur" et "Ajouter un match".
-- [en cours] Ranking — Ajouter un joueur : formulaire simple (champ nom), création du joueur en base avec ELO initial par défaut (1000). Retour automatique à la page classement.
-- [en cours] Ranking — Ajouter un match Pétanque : sélection des joueurs participants, désignation des gagnants, calcul et mise à jour des ELO selon l'algorithme standard, sauvegarde en base.
-- [en cours] Ranking — Ajouter un match Fléchettes : sélection des joueurs participants, saisie de l'ordre d'arrivée, calcul et mise à jour des ELO, sauvegarde en base.
+- [fait] Ranking — Page classement : afficher la liste des joueurs triés par ELO décroissant pour chaque sport (onglets Pétanque / Fléchettes). Deux boutons en bas : "Ajouter un joueur" et "Ajouter un match". - Difficulté 2/5 - Claude
+- [fait] Ranking — Ajouter un joueur : formulaire simple (champ nom), création du joueur en base avec ELO initial par défaut (1000). Retour automatique à la page classement. - Difficulté 1/5 - Claude
+- [fait] Ranking — Ajouter un match Pétanque : sélection des joueurs participants, désignation des gagnants, calcul et mise à jour des ELO selon l'algorithme standard, sauvegarde en base. - Difficulté 3/5 - Claude
+- [fait] Ranking — Ajouter un match Fléchettes : sélection des joueurs participants, saisie de l'ordre d'arrivée, calcul et mise à jour des ELO, sauvegarde en base. - Difficulté 3/5 - Claude
 - [ ] Ranking — Bouton "Enregistrer la partie" (End Game) : ajouter un bouton Default "Enregistrer la partie" sur l'écran End Game (`node-id=7-783`), redirigant vers le flow d'ajout d'un match Pétanque dans le classement.
-- [ ] Ranking — Fléchettes : écran résultat par ordre de classement : remplacer l'écran "qui a gagné" (sélection) par un tri drag/drop des joueurs par ordre d'arrivée. Le premier est labellisé "gagnant", le dernier "perdant".
+- [ ] Ranking — Fléchettes drag/drop : animer le déplacement des items pendant le drag — créer un espace à la position survolée, les autres éléments s'écartent progressivement pour indiquer l'emplacement cible.
+- [ ] Ranking — Masquer bouton "Suivant" quand le clavier est ouvert sur l'ajout de joueur (étape 1 du flow AddMatch).
+- [ ] Ranking — ELO fléchettes trop volatile : avec 5 joueurs, les deltas pairwise peuvent dépasser ±100 par match. Calibrer le K-factor pour les matchs à N joueurs (diviser par N-1 ou ajuster la constante).
 
 ## Priorité basse
 
