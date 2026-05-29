@@ -27,7 +27,7 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 
 <!-- fonctionnalités importantes mais non bloquantes -->
 
-- [en cours] Logo et nom de l'appli : modifier le logo, le nom affiché et le slug de l'application.
+- [fait] Logo et nom de l'appli : modifier le logo, le nom affiché et le slug de l'application. - Difficulté 1/5 - Codex
 - [fait] Ranking — Écran winner fléchettes et composants : mettre à jour `Design.md` avec l'écran de choix du gagnant en mode tri (fléchettes) depuis Figma (`node-id=69-159`) et ses composants spécifiques (`node-id=69-190`), puis implémenter l'écran et les composants dans le flow d'ajout de match Fléchettes. Mettre à jour le catalogue de composants et les tokens si nécessaire. - Difficulté 3/5 - Codex
 - [fait] Design check — Composants partagés : comparer chacun des 14 composants listés dans `COMPOSANTS — Partagés` de `Design.md` avec son équivalent Figma. Vérifier récursivement : couleurs, typographie, tailles, paddings, gaps, rayons, états. Couvrir : ScoreBoard, Rule, HistoryItem, History, Button, ButtonIcon, Head, AlertBox, Logo, WheelPicker, SetupOption, IncrementalInput, Readonly, BonusButton. - Difficulté 2/5 - Codex
 - [fait] Design check — Écrans Setup : vérifier la conformité Figma des 4 étapes Setup — Mode Choice (`node-id=1-5`), End Condition (`node-id=4-116`), Target Value (`node-id=4-124`), Veto Toggle (`node-id=4-234`). Même protocole : couleurs, typo, layout, espaces. - Difficulté 2/5 - Codex
