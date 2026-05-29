@@ -41,6 +41,7 @@ export function PlayingView() {
   const renderRuleUIInDrawer =
     round.rule?.uiType === 'cochonnet-sorti' ||
     round.rule?.uiType === 'contrat' ||
+    round.rule?.uiType === 'assurance-vie' ||
     round.rule?.uiType === 'bonus-buttons' ||
     round.rule?.uiType === 'malus-buttons';
   const alwaysExpanded = usesWinnerConfirmation || renderRuleUIInDrawer;

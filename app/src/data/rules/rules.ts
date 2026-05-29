@@ -169,7 +169,7 @@ export const ALL_RULES: Rule[] = [
   {
     id: 'assurance-vie',
     name: 'Assurance vie',
-    description: "Chaque équipe peut prendre une assurance avant la mène. Équipe assurée qui perd : +1 point. Équipe assurée qui gagne : -1 sur ses points normaux (minimum 0 sur la mène).",
+    description: "Si vous prenez l'assurance, votre défaite vous <b>rapportera 1 point</b>. En revanche, gagner vous rapportera <b>un point de moins.</b>",
     shortDescription: 'Assurance : perdre = +1, gagner = -1.',
     tags: ['setup', 'score-modifier', 'specific-ui', 'auto-resolution'],
     uiType: 'assurance-vie',

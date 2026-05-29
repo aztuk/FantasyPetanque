@@ -498,4 +498,45 @@ describe('buildSteps (PostRoundView)', () => {
     expect(steps[0].redDelta).toBe(1);
     expect(steps[0].redAfter).toBe(6);
   });
+
+  it('adds an Assurance step for winner penalty and loser protection', () => {
+    const steps = buildSteps(
+      { blue: 3, red: 0 },
+      [],
+      null,
+      'assurance-vie',
+      scoreBefore,
+      { blue: true, red: true },
+    );
+
+    expect(steps).toHaveLength(2);
+    expect(steps[0]).toMatchObject({
+      badgeLabel: 'SCORE NORMAL',
+      blueDelta: 3,
+      redDelta: 0,
+      blueAfter: 6,
+      redAfter: 5,
+    });
+    expect(steps[1]).toMatchObject({
+      badgeLabel: 'ASSURANCE',
+      blueDelta: -1,
+      redDelta: 1,
+      blueAfter: 5,
+      redAfter: 6,
+    });
+  });
+
+  it('does not add an Assurance step when no team took insurance', () => {
+    const steps = buildSteps(
+      { blue: 3, red: 0 },
+      [],
+      null,
+      'assurance-vie',
+      scoreBefore,
+      { blue: false, red: false },
+    );
+
+    expect(steps).toHaveLength(1);
+    expect(steps[0].badgeLabel).toBe('SCORE NORMAL');
+  });
 });

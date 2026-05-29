@@ -56,6 +56,10 @@ export const gameScreenStyles = StyleSheet.create({
     paddingTop: 80,
     paddingBottom: 0,
   },
+  assuranceRuleSetupScrollContent: {
+    paddingHorizontal: 0,
+    paddingBottom: 0,
+  },
   ruleSetupScrollContentFocused: {
     justifyContent: 'flex-start',
     paddingTop: 24,

@@ -43,6 +43,7 @@ export function buildSteps(
   impairResult: { winner: Team; points: number; isOdd: boolean } | null,
   ruleId: string | undefined,
   scoreBefore: Record<Team, number>,
+  assurance?: Record<Team, boolean>,
 ): ScoreStep[] {
   const steps: ScoreStep[] = [];
   let blue = scoreBefore.blue;
@@ -50,6 +51,7 @@ export function buildSteps(
 
   const blueNormal = normalPoints.blue;
   const redNormal = normalPoints.red;
+  const normalWinner: Team | null = blueNormal > 0 ? 'blue' : redNormal > 0 ? 'red' : null;
 
   if (blueNormal > 0) {
     blue = Math.max(0, blue + blueNormal);
@@ -78,6 +80,24 @@ export function buildSteps(
     return steps;
   }
 
+  if (ruleId === 'assurance-vie' && normalWinner && assurance) {
+    const loser: Team = normalWinner === 'blue' ? 'red' : 'blue';
+    const blueDelta =
+      assurance.blue && normalWinner === 'blue' ? -1 :
+      assurance.blue && loser === 'blue' ? 1 :
+      0;
+    const redDelta =
+      assurance.red && normalWinner === 'red' ? -1 :
+      assurance.red && loser === 'red' ? 1 :
+      0;
+
+    if (blueDelta !== 0 || redDelta !== 0) {
+      blue = Math.max(0, blue + blueDelta);
+      red = Math.max(0, red + redDelta);
+      steps.push({ badgeLabel: 'ASSURANCE', blueDelta, redDelta, blueAfter: blue, redAfter: red });
+    }
+  }
+
   for (const bm of bonuses) {
     const blueDelta = bm.team === 'blue' ? bm.value : 0;
     const redDelta = bm.team === 'red' ? bm.value : 0;
@@ -89,7 +109,7 @@ export function buildSteps(
   return steps;
 }
 
-// Rows appear bottom-to-top, each row springs in then score increments
+// Rows appear top-to-bottom, each row springs in then score increments
 const SCORE_DELAY = 380;
 const STEP_DURATION = 1050;
 const INITIAL_DELAY = 300;
@@ -129,6 +149,7 @@ export function PostRoundView() {
             lastRound.impairResult,
             lastRound.rule?.id,
             scoreBefore,
+            lastRound.assurance,
           )
         : [],
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -167,8 +188,8 @@ export function PostRoundView() {
   useEffect(() => {
     if (visibleCount === 0) return;
 
-    // Rows appear bottom-to-top: last step first, first step last
-    const idx = steps.length - visibleCount;
+    // Rows appear top-to-bottom: first step first, last step last
+    const idx = visibleCount - 1;
     const step = steps[idx];
     if (!step) return;
 
@@ -181,7 +202,7 @@ export function PostRoundView() {
     const isLast = visibleCount === steps.length;
 
     // 2. Score increments after row settles
-    // On the last step (topmost / first logical step), set final score explicitly for correctness
+    // On the last step, set final score explicitly for correctness
     const scoreTimer = setTimeout(() => {
       if (isLast) {
         setDisplayBlue(finalBlue);

@@ -25,7 +25,8 @@ export function RuleSetupView() {
   const round = currentRound!;
   const isCasino = round.rule?.id === 'casino';
   const isContrat = round.rule?.id === 'contrat';
-  const useConfirmLabel = isCasino || round.rule?.id === 'prediction' || isContrat;
+  const isAssuranceVie = round.rule?.id === 'assurance-vie';
+  const useConfirmLabel = isCasino || round.rule?.id === 'prediction' || isContrat || isAssuranceVie;
   const setupComplete = isPreMeneSetupComplete(round);
   const confirmLabel = useConfirmLabel
     ? 'Confirmer'
@@ -59,6 +60,7 @@ export function RuleSetupView() {
         contentContainerStyle={[
           gameScreenStyles.ruleSetupScrollContent,
           isContrat && gameScreenStyles.contratRuleSetupScrollContent,
+          isAssuranceVie && gameScreenStyles.assuranceRuleSetupScrollContent,
           shouldFocusSetupControls && gameScreenStyles.ruleSetupScrollContentFocused,
         ]}
         showsVerticalScrollIndicator={false}

@@ -206,6 +206,43 @@ describe('GameScreen fantasy inter-mene', () => {
     expect(useGameStore.getState().scores).toEqual({ blue: 3, red: 2 });
   });
 
+  it('runs Assurance vie through the dedicated setup toggles', () => {
+    useGameStore.getState().startGame({ mode: 'fantasy', vetosEnabled: true });
+    useGameStore.getState().forceRule(ALL_RULES.find((rule) => rule.id === 'assurance-vie')!);
+    render(<GameScreen />);
+
+    fireEvent.press(screen.getByTestId('begin-round-button'));
+
+    expect(useGameStore.getState().phase).toBe('rule-setup');
+    expect(screen.getByTestId('confirm-rule-setup-button').props.accessibilityState.disabled).toBe(false);
+    expect(screen.getByText('CONFIRMER')).toBeTruthy();
+    expect(StyleSheet.flatten(screen.getByTestId('assurance-setup-row').props.style).marginBottom).toBe(4);
+    expect(screen.getAllByText('Assurance')).toHaveLength(2);
+    expect(
+      StyleSheet.flatten(screen.getByTestId('assurance-blue-button').props.style).backgroundColor,
+    ).toBe(gameUiColors.divider);
+
+    fireEvent.press(screen.getByTestId('assurance-blue-button'));
+    fireEvent.press(screen.getByTestId('assurance-red-button'));
+
+    expect(useGameStore.getState().currentRound?.assurance).toEqual({ blue: true, red: true });
+    expect(screen.getByText('Bleu assuré')).toBeTruthy();
+    expect(screen.getByText('Rouge assuré')).toBeTruthy();
+    expect(
+      StyleSheet.flatten(screen.getByTestId('assurance-blue-button').props.style).backgroundColor,
+    ).toBe(gameUiColors.blueSurface);
+    expect(
+      StyleSheet.flatten(screen.getByTestId('assurance-red-button').props.style).backgroundColor,
+    ).toBe(gameUiColors.redSurface);
+
+    fireEvent.press(screen.getByTestId('confirm-rule-setup-button'));
+
+    expect(useGameStore.getState().phase).toBe('playing');
+    expect(StyleSheet.flatten(screen.getByTestId('assurance-status-row').props.style).marginTop).toBeUndefined();
+    expect(screen.getByTestId('assurance-blue-status')).toBeTruthy();
+    expect(screen.getByTestId('assurance-red-status')).toBeTruthy();
+  });
+
   it('runs Casino through bet setup before choosing the winner in game', () => {
     useGameStore.getState().startGame({ mode: 'fantasy', vetosEnabled: true });
     useGameStore.setState({ scores: { blue: 4, red: 2 } });
