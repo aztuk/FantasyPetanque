@@ -6,6 +6,7 @@ import { createEmptyRankingRecords, fetchRankingData } from '../features/ranking
 import { colors, figmaTextStyles, typography } from '../shared/constants';
 
 const mockGoBack = jest.fn();
+const mockRouteParams: { sport?: 'petanque' | 'flechettes' } = {};
 
 jest.mock('@react-navigation/native', () => {
   const React = require('react');
@@ -13,6 +14,9 @@ jest.mock('@react-navigation/native', () => {
     useNavigation: () => ({
       goBack: mockGoBack,
       navigate: jest.fn(),
+    }),
+    useRoute: () => ({
+      params: mockRouteParams,
     }),
     useFocusEffect: (cb: () => (() => void) | void) => {
       React.useEffect(() => cb(), []);
@@ -54,6 +58,7 @@ const players = [
 
 beforeEach(() => {
   mockGoBack.mockClear();
+  delete mockRouteParams.sport;
   const records = createEmptyRankingRecords();
   records.petanque.clement = { wins: 13, losses: 8 };
   records.petanque.quentin = { wins: 11, losses: 8 };
@@ -105,6 +110,16 @@ describe('RankingScreen', () => {
     ).toBe(figmaTextStyles.bodyXs.fontSize);
     expect(within(screen.getByTestId('ranking-player-clement')).getByText('8D')).toBeTruthy();
     expect(screen.getByTestId('ranking-add-match-button')).toBeTruthy();
+  });
+
+  it('opens directly on the requested sport ranking when provided by navigation params', async () => {
+    mockRouteParams.sport = 'petanque';
+
+    render(<RankingScreen />);
+
+    expect(await screen.findByTestId('ranking-player-list')).toBeTruthy();
+    expect(screen.queryByTestId('ranking-flechettes-choice')).toBeNull();
+    expect(screen.getByTestId('ranking-rank-clement').props.accessibilityLabel).toBe('01');
   });
 
   it('renders flechettes players sorted by descending ELO', async () => {

@@ -22,3 +22,4 @@
 - Contrat garde les cinq missions de `fantasy-petanque.md` comme source gameplay, y compris "Finir avec exactement 2 points" pour la mission 3. Les labels courts ajoutés pour l'écran en partie sont uniquement des résumés UI.
 - Le module Ranking utilise Supabase avec les variables Expo publiques `EXPO_PUBLIC_SUPABASE_URL` et `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Le schéma initial est versionné dans `app/supabase/schema.sql`; les policies RLS autorisent temporairement lecture, insertion et mise à jour publiques pour prototyper le classement sans authentification.
 - L'accès au module Ranking depuis la Home utilise le CTA `CLASSEMENTS` au-dessus de `JOUER`, conformément à la frame Figma Home `node-id=1-2`.
+- Depuis l'écran de fin de partie, le flow `PARTIE CLASSÉE ?` ouvre l'ajout de match Pétanque avec `source: 'gameResult'`. Après sauvegarde, le retour va au résultat de partie et le CTA devient `VOIR LE CLASSEMENT`, qui ouvre directement le classement Pétanque.

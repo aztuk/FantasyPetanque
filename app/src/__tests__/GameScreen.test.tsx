@@ -31,6 +31,7 @@ beforeEach(() => {
     winningScore: 13,
     maxRounds: null,
     vetosEnabled: true,
+    rankingMatchSaved: false,
     phase: 'setup',
     debugMode: false,
   });
@@ -456,6 +457,39 @@ describe('GameScreen simple mode - skip inter-mene', () => {
     expect(screen.getByTestId('cancel-game-button')).toBeTruthy();
     expect(screen.getByText('BLEU GAGNE')).toBeTruthy();
     expect(screen.getByText('NOUVELLE PARTIE')).toBeTruthy();
+  });
+
+  it('opens the Petanque match recording flow from the game-over screen', () => {
+    useGameStore.getState().startGame({ mode: 'simple', winningScore: 1 });
+
+    render(<GameScreen />);
+
+    fireEvent(screen.getByTestId('score-block-blue'), 'pressIn');
+    fireEvent.press(screen.getByTestId('end-round-button'));
+    fireEvent.press(screen.getByTestId('save-game-button'));
+
+    expect(screen.getByText('PARTIE CLASSÉE ?')).toBeTruthy();
+    expect(mockNavigate).toHaveBeenCalledWith('AddMatch', { sport: 'petanque', source: 'gameResult' });
+  });
+
+  it('shows the ranking shortcut after the game has been recorded', () => {
+    useGameStore.getState().startGame({ mode: 'simple', winningScore: 1 });
+
+    render(<GameScreen />);
+
+    fireEvent(screen.getByTestId('score-block-blue'), 'pressIn');
+    fireEvent.press(screen.getByTestId('end-round-button'));
+
+    act(() => {
+      useGameStore.getState().markRankingMatchSaved();
+    });
+
+    expect(screen.queryByTestId('save-game-button')).toBeNull();
+    expect(screen.getByText('VOIR LE CLASSEMENT')).toBeTruthy();
+
+    fireEvent.press(screen.getByTestId('view-ranking-button'));
+
+    expect(mockNavigate).toHaveBeenCalledWith('Ranking', { sport: 'petanque' });
   });
 });
 

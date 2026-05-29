@@ -5,6 +5,6 @@ export type RootStackParamList = {
   Setup: undefined;
   Game: undefined;
   DebugRuleSelect: undefined;
-  Ranking: undefined;
-  AddMatch: { sport: RankingSport };
+  Ranking: { sport?: RankingSport } | undefined;
+  AddMatch: { sport: RankingSport; source?: 'gameResult' };
 };

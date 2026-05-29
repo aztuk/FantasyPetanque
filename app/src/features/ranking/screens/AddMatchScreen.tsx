@@ -29,6 +29,7 @@ import {
 } from 'phosphor-react-native';
 import type { Player, RankingSport } from '../../../domain/ranking/models';
 import { RootStackParamList } from '../../../app/navigation/types';
+import { useGameStore } from '../../game/state/gameStore';
 import { FullWidthCtaButton } from '../../../shared/components/FullWidthCtaButton';
 import {
   colors,
@@ -63,8 +64,10 @@ type Route = RouteProp<RootStackParamList, 'AddMatch'>;
 export function AddMatchScreen() {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
-  const { sport } = route.params;
+  const { sport, source } = route.params;
+  const markRankingMatchSaved = useGameStore((state) => state.markRankingMatchSaved);
   const insets = useSafeAreaInsets();
+  const isGameResultFlow = source === 'gameResult';
 
   const [step, setStep] = useState<Step>('players');
   const [allPlayers, setAllPlayers] = useState<Player[]>([]);
@@ -174,6 +177,9 @@ export function AddMatchScreen() {
           })),
         );
       }
+      if (isGameResultFlow) {
+        markRankingMatchSaved();
+      }
       setStep('result');
     } finally {
       setSubmitting(false);
@@ -218,6 +224,7 @@ export function AddMatchScreen() {
         rankedOrder={sport === 'flechettes' ? rankedOrder.map((p) => p.id) : undefined}
         onCancel={() => setStep('order')}
         onDone={() => navigation.goBack()}
+        doneLabel={isGameResultFlow ? 'RETOUR AU RÉSULTAT' : 'RETOUR AU CLASSEMENT'}
       />
     );
   }
@@ -657,9 +664,19 @@ interface ResultViewProps {
   rankedOrder?: string[];
   onCancel: () => void;
   onDone: () => void;
+  doneLabel: string;
 }
 
-function ResultView({ sport, players, eloDeltas, statuses, rankedOrder, onCancel, onDone }: ResultViewProps) {
+function ResultView({
+  sport,
+  players,
+  eloDeltas,
+  statuses,
+  rankedOrder,
+  onCancel,
+  onDone,
+  doneLabel,
+}: ResultViewProps) {
   let ordered: Player[];
   if (sport === 'flechettes' && rankedOrder) {
     const byId = Object.fromEntries(players.map((p) => [p.id, p]));
@@ -696,7 +713,7 @@ function ResultView({ sport, players, eloDeltas, statuses, rankedOrder, onCancel
           testID="result-cancel-button"
         />
         <FullWidthCtaButton
-          label="RETOUR AU CLASSEMENT"
+          label={doneLabel}
           onPress={onDone}
           testID="result-back-button"
         />

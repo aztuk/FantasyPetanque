@@ -7,7 +7,7 @@ interface Props {
   label: string;
   onPress: () => void;
   disabled?: boolean;
-  variant?: 'primary' | 'muted' | 'blue' | 'red';
+  variant?: 'primary' | 'default' | 'muted' | 'blue' | 'red';
   style?: ViewStyle;
   testID?: string;
 }
@@ -24,9 +24,9 @@ export function GameActionButton({
     disabled ? colors.disabled :
     variant === 'blue' ? gameUiColors.blueSurface :
     variant === 'red' ? gameUiColors.redSurface :
-    variant === 'muted' ? gameUiColors.divider :
+    variant === 'default' || variant === 'muted' ? gameUiColors.divider :
     gameUiColors.primary;
-  const color = variant === 'blue' || variant === 'red' || variant === 'muted'
+  const color = variant === 'blue' || variant === 'red' || variant === 'default' || variant === 'muted'
     ? gameUiColors.white
     : gameUiColors.background;
 

@@ -35,6 +35,7 @@ function makeInitialState(): GameState {
     winningScore: WINNING_SCORE,
     maxRounds: null,
     vetosEnabled: true,
+    rankingMatchSaved: false,
     phase: 'setup',
   };
 }
@@ -47,6 +48,7 @@ interface GameStore extends GameState {
   // Setup actions
   startGame: (options: GameStartOptions) => void;
   resetGame: () => void;
+  markRankingMatchSaved: () => void;
 
   // Round lifecycle
   startNewRound: () => void;
@@ -152,6 +154,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   resetGame: () => {
     set(makeInitialState());
+  },
+
+  markRankingMatchSaved: () => {
+    set({ rankingMatchSaved: true });
   },
 
   startNewRound: () => {

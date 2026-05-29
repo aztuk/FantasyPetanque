@@ -107,6 +107,7 @@ export interface GameState {
   winningScore: number;
   maxRounds: number | null;      // null = score-based win condition
   vetosEnabled: boolean;
+  rankingMatchSaved: boolean;
   phase: GamePhase;
 }
 

@@ -10,7 +10,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ArrowLeftIcon, PlusIcon, TrophyIcon } from 'phosphor-react-native';
 import type { Player, RankingSport } from '../../../domain/ranking/models';
@@ -33,6 +33,7 @@ import {
 } from '../services/rankingPlayers';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'Ranking'>;
+type Route = RouteProp<RootStackParamList, 'Ranking'>;
 
 const SPORT_LABELS: Record<RankingSport, string> = {
   petanque: 'Pétanque',
@@ -53,11 +54,18 @@ const ITEM_HEIGHTS = {
 
 export function RankingScreen() {
   const navigation = useNavigation<Nav>();
-  const [selectedSport, setSelectedSport] = useState<RankingSport | null>(null);
+  const route = useRoute<Route>();
+  const [selectedSport, setSelectedSport] = useState<RankingSport | null>(route.params?.sport ?? null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [records, setRecords] = useState<RankingRecords>(() => createEmptyRankingRecords());
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (route.params?.sport) {
+      setSelectedSport(route.params.sport);
+    }
+  }, [route.params?.sport]);
 
   const loadData = useCallback(() => {
     let mounted = true;

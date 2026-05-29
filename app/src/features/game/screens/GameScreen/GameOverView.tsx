@@ -28,7 +28,7 @@ function getWinningTeam(scores: Record<Team, number>): Team | null {
 
 export function GameOverView() {
   const navigation = useNavigation<Nav>();
-  const { scores, rounds, resetGame } = useGameStore();
+  const { scores, rounds, resetGame, rankingMatchSaved } = useGameStore();
   const winner = getWinningTeam(scores);
 
   const handleCancelGame = () => {
@@ -39,6 +39,14 @@ export function GameOverView() {
   const handleStartNewGame = () => {
     resetGame();
     navigation.navigate('Home');
+  };
+
+  const handleSaveGame = () => {
+    navigation.navigate('AddMatch', { sport: 'petanque', source: 'gameResult' });
+  };
+
+  const handleOpenRanking = () => {
+    navigation.navigate('Ranking', { sport: 'petanque' });
   };
 
   return (
@@ -57,7 +65,24 @@ export function GameOverView() {
         />
         <GameHistoryList rounds={rounds} style={gameScreenStyles.endHistory} />
       </View>
-      <GameActionButton label="Nouvelle partie" onPress={handleStartNewGame} testID="new-game-button" />
+      <View style={gameScreenStyles.bottomActions}>
+        {rankingMatchSaved ? (
+          <GameActionButton
+            label="Voir le classement"
+            onPress={handleOpenRanking}
+            variant="default"
+            testID="view-ranking-button"
+          />
+        ) : (
+          <GameActionButton
+            label="Partie classée ?"
+            onPress={handleSaveGame}
+            variant="default"
+            testID="save-game-button"
+          />
+        )}
+        <GameActionButton label="Nouvelle partie" onPress={handleStartNewGame} testID="new-game-button" />
+      </View>
     </SafeAreaView>
   );
 }

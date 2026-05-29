@@ -10,27 +10,28 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 
 <!-- tâches critiques pour le fonctionnement de base -->
 
-*(aucune tâche en cours ou à faire)*
-
-## Priorité moyenne
-
-<!-- fonctionnalités importantes mais non bloquantes -->
-
-- [fait] Design check — Composants partagés : comparer chacun des 14 composants listés dans `COMPOSANTS — Partagés` de `Design.md` avec son équivalent Figma. Vérifier récursivement : couleurs, typographie, tailles, paddings, gaps, rayons, états. Couvrir : ScoreBoard, Rule, HistoryItem, History, Button, ButtonIcon, Head, AlertBox, Logo, WheelPicker, SetupOption, IncrementalInput, Readonly, BonusButton. - Difficulté 2/5 - Codex
-- [fait] Design check — Écrans Setup : vérifier la conformité Figma des 4 étapes Setup — Mode Choice (`node-id=1-5`), End Condition (`node-id=4-116`), Target Value (`node-id=4-124`), Veto Toggle (`node-id=4-234`). Même protocole : couleurs, typo, layout, espaces. - Difficulté 2/5 - Codex
-- [fait] Design check — Écrans Game : vérifier la conformité Figma de tous les états de jeu — Classic ingame (`node-id=1-12`), Fantasy scoreState (`node-id=4-638`), Fantasy ruleState (`node-id=8-1013`), Inter-mène (`node-id=4-742`), Post-mène (`node-id=18-1857`), End Game (`node-id=7-783`). Inclut création de `GameScreenLayout` master template (drawer collapsible, back button fixe, scrollView unifié) et migration de PlayingView / PreMeneView / SimpleModeView. - Difficulté 4/5 - Claude
-- [fait] AlertBox confirmation Véto : avant d'appliquer un véto, afficher une AlertBox de confirmation ("Utiliser votre véto sur cette règle ?") avec les boutons Confirmer / Annuler. Le véto ne doit être consommé qu'après confirmation explicite. - Difficulté 1/5 - Claude
-- [fait] Ranking — Écran winner fléchettes et composants : mettre à jour `Design.md` avec l'écran de choix du gagnant en mode tri (fléchettes) depuis Figma (`node-id=69-159`) et ses composants spécifiques (`node-id=69-190`), puis implémenter l'écran et les composants dans le flow d'ajout de match Fléchettes. Mettre à jour le catalogue de composants et les tokens si nécessaire. - Difficulté 3/5 - Codex
 - [fait] Ranking — Setup Supabase + modèle de données : créer le projet Supabase, configurer le client dans l'app, définir les tables `players` (id, name, elo_petanque, elo_flechettes) et `matches` (id, sport, date, participants, result). Ajouter les variables d'environnement nécessaires. - Difficulté 2/5 - Codex
 - [fait] Ranking — Navigation : ajouter une section "Ranking" accessible depuis la Home (bouton ou tab). Créer le skeleton de navigation (RankingScreen, sous-pages) avec les deux sports Pétanque et Fléchettes. - Difficulté 2/5 - Codex
 - [fait] Ranking — Page classement : afficher la liste des joueurs triés par ELO décroissant pour chaque sport (onglets Pétanque / Fléchettes). Deux boutons en bas : "Ajouter un joueur" et "Ajouter un match". - Difficulté 2/5 - Claude
 - [fait] Ranking — Ajouter un joueur : formulaire simple (champ nom), création du joueur en base avec ELO initial par défaut (1000). Retour automatique à la page classement. - Difficulté 1/5 - Claude
 - [fait] Ranking — Ajouter un match Pétanque : sélection des joueurs participants, désignation des gagnants, calcul et mise à jour des ELO selon l'algorithme standard, sauvegarde en base. - Difficulté 3/5 - Claude
 - [fait] Ranking — Ajouter un match Fléchettes : sélection des joueurs participants, saisie de l'ordre d'arrivée, calcul et mise à jour des ELO, sauvegarde en base. - Difficulté 3/5 - Claude
-- [ ] Ranking — Bouton "Enregistrer la partie" (End Game) : ajouter un bouton Default "Enregistrer la partie" sur l'écran End Game (`node-id=7-783`), redirigant vers le flow d'ajout d'un match Pétanque dans le classement.
-- [fait] Ranking — Fléchettes drag/drop : animer le déplacement des items pendant le drag — créer un espace à la position survolée, les autres éléments s'écartent progressivement pour indiquer l'emplacement cible. - Difficulté 3/5 - Codex
+- [fait] Ranking — Bouton "Enregistrer la partie" (End Game) : ajouter un bouton Default "Enregistrer la partie" sur l'écran End Game (`node-id=7-783`), redirigant vers le flow d'ajout d'un match Pétanque dans le classement. - Difficulté 2/5 - Codex
+- [fait] Ranking — Fléchettes drag/drop : améliorer le feedback utilisateur — au début du drag, garder un slot fantôme à la position d'origine (les autres joueurs ne se décalent pas), déplacer ce ghost pendant le survol pour indiquer l'emplacement cible, animer les changements de position avec une transition smooth. - Difficulté 3/5 - Codex
 - [ ] Ranking — Masquer bouton "Suivant" quand le clavier est ouvert sur l'ajout de joueur (étape 1 du flow AddMatch).
-- [ ] Ranking — ELO fléchettes trop volatile : avec 5 joueurs, les deltas pairwise peuvent dépasser ±100 par match. Calibrer le K-factor pour les matchs à N joueurs (diviser par N-1 ou ajuster la constante).
+- [fait] Ranking — ELO fléchettes trop volatile : avec 5 joueurs, les deltas pairwise peuvent dépasser ±100 par match. Calibrer le K-factor pour les matchs à N joueurs (diviser par N-1 ou ajuster la constante). - Difficulté 1/5 - Claude
+- [ ] Ranking — Bug drag-and-drop fléchettes (flickering + joueurs cachés) : corriger deux bugs liés au tri des gagnants dans l'écran fléchettes — (1) flickering visuel au moment du drop, (2) quand on repose un joueur puis on le reprend et le remonte, chaque joueur survolé devient invisible.
+
+## Priorité moyenne
+
+<!-- fonctionnalités importantes mais non bloquantes -->
+
+- [ ] Logo et nom de l'appli : modifier le logo et le nom affiché dans l'application.
+- [fait] Ranking — Écran winner fléchettes et composants : mettre à jour `Design.md` avec l'écran de choix du gagnant en mode tri (fléchettes) depuis Figma (`node-id=69-159`) et ses composants spécifiques (`node-id=69-190`), puis implémenter l'écran et les composants dans le flow d'ajout de match Fléchettes. Mettre à jour le catalogue de composants et les tokens si nécessaire. - Difficulté 3/5 - Codex
+- [fait] Design check — Composants partagés : comparer chacun des 14 composants listés dans `COMPOSANTS — Partagés` de `Design.md` avec son équivalent Figma. Vérifier récursivement : couleurs, typographie, tailles, paddings, gaps, rayons, états. Couvrir : ScoreBoard, Rule, HistoryItem, History, Button, ButtonIcon, Head, AlertBox, Logo, WheelPicker, SetupOption, IncrementalInput, Readonly, BonusButton. - Difficulté 2/5 - Codex
+- [fait] Design check — Écrans Setup : vérifier la conformité Figma des 4 étapes Setup — Mode Choice (`node-id=1-5`), End Condition (`node-id=4-116`), Target Value (`node-id=4-124`), Veto Toggle (`node-id=4-234`). Même protocole : couleurs, typo, layout, espaces. - Difficulté 2/5 - Codex
+- [fait] Design check — Écrans Game : vérifier la conformité Figma de tous les états de jeu — Classic ingame (`node-id=1-12`), Fantasy scoreState (`node-id=4-638`), Fantasy ruleState (`node-id=8-1013`), Inter-mène (`node-id=4-742`), Post-mène (`node-id=18-1857`), End Game (`node-id=7-783`). Inclut création de `GameScreenLayout` master template (drawer collapsible, back button fixe, scrollView unifié) et migration de PlayingView / PreMeneView / SimpleModeView. - Difficulté 4/5 - Claude
+- [fait] AlertBox confirmation Véto : avant d'appliquer un véto, afficher une AlertBox de confirmation ("Utiliser votre véto sur cette règle ?") avec les boutons Confirmer / Annuler. Le véto ne doit être consommé qu'après confirmation explicite. - Difficulté 1/5 - Claude
 
 ## Priorité basse
 
