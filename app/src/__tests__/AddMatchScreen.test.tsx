@@ -2,19 +2,19 @@ import React from 'react';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react-native';
 import { StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import {
-  AddMatchScreen,
-  getWinnerSortOffset,
-  getWinnerSortVisualIndex,
-} from '../features/ranking/screens/AddMatchScreen';
+import { AddMatchScreen } from '../features/ranking/screens/AddMatchScreen';
 import {
   fetchPlayersOrderedByActivity,
+  saveMatch,
   saveMatchRanked,
 } from '../features/ranking/services/rankingPlayers';
+import { useGameStore } from '../features/game/state/gameStore';
 import { colors, figmaTextStyles } from '../shared/constants';
 
 const mockGoBack = jest.fn();
-const mockRouteParams = { sport: 'flechettes' };
+const mockRouteParams: { sport: 'flechettes' | 'petanque'; source?: 'gameResult' } = {
+  sport: 'flechettes',
+};
 
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
@@ -40,6 +40,7 @@ jest.mock('../features/ranking/services/rankingPlayers', () => {
 const mockFetchPlayersOrderedByActivity =
   fetchPlayersOrderedByActivity as jest.MockedFunction<typeof fetchPlayersOrderedByActivity>;
 const mockSaveMatchRanked = saveMatchRanked as jest.MockedFunction<typeof saveMatchRanked>;
+const mockSaveMatch = saveMatch as jest.MockedFunction<typeof saveMatch>;
 
 const players = [
   {
@@ -64,26 +65,15 @@ const players = [
 
 beforeEach(() => {
   mockGoBack.mockClear();
+  mockRouteParams.sport = 'flechettes';
+  delete mockRouteParams.source;
   mockFetchPlayersOrderedByActivity.mockResolvedValue(players);
   mockSaveMatchRanked.mockResolvedValue();
+  mockSaveMatch.mockResolvedValue();
+  useGameStore.setState({ rankingMatchSaved: false });
 });
 
 describe('AddMatchScreen', () => {
-  it('computes smooth drag target positions while fixed rank slots stay in place', () => {
-    expect(getWinnerSortVisualIndex(0, 0, 2)).toBe(0);
-    expect(getWinnerSortVisualIndex(1, 0, 2)).toBe(0);
-    expect(getWinnerSortVisualIndex(2, 0, 2)).toBe(1);
-    expect(getWinnerSortVisualIndex(3, 0, 2)).toBe(3);
-
-    expect(getWinnerSortOffset(1, 0, 2)).toBe(-64);
-    expect(getWinnerSortOffset(2, 0, 2)).toBe(-64);
-    expect(getWinnerSortOffset(0, 0, 2)).toBe(0);
-
-    expect(getWinnerSortVisualIndex(0, 3, 1)).toBe(0);
-    expect(getWinnerSortVisualIndex(1, 3, 1)).toBe(2);
-    expect(getWinnerSortVisualIndex(2, 3, 1)).toBe(3);
-    expect(getWinnerSortOffset(1, 3, 1)).toBe(64);
-  });
 
   it('renders the flechettes winner sort screen with Figma item states', async () => {
     render(
@@ -119,7 +109,6 @@ describe('AddMatchScreen', () => {
     expect(
       StyleSheet.flatten(within(between).getByText('2e').props.style).fontSize,
     ).toBe(figmaTextStyles.buttonActions.fontSize);
-    expect(typeof first.props.onStartShouldSetResponder).toBe('function');
     expect(screen.getByTestId('drag-handle-0').props.accessibilityLabel).toBe('Déplacer Lea');
 
     fireEvent.press(screen.getByTestId('add-match-next-button'));
@@ -135,5 +124,42 @@ describe('AddMatchScreen', () => {
         }),
       );
     });
+  });
+
+  it('returns to the game result after recording a Petanque match from game-over', async () => {
+    mockRouteParams.sport = 'petanque';
+    mockRouteParams.source = 'gameResult';
+
+    render(
+      <SafeAreaProvider
+        initialMetrics={{
+          frame: { x: 0, y: 0, width: 393, height: 852 },
+          insets: { top: 0, right: 0, bottom: 0, left: 0 },
+        }}
+      >
+        <AddMatchScreen />
+      </SafeAreaProvider>,
+    );
+
+    fireEvent.press(await screen.findByText('Lea'));
+    fireEvent.press(screen.getByText('Quentin'));
+    fireEvent.press(screen.getByTestId('add-match-next-button'));
+
+    fireEvent.press(screen.getByText('Lea'));
+    fireEvent.press(screen.getByText('Quentin'));
+    fireEvent.press(screen.getByText('Quentin'));
+    fireEvent.press(screen.getByTestId('add-match-next-button'));
+
+    await waitFor(() => {
+      expect(mockSaveMatch).toHaveBeenCalled();
+    });
+
+    expect(useGameStore.getState().rankingMatchSaved).toBe(true);
+    expect(screen.getByText('RETOUR AU RÉSULTAT')).toBeTruthy();
+    expect(screen.queryByText('RETOUR AU CLASSEMENT')).toBeNull();
+
+    fireEvent.press(screen.getByTestId('result-back-button'));
+
+    expect(mockGoBack).toHaveBeenCalled();
   });
 });

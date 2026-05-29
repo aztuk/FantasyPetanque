@@ -34,7 +34,7 @@
     "react-native-gesture-handler": "~2.28.0",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",
-    "react-native-svg": "15.12.1",
+    "react-native-svg": "^15.12.1",
     "react-native-url-polyfill": "^3.0.0",
     "zustand": "^5.0.13"
   },
@@ -53,6 +53,10 @@
     "preset": "jest-expo",
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|react-native-animated-numbers)"
-    ]
+    ],
+    "moduleNameMapper": {
+      "^react-native-draggable-flatlist$": "<rootDir>/src/__mocks__/react-native-draggable-flatlist.tsx",
+      "^react-native-reanimated$": "<rootDir>/src/__mocks__/react-native-reanimated.ts"
+    }
   }
 }

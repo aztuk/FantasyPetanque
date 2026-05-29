@@ -5,9 +5,9 @@ import {
   Easing,
   type GestureResponderHandlers,
   Keyboard,
-  KeyboardEvent,
+  KeyboardAvoidingView,
+  LayoutAnimation,
   PanResponder,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -17,7 +17,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   ArrowLeftIcon,
@@ -66,7 +65,6 @@ export function AddMatchScreen() {
   const route = useRoute<Route>();
   const { sport, source } = route.params;
   const markRankingMatchSaved = useGameStore((state) => state.markRankingMatchSaved);
-  const insets = useSafeAreaInsets();
   const isGameResultFlow = source === 'gameResult';
 
   const [step, setStep] = useState<Step>('players');
@@ -94,17 +92,12 @@ export function AddMatchScreen() {
     }
   }, [addingPlayer]);
 
-  const [keyboardPadding, setKeyboardPadding] = useState(0);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   useEffect(() => {
-    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
-    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
-    const show = Keyboard.addListener(showEvent, (e: KeyboardEvent) => {
-      const padding = Math.max(0, e.endCoordinates.height - insets.bottom);
-      setKeyboardPadding(padding);
-    });
-    const hide = Keyboard.addListener(hideEvent, () => setKeyboardPadding(0));
+    const show = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
+    const hide = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
     return () => { show.remove(); hide.remove(); };
-  }, [insets.bottom]);
+  }, []);
 
   const selectedPlayers = allPlayers.filter((p) => selectedIds.has(p.id));
 
@@ -152,21 +145,25 @@ export function AddMatchScreen() {
 
   const handleConfirmMatch = async () => {
     if (submitting) return;
-    setSubmitting(true);
-    try {
-      if (sport === 'flechettes') {
-        const deltas = computeEloRankedDeltas(rankedOrder, sport);
-        await saveMatchRanked(sport, rankedOrder, deltas);
-        setEloDeltas(deltas);
-        setResultPlayers(
-          rankedOrder.map((p) => ({
-            ...p,
-            eloFlechettes: getPlayerElo(p, sport) + (deltas[p.id] ?? 0),
-          })),
-        );
-      } else {
-        const winners = selectedPlayers.filter((p) => statuses[p.id] === 'winner');
-        const losers = selectedPlayers.filter((p) => statuses[p.id] === 'loser');
+
+    if (sport === 'petanque') {
+      const hasUndecided = selectedPlayers.some(
+        (p) => !statuses[p.id] || statuses[p.id] === 'neutral',
+      );
+      const finalStatuses = { ...statuses };
+      if (hasUndecided) {
+        selectedPlayers.forEach((p) => {
+          if (!finalStatuses[p.id] || finalStatuses[p.id] === 'neutral') {
+            finalStatuses[p.id] = 'loser';
+          }
+        });
+        setStatuses(finalStatuses);
+        await new Promise<void>((resolve) => setTimeout(resolve, 1000));
+      }
+      setSubmitting(true);
+      try {
+        const winners = selectedPlayers.filter((p) => finalStatuses[p.id] === 'winner');
+        const losers = selectedPlayers.filter((p) => finalStatuses[p.id] === 'loser');
         const deltas = computeEloDeltas(winners, losers, sport);
         await saveMatch(sport, winners, losers, deltas);
         setEloDeltas(deltas);
@@ -176,10 +173,26 @@ export function AddMatchScreen() {
             eloPetanque: getPlayerElo(p, sport) + (deltas[p.id] ?? 0),
           })),
         );
+        if (isGameResultFlow) markRankingMatchSaved();
+        setStep('result');
+      } finally {
+        setSubmitting(false);
       }
-      if (isGameResultFlow) {
-        markRankingMatchSaved();
-      }
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const deltas = computeEloRankedDeltas(rankedOrder, sport);
+      await saveMatchRanked(sport, rankedOrder, deltas);
+      setEloDeltas(deltas);
+      setResultPlayers(
+        rankedOrder.map((p) => ({
+          ...p,
+          eloFlechettes: getPlayerElo(p, sport) + (deltas[p.id] ?? 0),
+        })),
+      );
+      if (isGameResultFlow) markRankingMatchSaved();
       setStep('result');
     } finally {
       setSubmitting(false);
@@ -201,17 +214,13 @@ export function AddMatchScreen() {
   const neutralCount = selectedPlayers.filter(
     (p) => !statuses[p.id] || statuses[p.id] === 'neutral',
   ).length;
-  const canConfirmPetanque = winnersCount >= 1 && losersCount >= 1 && neutralCount === 0;
+  const canConfirmPetanque = winnersCount >= 1;
   const step2ButtonLabel =
     sport === 'flechettes'
       ? 'CONFIRMER'
-      : neutralCount > 0
-        ? `ENCORE ${neutralCount} STATUT${neutralCount > 1 ? 'S' : ''}`
-        : winnersCount === 0
-          ? 'ENCORE 1 GAGNANT'
-          : losersCount === 0
-            ? 'ENCORE 1 PERDANT'
-            : 'CONFIRMER';
+      : winnersCount === 0
+        ? 'ENCORE 1 GAGNANT'
+        : 'CONFIRMER';
   const canConfirmStep2 = sport === 'flechettes' ? true : canConfirmPetanque;
 
   if (step === 'result') {
@@ -238,7 +247,8 @@ export function AddMatchScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-        <View style={[styles.screen, { paddingBottom: keyboardPadding }]}>
+      <KeyboardAvoidingView style={styles.flex} behavior="padding">
+        <View style={styles.screen}>
           <View style={styles.header}>
             <BackButton onPress={handleBack} />
             <Text style={styles.headerTitle}>{stepTitle}</Text>
@@ -320,13 +330,16 @@ export function AddMatchScreen() {
             </View>
           )}
 
-          <FullWidthCtaButton
-            label={step === 'players' ? 'SUIVANT' : step2ButtonLabel}
-            onPress={step === 'players' ? handleGoToStep2 : handleConfirmMatch}
-            disabled={step === 'players' ? !canProceedStep1 : !canConfirmStep2 || submitting}
-            testID="add-match-next-button"
-          />
+          {!(step === 'players' && addingPlayer && keyboardVisible) && (
+            <FullWidthCtaButton
+              label={step === 'players' ? 'SUIVANT' : step2ButtonLabel}
+              onPress={step === 'players' ? handleGoToStep2 : handleConfirmMatch}
+              disabled={step === 'players' ? !canProceedStep1 : !canConfirmStep2 || submitting}
+              testID="add-match-next-button"
+            />
+          )}
         </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -338,68 +351,59 @@ interface DragOrderListProps {
   onReorder: (players: Player[]) => void;
 }
 
+const DRAG_LAYOUT_ANIM = {
+  duration: 180,
+  update: { type: LayoutAnimation.Types.easeInEaseOut },
+};
+
 function DragOrderList({ players, onReorder }: DragOrderListProps) {
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
-  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [draggingPlayerId, setDraggingPlayerId] = useState<string | null>(null);
   const dragY = useRef(new Animated.Value(0)).current;
-  const itemOffsets = useRef(new Map<string, Animated.Value>()).current;
   const dragOriginY = useRef(0);
   const draggingIndexRef = useRef<number | null>(null);
   const hoverIndexRef = useRef<number | null>(null);
-  const draggingPlayerIdRef = useRef<string | null>(null);
   const isDraggingRef = useRef(false);
   const currentOrder = useRef(players);
   currentOrder.current = players;
 
-  const getItemOffset = useCallback(
-    (playerId: string) => {
-      const existing = itemOffsets.get(playerId);
-      if (existing) {
-        return existing;
-      }
-
-      const value = new Animated.Value(0);
-      itemOffsets.set(playerId, value);
-      return value;
+  // Swap the dragged item to a new position using LayoutAnimation.
+  // The animation IS the commit — no offset/array sync problem, no flash.
+  const doSwap = useCallback(
+    (targetIndex: number) => {
+      const fromIdx = draggingIndexRef.current;
+      if (fromIdx === null || fromIdx === targetIndex) return;
+      const nextOrder = [...currentOrder.current];
+      const [moved] = nextOrder.splice(fromIdx, 1);
+      nextOrder.splice(targetIndex, 0, moved);
+      LayoutAnimation.configureNext(DRAG_LAYOUT_ANIM);
+      draggingIndexRef.current = targetIndex;
+      hoverIndexRef.current = targetIndex;
+      setDraggingIndex(targetIndex);
+      onReorder(nextOrder);
     },
-    [itemOffsets],
+    [onReorder],
   );
-
-  const resetDragState = useCallback(() => {
-    isDraggingRef.current = false;
-    draggingIndexRef.current = null;
-    hoverIndexRef.current = null;
-    draggingPlayerIdRef.current = null;
-    dragY.stopAnimation();
-    itemOffsets.forEach((offset) => {
-      offset.stopAnimation();
-      offset.setValue(0);
-    });
-    setDraggingIndex(null);
-    setHoverIndex(null);
-    setDraggingPlayerId(null);
-  }, [dragY, itemOffsets]);
 
   const finishDrag = useCallback(
     (shouldCommit: boolean) => {
       const fromIndex = draggingIndexRef.current;
       const toIndex = hoverIndexRef.current;
-      let nextOrder: Player[] | null = null;
-
+      isDraggingRef.current = false;
+      draggingIndexRef.current = null;
+      hoverIndexRef.current = null;
+      dragY.stopAnimation();
+      setDraggingIndex(null);
+      setDraggingPlayerId(null);
+      // Array already committed via doSwap — only need to reorder if no swap happened
       if (shouldCommit && fromIndex !== null && toIndex !== null && fromIndex !== toIndex) {
-        nextOrder = [...currentOrder.current];
+        const nextOrder = [...currentOrder.current];
         const [moved] = nextOrder.splice(fromIndex, 1);
         nextOrder.splice(toIndex, 0, moved);
-      }
-
-      resetDragState();
-
-      if (nextOrder) {
-        requestAnimationFrame(() => onReorder(nextOrder));
+        onReorder(nextOrder);
       }
     },
-    [onReorder, resetDragState],
+    [dragY, onReorder],
   );
 
   const makePanResponder = useCallback(
@@ -410,104 +414,36 @@ function DragOrderList({ players, onReorder }: DragOrderListProps) {
         onMoveShouldSetPanResponder: () => true,
         onPanResponderTerminationRequest: () => false,
         onPanResponderGrant: (evt) => {
-          const draggedPlayerId = currentOrder.current[index]?.id ?? null;
-          if (!draggedPlayerId) {
-            return;
-          }
-
+          const player = currentOrder.current[index];
+          if (!player) return;
           isDraggingRef.current = true;
           draggingIndexRef.current = index;
           hoverIndexRef.current = index;
-          draggingPlayerIdRef.current = draggedPlayerId;
           dragOriginY.current = evt.nativeEvent.pageY - index * WINNER_SORT_ITEM_HEIGHT;
           dragY.setValue(index * WINNER_SORT_ITEM_HEIGHT);
           setDraggingIndex(index);
-          setHoverIndex(index);
-          setDraggingPlayerId(draggedPlayerId);
+          setDraggingPlayerId(player.id);
         },
         onPanResponderMove: (evt) => {
-          if (!isDraggingRef.current) {
-            return;
-          }
-
+          if (!isDraggingRef.current) return;
           const rawY = evt.nativeEvent.pageY - dragOriginY.current;
-          const clamped = Math.max(
-            0,
-            Math.min(rawY, (currentOrder.current.length - 1) * WINNER_SORT_ITEM_HEIGHT),
-          );
+          const clamped = Math.max(0, Math.min(rawY, (currentOrder.current.length - 1) * WINNER_SORT_ITEM_HEIGHT));
           dragY.setValue(clamped);
-          const targetIndex = Math.round(clamped / WINNER_SORT_ITEM_HEIGHT);
-          const nextHoverIndex = Math.max(0, Math.min(targetIndex, currentOrder.current.length - 1));
-          if (hoverIndexRef.current !== nextHoverIndex) {
-            hoverIndexRef.current = nextHoverIndex;
-            setHoverIndex(nextHoverIndex);
+          const next = Math.max(0, Math.min(
+            Math.round(clamped / WINNER_SORT_ITEM_HEIGHT),
+            currentOrder.current.length - 1,
+          ));
+          if (next !== draggingIndexRef.current) {
+            doSwap(next);
           }
         },
         onPanResponderRelease: () => finishDrag(true),
         onPanResponderTerminate: () => finishDrag(false),
       }),
-    [dragY, finishDrag],
+    [dragY, doSwap, finishDrag],
   );
 
   const total = players.length;
-  const draggingPlayer = draggingPlayerId
-    ? players.find((player) => player.id === draggingPlayerId) ?? null
-    : null;
-
-  useEffect(() => {
-    const animations = players
-      .map((player, index) => {
-        if (index === draggingIndex) {
-          return null;
-        }
-
-        return Animated.timing(getItemOffset(player.id), {
-          toValue: getWinnerSortOffset(index, draggingIndex, hoverIndex),
-          duration: 180,
-          easing: Easing.out(Easing.cubic),
-          useNativeDriver: true,
-        });
-      })
-      .filter((animation): animation is Animated.CompositeAnimation => animation !== null);
-
-    const animation = Animated.parallel(animations);
-    animation.start();
-
-    return () => {
-      animation.stop();
-    };
-  }, [draggingIndex, getItemOffset, hoverIndex, players]);
-
-  const renderWinnerSortItem = (
-    player: Player,
-    index: number,
-    options?: {
-      dragging?: boolean;
-      hover?: boolean;
-      nameHidden?: boolean;
-      nameOffset?: Animated.Value;
-      panHandlers?: ReturnType<typeof makePanResponder>['panHandlers'];
-    },
-  ) => {
-    const isFirst = index === 0;
-    const isLast = index === total - 1;
-    const selected = isFirst ? 'first' : isLast ? 'last' : 'between';
-
-    return (
-      <WinnerSortItem
-        name={player.name}
-        selected={selected}
-        rank={index + 1}
-        dragging={options?.dragging}
-        hover={options?.hover}
-        nameHidden={options?.nameHidden}
-        nameOffset={options?.nameOffset}
-        panHandlers={options?.panHandlers}
-        testID={`rank-order-item-${index + 1}`}
-        dragTestID={`drag-handle-${index}`}
-      />
-    );
-  };
 
   return (
     <View style={styles.winnerSortList}>
@@ -515,37 +451,36 @@ function DragOrderList({ players, onReorder }: DragOrderListProps) {
         {players.map((player, index) => {
           const isDragging = draggingPlayerId === player.id;
           const panResponder = makePanResponder(index);
+          const isFirst = index === 0;
+          const isLast = index === total - 1;
+          const selected: 'first' | 'between' | 'last' = isFirst ? 'first' : isLast ? 'last' : 'between';
 
           return (
-            <Animated.View
+            <View
               key={player.id}
               style={[
                 styles.winnerSortRow,
-                {
-                  top: index * WINNER_SORT_ITEM_HEIGHT,
-                },
+                { top: index * WINNER_SORT_ITEM_HEIGHT, opacity: isDragging ? 0 : 1 },
               ]}
             >
-              {renderWinnerSortItem(player, index, {
-                nameHidden: isDragging,
-                nameOffset: getItemOffset(player.id),
-                panHandlers: panResponder.panHandlers,
-              })}
-            </Animated.View>
+              <WinnerSortItem
+                name={player.name}
+                selected={selected}
+                rank={index + 1}
+                panHandlers={panResponder.panHandlers}
+                testID={`rank-order-item-${index + 1}`}
+                dragTestID={`drag-handle-${index}`}
+              />
+            </View>
           );
         })}
-        {draggingPlayer && draggingIndex !== null && (
+        {draggingPlayerId !== null && draggingIndex !== null && (
           <Animated.View
-            style={[
-              styles.winnerSortDraggedName,
-              {
-                top: dragY,
-              },
-            ]}
+            style={[styles.winnerSortDraggedOverlay, { top: dragY }]}
             pointerEvents="none"
           >
-            <Text style={styles.winnerSortDraggedNameText} numberOfLines={1}>
-              {draggingPlayer.name}
+            <Text style={styles.winnerSortDraggedName} numberOfLines={1}>
+              {players.find((p) => p.id === draggingPlayerId)?.name ?? ''}
             </Text>
           </Animated.View>
         )}
@@ -559,18 +494,9 @@ export function getWinnerSortVisualIndex(
   draggingIndex: number | null,
   hoverIndex: number | null,
 ): number {
-  if (draggingIndex === null || hoverIndex === null || index === draggingIndex) {
-    return index;
-  }
-
-  if (draggingIndex < hoverIndex && index > draggingIndex && index <= hoverIndex) {
-    return index - 1;
-  }
-
-  if (draggingIndex > hoverIndex && index >= hoverIndex && index < draggingIndex) {
-    return index + 1;
-  }
-
+  if (draggingIndex === null || hoverIndex === null || index === draggingIndex) return index;
+  if (draggingIndex < hoverIndex && index > draggingIndex && index <= hoverIndex) return index - 1;
+  if (draggingIndex > hoverIndex && index >= hoverIndex && index < draggingIndex) return index + 1;
   return index;
 }
 
@@ -579,35 +505,19 @@ export function getWinnerSortOffset(
   draggingIndex: number | null,
   hoverIndex: number | null,
 ): number {
-  return (getWinnerSortVisualIndex(index, draggingIndex, hoverIndex) - index)
-    * WINNER_SORT_ITEM_HEIGHT;
+  return (getWinnerSortVisualIndex(index, draggingIndex, hoverIndex) - index) * WINNER_SORT_ITEM_HEIGHT;
 }
 
 interface WinnerSortItemProps {
   name: string;
   selected: 'first' | 'between' | 'last';
   rank: number;
-  dragging?: boolean;
-  hover?: boolean;
-  nameHidden?: boolean;
-  nameOffset?: Animated.Value;
   panHandlers?: GestureResponderHandlers;
   testID: string;
   dragTestID: string;
 }
 
-function WinnerSortItem({
-  name,
-  selected,
-  rank,
-  dragging = false,
-  hover = false,
-  nameHidden = false,
-  nameOffset,
-  panHandlers,
-  testID,
-  dragTestID,
-}: WinnerSortItemProps) {
+function WinnerSortItem({ name, selected, rank, panHandlers, testID, dragTestID }: WinnerSortItemProps) {
   const isFirst = selected === 'first';
   const isLast = selected === 'last';
   const isBetween = selected === 'between';
@@ -615,11 +525,7 @@ function WinnerSortItem({
   return (
     <View
       {...(panHandlers ?? {})}
-      style={[
-        styles.winnerSortItem,
-        hover && styles.winnerSortItemHover,
-        dragging && styles.winnerSortItemDragging,
-      ]}
+      style={styles.winnerSortItem}
       testID={testID}
     >
       <View
@@ -630,25 +536,13 @@ function WinnerSortItem({
       >
         <DotsSixVerticalIcon color={colors.textSmooth} size={24} weight="regular" />
       </View>
-
-      <Animated.View
-        style={[
-          styles.winnerSortNameLayer,
-          nameOffset && { transform: [{ translateY: nameOffset }] },
-          nameHidden && styles.winnerSortNameHidden,
-        ]}
-      >
-        <Text style={styles.winnerSortName} numberOfLines={1}>
-          {name}
-        </Text>
-      </Animated.View>
-
+      <View style={styles.winnerSortNameLayer}>
+        <Text style={styles.winnerSortName} numberOfLines={1}>{name}</Text>
+      </View>
       <View style={styles.winnerSortRank}>
         {isFirst && <TrophyIcon color={colors.primary} size={32} weight="regular" />}
         {isLast && <SmileySadIcon color={colors.team.red} size={32} weight="regular" />}
-        {isBetween && (
-          <Text style={styles.winnerSortRankLabel}>{formatOrdinalRank(rank)}</Text>
-        )}
+        {isBetween && <Text style={styles.winnerSortRankLabel}>{formatOrdinalRank(rank)}</Text>}
       </View>
     </View>
   );
@@ -942,28 +836,23 @@ const styles = StyleSheet.create({
     paddingVertical: spacing[4],
     backgroundColor: colors.dark,
   },
-  winnerSortItemHover: {
-    backgroundColor: colors.darkSmoother,
-  },
-  winnerSortItemDragging: {
+  winnerSortDraggedOverlay: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    height: WINNER_SORT_ITEM_HEIGHT,
+    zIndex: 100,
     backgroundColor: colors.darkSmoother,
     elevation: 8,
     shadowColor: colors.dark,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 8,
-  },
-  winnerSortDraggedName: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    height: WINNER_SORT_ITEM_HEIGHT,
     justifyContent: 'center',
     paddingLeft: spacing[10],
-    paddingRight: spacing[8],
-    zIndex: 10,
+    paddingRight: spacing[6],
   },
-  winnerSortDraggedNameText: {
+  winnerSortDraggedName: {
     ...figmaTextStyles.buttonActions,
     color: colors.white,
     includeFontPadding: false,
@@ -980,9 +869,6 @@ const styles = StyleSheet.create({
   winnerSortNameLayer: {
     flex: 1,
     minWidth: 0,
-  },
-  winnerSortNameHidden: {
-    opacity: 0,
   },
   winnerSortName: {
     ...figmaTextStyles.buttonActions,

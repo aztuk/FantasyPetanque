@@ -1,10 +1,15 @@
 import { useEffect } from 'react';
-import { AppState, Platform } from 'react-native';
+import { AppState, Platform, UIManager } from 'react-native';
+
+if (Platform.OS === 'android') {
+  UIManager.setLayoutAnimationEnabledExperimental?.(true);
+}
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import * as NavigationBar from 'expo-navigation-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { AppNavigator } from './src/app/navigation/AppNavigator';
 
 SplashScreen.preventAutoHideAsync();
@@ -14,6 +19,8 @@ export default function App() {
     GoogleSansFlex_400Regular: require('./node_modules/@expo-google-fonts/google-sans-flex/400Regular/GoogleSansFlex_400Regular.ttf'),
     GoogleSansFlex_600SemiBold: require('./node_modules/@expo-google-fonts/google-sans-flex/600SemiBold/GoogleSansFlex_600SemiBold.ttf'),
     GoogleSansFlex_700Bold: require('./node_modules/@expo-google-fonts/google-sans-flex/700Bold/GoogleSansFlex_700Bold.ttf'),
+    CascadiaMono_400Regular: require('./node_modules/@expo-google-fonts/cascadia-mono/400Regular/CascadiaMono_400Regular.ttf'),
+    CascadiaMono_700Bold: require('./node_modules/@expo-google-fonts/cascadia-mono/700Bold/CascadiaMono_700Bold.ttf'),
     RoadRage_400Regular: require('./node_modules/@expo-google-fonts/road-rage/400Regular/RoadRage_400Regular.ttf'),
   });
 
@@ -38,9 +45,11 @@ export default function App() {
   }
 
   return (
-    <SafeAreaProvider>
-      <StatusBar style="light" />
-      <AppNavigator />
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <StatusBar style="light" />
+        <AppNavigator />
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
