@@ -3,9 +3,11 @@
 const palette = {
   primary:        '#E7C241',
   secondary:      '#41E79A',
+  copper:         '#D87951',
+  silver:         '#C6D0D7',
   dark:           '#28261F',
   darkSmooth:     '#3B382E',
-  darkSmoother:   'rgba(59, 56, 46, 0.20)',
+  darkSmoother:   '#3B382E33',
   disabled:       '#453F2D',
   textSmooth:     '#949084',
   white:          '#ECEBE8',
@@ -22,6 +24,8 @@ const palette = {
 export const colors = {
   primary:      palette.primary,
   secondary:    palette.secondary,
+  copper:       palette.copper,
+  silver:       palette.silver,
   dark:         palette.dark,
   darkSmooth:   palette.darkSmooth,
   darkSmoother: palette.darkSmoother,
@@ -85,10 +89,10 @@ export const figmaTextStyles = {
   },
   buttonCTA: {
     fontFamily: typography.family.bodySemibold,
-    fontSize: 28,
-    lineHeight: 47.6,
+    fontSize: 24,
+    lineHeight: 40.8,
     fontWeight: typography.weight.semibold,
-    letterSpacing: -0.84,
+    letterSpacing: -0.72,
     textTransform: 'uppercase' as const,
   },
   buttonActions: {
@@ -118,6 +122,14 @@ export const figmaTextStyles = {
     lineHeight: 18,
     fontWeight: typography.weight.bold,
     letterSpacing: -0.72,
+    textTransform: 'uppercase' as const,
+  },
+  bodyXs: {
+    fontFamily: typography.family.bodyBold,
+    fontSize: 15,
+    lineHeight: 15,
+    fontWeight: typography.weight.bold,
+    letterSpacing: -0.6,
     textTransform: 'uppercase' as const,
   },
   numberLg100: {

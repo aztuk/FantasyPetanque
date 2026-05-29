@@ -13,15 +13,17 @@ Figma principal : <!-- URL fichier Figma principal -->
 
 > Référence Figma : [node-id=26:1950](https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=26-1950)
 >
-> **15 tokens (13 Figma + 2 team darks hors frame).** Aucun token couleur non listé ici ne doit être utilisé dans le code. Aucun token couleur non listé ici ne doit être utilisé dans le code.
+> **15 tokens Figma + 3 tokens produit.** Aucun token couleur non listé ici ne doit être utilisé dans le code.
 
 | Nom Figma        | Variable CSS         | Valeur                   | Rôle                              |
 |------------------|----------------------|--------------------------|-----------------------------------|
 | Primary          | `--primary`          | `#E7C241`                | Jaune brand — accent principal    |
 | Secondary        | `--secondary`        | `#41E79A`                | Vert brand — highlight secondaire |
+| Copper           | `--copper`           | `#D87951`                | Accent podium — rang 3            |
+| Silver           | `--silver`           | `#C6D0D7`                | Accent podium — rang 2            |
 | Dark             | `--dark`             | `#28261F`                | Fond le plus sombre               |
 | DarkSmooth       | `--darksmooth`       | `#3B382E`                | Surface sombre                    |
-| DarkSmoother     | `--darksmoother`     | `rgba(59, 56, 46, 0.20)` | Overlay sombre semi-transparent   |
+| DarkSmoother     | `--darksmoother`     | `#3B382E33`              | Overlay sombre semi-transparent   |
 | Disabled         | `--disabled`         | `#453F2D`                | État désactivé (couleur de fond)  |
 | TextSmooth       | `--textsmooth`       | `#949084`                | Texte secondaire / annotations    |
 | White            | `--white`            | `#ECEBE8`                | Texte principal / blanc cassé     |
@@ -40,18 +42,19 @@ Figma principal : <!-- URL fichier Figma principal -->
 
 > Référence Figma : [node-id=26:1951](https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=26-1951&t=qil4nd06wX0YCs6f-11)
 
-> **10 styles bruts uniquement.** `Design.md` est la source de vérité : le code doit reprendre ces noms et ces valeurs.
+> **10 styles Figma + 1 style produit.** `Design.md` est la source de vérité : le code doit reprendre ces noms et ces valeurs.
 >
 > Conversion React Native : `lineHeight` et `letterSpacing` sont documentés en pixels, calculés depuis les pourcentages Figma.
 
 | Nom Figma | Famille | Style | Taille | Poids | Line height Figma | Line height RN | Letter spacing Figma | Letter spacing RN | Casse |
 |---|---|---|---:|---:|---:|---:|---:|---:|---|
 | PageTitles | Google Sans Flex | Bold | 28 | 700 | 170% | 47.6 | -4% | -1.12 | Original |
-| ButtonCTA | Google Sans Flex | SemiBold | 28 | 600 | 170% | 47.6 | -3% | -0.84 | UPPER |
+| ButtonCTA | Google Sans Flex | SemiBold | 24 | 600 | 170% | 40.8 | -3% | -0.72 | UPPER |
 | ButtonActions | Google Sans Flex | SemiBold | 21 | 600 | 150% | 31.5 | -4% | -0.84 | Original |
 | BodyMd | Google Sans Flex | Regular | 21 | 400 | 170% | 35.7 | -4% | -0.84 | Original |
 | BodySm | Google Sans Flex | Regular | 18 | 400 | 170% | 30.6 | -4% | -0.72 | Original |
 | Labels | Google Sans Flex | Bold | 18 | 700 | 100% | 18 | -4% | -0.72 | UPPER |
+| BodyXs | Google Sans Flex | Bold | 15 | 700 | 100% | 15 | -4% | -0.60 | UPPER |
 | NumberLg-100 | Cascadia Mono | Regular | 60 | 400 | 170% | 102 | -4% | -2.4 | Original |
 | NumberMd-80 | Cascadia Mono | Regular | 48 | 400 | 170% | 81.6 | -4% | -1.92 | Original |
 | NumberSm-60 | Cascadia Mono | Regular | 40 | 400 | 170% | 68 | -4% | -1.6 | Original |
@@ -67,6 +70,7 @@ Figma principal : <!-- URL fichier Figma principal -->
 | BodyMd | `figmaTextStyles.bodyMd` |
 | BodySm | `figmaTextStyles.bodySm` |
 | Labels | `figmaTextStyles.labels` |
+| BodyXs | `figmaTextStyles.bodyXs` |
 | NumberLg-100 | `figmaTextStyles.numberLg100` |
 | NumberMd-80 | `figmaTextStyles.numberMd80` |
 | NumberSm-60 | `figmaTextStyles.numberSm60` |

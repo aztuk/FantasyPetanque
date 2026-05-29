@@ -53,7 +53,7 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 - [fait] Ranking — Stats fléchettes : remplacer le nombre de victoires/défaites par un taux de victoire affiché sous la forme "31% winrate" (victoires ÷ matchs joués, arrondi à l'entier). - Difficulté 1/5 - Claude
 - [fait] Ranking — Taille des icônes trophée top 3 : ajuster la taille des icônes trophée pour les 3 premiers du classement (informer l'utilisateur de la taille actuelle, puis demander la nouvelle taille souhaitée avant d'implémenter). - Difficulté 1/5 - Codex
 - [ ] UI polish — supprimer les bordures des scores de mène dans l'écran de jeu en cours.
-- [ ] Polish UI — tailles de textes : réduire la taille du score de mène dans l'interface partie en cours ; réduire globalement les tailles de textes d'un cran.
+- [fait] Design system — Synchronisation Figma des tokens couleurs et styles de texte : inventorier les écarts entre Figma, `Design.md`, `theme.ts` et les usages UI (couleurs, `figmaTextStyles`, anciens `textStyles.*` / `typography.*`), produire un rapport d'écarts, puis demander un arbitrage humain avant toute correction. - Difficulté 2/5 - Codex
 - [ ] Design system / bouton disabled : ajouter le token de couleur disabled et appliquer le style du bouton disabled depuis la maquette Figma `node-id=4-276`.
 - [ ] Home — tagline : réduire la police de la tagline à 21 px.
 - [ ] Inter-mène UI — règle alignée en haut : dans l'écran inter-mène (affichage règle + vétos), aligner le contenu de la règle en haut de l'écran plutôt qu'en bas.
