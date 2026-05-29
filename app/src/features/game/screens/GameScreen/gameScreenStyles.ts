@@ -30,7 +30,7 @@ export const gameScreenStyles = StyleSheet.create({
     flex: 1,
     width: '100%',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
   },
   floatingHead: {
     position: 'absolute',
