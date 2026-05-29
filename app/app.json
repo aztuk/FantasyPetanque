@@ -4,6 +4,7 @@
     "slug": "fantasy-petanque",
     "version": "1.0.0",
     "orientation": "portrait",
+    "backgroundColor": "#28261F",
     "icon": "./assets/app-icon.png",
     "userInterfaceStyle": "light",
     "splash": {
@@ -45,6 +46,17 @@
           "backgroundColor": "#28261F"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "expo-navigation-bar": {
+        "position": "absolute",
+        "visibility": "hidden",
+        "behavior": "overlay-swipe"
+      },
+      "eas": {
+        "projectId": "a3bd6fe4-7f23-4ebb-ae6f-dfd726547e9b"
+      }
+    },
+    "owner": "aztuk"
   }
 }

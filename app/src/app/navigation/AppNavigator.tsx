@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { DarkTheme, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { HomeScreen } from '../../features/game/screens/HomeScreen';
 import { SetupScreen } from '../../features/game/screens/SetupScreen';
@@ -8,13 +8,24 @@ import { DebugRuleSelectScreen } from '../../features/game/screens/DebugRuleSele
 import { RankingScreen } from '../../features/ranking/screens/RankingScreen';
 import { AddMatchScreen } from '../../features/ranking/screens/AddMatchScreen';
 import { RootStackParamList } from './types';
-import { BACKGROUND, TEXT_PRIMARY, figmaTextStyles } from '../../shared/constants';
+import { BACKGROUND, TEXT_PRIMARY, colors, figmaTextStyles } from '../../shared/constants';
+
+const NAV_THEME = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    background: BACKGROUND,
+    card: BACKGROUND,
+    text: TEXT_PRIMARY,
+    border: colors.darkSmooth,
+  },
+};
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function AppNavigator() {
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={NAV_THEME}>
       <Stack.Navigator
         screenOptions={{
           headerStyle: { backgroundColor: BACKGROUND },

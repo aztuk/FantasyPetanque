@@ -12,6 +12,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { AppNavigator } from './src/app/navigation/AppNavigator';
 
+const ROOT_BG = '#28261F';
+
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
@@ -45,7 +47,7 @@ export default function App() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: ROOT_BG }}>
       <SafeAreaProvider>
         <StatusBar style="light" />
         <AppNavigator />
