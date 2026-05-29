@@ -4,7 +4,7 @@ export const ALL_RULES: Rule[] = [
   {
     id: 'gauche-caviar',
     name: 'Gauche caviar',
-    description: 'Chaque joueur doit lancer avec sa mauvaise main. Un tir réussi vaut +1 point bonus.',
+    description: 'Chaque joueur doit lancer avec <b>sa mauvaise main</b>. Un tir réussi vaut <b>+1 point bonus.</b>',
     shortDescription: 'Mauvaise main obligatoire. Tir réussi = +1.',
     note: 'Maximum 1 bonus par équipe.',
     tags: ['fast', 'totem-compatible', 'bonus', 'specific-ui'],
@@ -66,8 +66,9 @@ export const ALL_RULES: Rule[] = [
   {
     id: 'sortie-de-porc',
     name: 'Sortie de porc',
-    description: 'Si un joueur fait sortir le cochonnet, son équipe gagne immédiatement 6 points et la mène se termine.',
+    description: 'Si un joueur fait <b>sortir le cochonnet</b>, son équipe gagne immédiatement <b>6 points</b> et la mène se termine.',
     shortDescription: 'Cochonnet sorti = 6 points directs.',
+    note: 'Pas de score normal sur cette mène',
     tags: ['fast', 'totem-compatible', 'instant-resolution', 'skip-normal-score', 'specific-ui'],
     uiType: 'cochonnet-sorti',
     skipNormalScore: false, // only skipped if cochonnet was actually exited
@@ -91,10 +92,11 @@ export const ALL_RULES: Rule[] = [
   {
     id: 'impair-contre-attaque',
     name: "L'impair contre-attaque",
-    description: "L'équipe gagnante doit gagner avec un nombre impair de points normaux. Sinon, l'équipe gagnante marque 0 et l'adversaire gagne 1 point de consolation. L'app calcule automatiquement.",
+    description: "Vous devez gagner avec <b>un score impair</b>, sinon le perdant gagne 1 point de consolation. ",
     shortDescription: "Gagner avec un score impair, sinon le perdant gagne 1.",
+    note: "Le cochonnet est lancé normalement.",
     tags: ['fast', 'totem-compatible', 'score-modifier', 'auto-resolution'],
-    uiType: 'impair',
+    uiType: 'none',
   },
   {
     id: 'make-petanque-great-again',
@@ -131,9 +133,8 @@ export const ALL_RULES: Rule[] = [
   {
     id: 'contrat',
     name: 'Contrat',
-    description: 'Chaque équipe choisit une mission parmi 5. Mission réussie = +2 points bonus.',
+    description: 'Choisissez une mission, si vous réussissez, votre équipe gagne <b>2 points bonus</b>',
     shortDescription: 'Choisir une mission, réussir = +2.',
-    note: 'Maximum 1 réussite par équipe.',
     tags: ['setup', 'bonus', 'specific-ui', 'mission'],
     uiType: 'contrat',
     maxBonusPerTeam: 2,
@@ -176,9 +177,10 @@ export const ALL_RULES: Rule[] = [
   },
   {
     id: 'frontiere',
-    name: 'Frontière',
-    description: "Choisissez un côté de la frontière. Seules les boules du bon côté peuvent marquer. Les boules du mauvais côté restent sur le terrain.",
+    name: 'Frontières',
+    description: '<b>Choisissez un côté.</b>\n\nSeules les boules de votre équipe qui seront de ce côté compteront dans le score.',
     shortDescription: 'Chaque équipe choisit un côté. Seules ces boules comptent.',
+    note: 'Auto-arbitrage',
     tags: ['setup', 'scoring-constraint', 'specific-ui', 'auto-arbitrage'],
     uiType: 'frontiere',
   },
@@ -207,8 +209,9 @@ export const ALL_RULES: Rule[] = [
   {
     id: 'totem-immunite',
     name: "Totem d'immunité",
-    description: "Cette mène est jouée normalement. La prochaine règle est révélée immédiatement. Le perdant de cette mène est immunisé contre la prochaine règle.",
+    description: "Le perdant de cette mène est <b>immunisé</b> contre la prochaine règle.",
     shortDescription: "Jouer normalement. Le perdant est immunisé contre la prochaine règle.",
+    note: "Cette mène est jouée normalement",
     tags: ['specific', 'future-rule', 'specific-ui', 'skip-random-draw-next-turn'],
     uiType: 'totem',
   },

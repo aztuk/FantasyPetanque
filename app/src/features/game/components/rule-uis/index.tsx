@@ -9,7 +9,6 @@ import { FrontiereSetupUI, FrontiereReminderUI } from './FrontiereUI';
 import { CasinoResolutionUI, CasinoSetupUI } from './CasinoUI';
 import { PredictionUI, PredictionSetupUI } from './PredictionUI';
 import { TotemUI } from './TotemUI';
-import { ImpairUI } from './ImpairUI';
 
 export function RuleUI({ round }: Props) {
   const rule = round.rule;
@@ -25,7 +24,6 @@ export function RuleUI({ round }: Props) {
     case 'casino': return <CasinoResolutionUI round={round} />;
     case 'prediction': return <PredictionUI round={round} />;
     case 'totem': return <TotemUI round={round} />;
-    case 'impair': return <ImpairUI />;
     default: return null;
   }
 }
