@@ -225,17 +225,6 @@ describe('ranking players service', () => {
       expect(deltas['bob']).toBeLessThan(0);
     });
 
-    it('is consistent with computeEloDeltas in a 2-player match', () => {
-      const p1 = makePlayer('alice', 1100);
-      const p2 = makePlayer('bob', 900);
-
-      const rankedDeltas = computeEloRankedDeltas([p1, p2], 'flechettes');
-      const winnerLoserDeltas = computeEloDeltas([p1], [p2], 'flechettes');
-
-      expect(rankedDeltas['alice']).toBe(winnerLoserDeltas['alice']);
-      expect(rankedDeltas['bob']).toBe(winnerLoserDeltas['bob']);
-    });
-
     it('gives 1st place more gain than middle players in a 4-player equal-ELO match', () => {
       const players = [
         makePlayer('first', 1000),
@@ -262,6 +251,30 @@ describe('ranking players service', () => {
       const total = Object.values(deltas).reduce((sum, d) => sum + d, 0);
 
       expect(Math.abs(total)).toBeLessThanOrEqual(players.length);
+    });
+
+    it('1st place gains ~14 pts in a 2-player equal-ELO match', () => {
+      const players = [makePlayer('alice', 1000), makePlayer('bob', 1000)];
+      const deltas = computeEloRankedDeltas(players, 'flechettes');
+
+      expect(deltas['alice']).toBeGreaterThanOrEqual(12);
+      expect(deltas['alice']).toBeLessThanOrEqual(16);
+    });
+
+    it('1st place gains ~28 pts in a 3-player equal-ELO match', () => {
+      const players = [makePlayer('p1', 1000), makePlayer('p2', 1000), makePlayer('p3', 1000)];
+      const deltas = computeEloRankedDeltas(players, 'flechettes');
+
+      expect(deltas['p1']).toBeGreaterThanOrEqual(24);
+      expect(deltas['p1']).toBeLessThanOrEqual(32);
+    });
+
+    it('1st place gains ~84 pts in a 7-player equal-ELO match', () => {
+      const players = Array.from({ length: 7 }, (_, i) => makePlayer(`p${i + 1}`, 1000));
+      const deltas = computeEloRankedDeltas(players, 'flechettes');
+
+      expect(deltas['p1']).toBeGreaterThanOrEqual(75);
+      expect(deltas['p1']).toBeLessThanOrEqual(90);
     });
   });
 });

@@ -170,6 +170,7 @@ export async function fetchPlayersOrderedByActivity(): Promise<Player[]> {
 }
 
 const ELO_K = 50;
+const ELO_K_RANKED = 28;
 
 export function computeEloDeltas(
   winners: Player[],
@@ -208,7 +209,7 @@ export function computeEloRankedDeltas(
       const expected = 1 / (1 + 10 ** ((opponentElo - playerElo) / 400));
       // i ranked above j means i "beat" j
       const actual = i < j ? 1 : 0;
-      totalDelta += ELO_K * (actual - expected);
+      totalDelta += ELO_K_RANKED * (actual - expected);
     }
     deltas[rankedPlayers[i].id] = Math.round(totalDelta);
   }
