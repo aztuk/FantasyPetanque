@@ -18,15 +18,16 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 - [fait] Ranking — Ajouter un match Fléchettes : sélection des joueurs participants, saisie de l'ordre d'arrivée, calcul et mise à jour des ELO, sauvegarde en base. - Difficulté 3/5 - Claude
 - [fait] Ranking — Bouton "Enregistrer la partie" (End Game) : ajouter un bouton Default "Enregistrer la partie" sur l'écran End Game (`node-id=7-783`), redirigant vers le flow d'ajout d'un match Pétanque dans le classement. - Difficulté 2/5 - Codex
 - [fait] Ranking — Fléchettes drag/drop : améliorer le feedback utilisateur — au début du drag, garder un slot fantôme à la position d'origine (les autres joueurs ne se décalent pas), déplacer ce ghost pendant le survol pour indiquer l'emplacement cible, animer les changements de position avec une transition smooth. - Difficulté 3/5 - Codex
-- [ ] Ranking — Masquer bouton "Suivant" quand le clavier est ouvert sur l'ajout de joueur (étape 1 du flow AddMatch).
+- [en cours] Ranking — Masquer bouton "Suivant" quand le clavier est ouvert sur l'ajout de joueur (étape 1 du flow AddMatch).
 - [fait] Ranking — ELO fléchettes trop volatile : avec 5 joueurs, les deltas pairwise peuvent dépasser ±100 par match. Calibrer le K-factor pour les matchs à N joueurs (diviser par N-1 ou ajuster la constante). - Difficulté 1/5 - Claude
-- [ ] Ranking — Bug drag-and-drop fléchettes (flickering + joueurs cachés) : corriger deux bugs liés au tri des gagnants dans l'écran fléchettes — (1) flickering visuel au moment du drop, (2) quand on repose un joueur puis on le reprend et le remonte, chaque joueur survolé devient invisible.
+- [en cours] Ranking — Bug drag-and-drop fléchettes (flickering + joueurs cachés) : corriger deux bugs liés au tri des gagnants dans l'écran fléchettes — (1) flickering visuel au moment du drop, (2) quand on repose un joueur puis on le reprend et le remonte, chaque joueur survolé devient invisible.
+- [en cours] Ranking — Sélection gagnants pétanque "winners only" : à l'étape de sélection des gagnants (mode pétanque), l'utilisateur peut ne désigner QUE les gagnants — les joueurs laissés "undecided" deviennent automatiquement perdants à la confirmation. Afficher 1 seconde le feedback visuel (tag "perdant" appliqué sur les undecided) avant de passer à l'écran suivant.
 
 ## Priorité moyenne
 
 <!-- fonctionnalités importantes mais non bloquantes -->
 
-- [ ] Logo et nom de l'appli : modifier le logo et le nom affiché dans l'application.
+- [en cours] Logo et nom de l'appli : modifier le logo, le nom affiché et le slug de l'application.
 - [fait] Ranking — Écran winner fléchettes et composants : mettre à jour `Design.md` avec l'écran de choix du gagnant en mode tri (fléchettes) depuis Figma (`node-id=69-159`) et ses composants spécifiques (`node-id=69-190`), puis implémenter l'écran et les composants dans le flow d'ajout de match Fléchettes. Mettre à jour le catalogue de composants et les tokens si nécessaire. - Difficulté 3/5 - Codex
 - [fait] Design check — Composants partagés : comparer chacun des 14 composants listés dans `COMPOSANTS — Partagés` de `Design.md` avec son équivalent Figma. Vérifier récursivement : couleurs, typographie, tailles, paddings, gaps, rayons, états. Couvrir : ScoreBoard, Rule, HistoryItem, History, Button, ButtonIcon, Head, AlertBox, Logo, WheelPicker, SetupOption, IncrementalInput, Readonly, BonusButton. - Difficulté 2/5 - Codex
 - [fait] Design check — Écrans Setup : vérifier la conformité Figma des 4 étapes Setup — Mode Choice (`node-id=1-5`), End Condition (`node-id=4-116`), Target Value (`node-id=4-124`), Veto Toggle (`node-id=4-234`). Même protocole : couleurs, typo, layout, espaces. - Difficulté 2/5 - Codex
@@ -46,6 +47,7 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 - [ ] UI spécifique règle L'impair contre-attaque : vérifier/refondre l'affichage d'aide au scoring automatique.
 - [ ] Animation UI — lévitation point bonus : le badge "+X" vert dans le bloc score de la mène doit avoir une animation de lévitation (flottement léger en boucle).
 - [fait] Animation UI — chiffres du score : modifier l'animation des chiffres pour qu'on voie clairement l'incrémentation chiffre après chiffre. L'unité doit réagir sans délai perceptible au touché ; utiliser une courbe d'accélération plus directe (moins d'ease-in). - Difficulté 1/5 - Claude
+- [en cours] Ranking — Stats fléchettes : remplacer le nombre de victoires/défaites par un taux de victoire affiché sous la forme "31% top 1" (victoires ÷ matchs joués, arrondi à l'entier).
 - [ ] UI polish — supprimer les bordures des scores de mène dans l'écran de jeu en cours.
 - [ ] Polish UI — tailles de textes : réduire la taille du score de mène dans l'interface partie en cours ; réduire globalement les tailles de textes d'un cran.
 - [ ] Design system / bouton disabled : ajouter le token de couleur disabled et appliquer le style du bouton disabled depuis la maquette Figma `node-id=4-276`.

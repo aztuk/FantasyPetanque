@@ -305,11 +305,20 @@ function RankingItem({ player, sport, record, rank }: RankingItemProps) {
         >
           {player.name}
         </Text>
-        <Text style={styles.playerMeta} testID={`ranking-player-record-${player.id}`}>
-          <Text style={styles.playerMetaWins}>{record.wins}V</Text>
-          <Text style={styles.playerMetaSeparator}> - </Text>
-          <Text style={styles.playerMetaLosses}>{record.losses}D</Text>
-        </Text>
+        {sport === 'flechettes' ? (
+          <Text
+            style={[styles.playerMeta, styles.playerMetaWinrate]}
+            testID={`ranking-player-record-${player.id}`}
+          >
+            {formatTop1Rate(record)}
+          </Text>
+        ) : (
+          <Text style={styles.playerMeta} testID={`ranking-player-record-${player.id}`}>
+            <Text style={styles.playerMetaWins}>{record.wins}V</Text>
+            <Text style={styles.playerMetaSeparator}> - </Text>
+            <Text style={styles.playerMetaLosses}>{record.losses}D</Text>
+          </Text>
+        )}
       </View>
 
       <RankingNumber
@@ -419,6 +428,12 @@ function RankingIconButton({
       <Icon color={colors.textSmooth} size={32} weight="regular" />
     </Pressable>
   );
+}
+
+function formatTop1Rate(record: { wins: number; losses: number }): string {
+  const total = record.wins + record.losses;
+  if (total === 0) return '– winrate';
+  return `${Math.round((record.wins / total) * 100)}% winrate`;
 }
 
 function getLeaderSummary(
@@ -627,6 +642,9 @@ const styles = StyleSheet.create({
   },
   playerMetaWins: {
     color: colors.secondary,
+  },
+  playerMetaWinrate: {
+    color: colors.textSmooth,
   },
   playerMetaSeparator: {
     color: colors.white,

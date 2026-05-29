@@ -133,6 +133,20 @@ describe('RankingScreen', () => {
     expect(screen.getByTestId('ranking-rank-clement').props.accessibilityLabel).toBe('03');
   });
 
+  it('shows top-1 rate for flechettes and wins/losses for petanque', async () => {
+    render(<RankingScreen />);
+
+    fireEvent.press(await screen.findByTestId('ranking-flechettes-choice'));
+
+    // fléchettes: % winrate format (9/10 = 90%, 7/10 = 70%, 4/9 ≈ 44%)
+    expect(screen.getByTestId('ranking-player-record-lea')).toHaveTextContent('90% winrate');
+    expect(screen.getByTestId('ranking-player-record-quentin')).toHaveTextContent('70% winrate');
+    expect(screen.getByTestId('ranking-player-record-clement')).toHaveTextContent('44% winrate');
+    // no wins/losses format
+    expect(screen.queryByText(/\d+V/)).toBeNull();
+    expect(screen.queryByText(/\d+D/)).toBeNull();
+  });
+
   it('goes back from the choice page header', async () => {
     render(<RankingScreen />);
 
