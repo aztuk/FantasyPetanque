@@ -1,5 +1,5 @@
-import React from 'react';
-import { Easing, Pressable, StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, Easing, Pressable, StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import AnimatedNumber from 'react-native-animated-numbers';
 import { Team } from '../../../domain/game/models';
 import { componentSizes, figmaTextStyles, radius } from '../../../shared/constants';
@@ -34,6 +34,34 @@ const TEAM_UI = {
     testID: 'score-block-red',
   },
 } as const;
+
+function FloatingModifier({ value, team }: { value: number; team: Team }) {
+  const floatAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const animation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(floatAnim, { toValue: -7, duration: 900, useNativeDriver: true }),
+        Animated.timing(floatAnim, { toValue: 0, duration: 900, useNativeDriver: true }),
+      ]),
+    );
+    animation.start();
+    return () => animation.stop();
+  }, [floatAnim]);
+
+  return (
+    <Animated.Text
+      style={[
+        styles.modifierText,
+        team === 'blue' ? styles.modifierBlue : styles.modifierRed,
+        { transform: [{ translateY: floatAnim }] },
+      ]}
+      testID={`score-modifier-${team}`}
+    >
+      {value > 0 ? `+${value}` : String(value)}
+    </Animated.Text>
+  );
+}
 
 function formatBadge(roundNumber?: number, badgeLabel?: string) {
   if (badgeLabel) return badgeLabel;
@@ -89,15 +117,7 @@ export function GameScoreBoard({
                   containerStyle={styles.meneContainer}
                 />
                 {modifierValue !== 0 && (
-                  <Text
-                    style={[
-                      styles.modifierText,
-                      team === 'blue' ? styles.modifierBlue : styles.modifierRed,
-                    ]}
-                    testID={`score-modifier-${team}`}
-                  >
-                    {modifierValue > 0 ? `+${modifierValue}` : String(modifierValue)}
-                  </Text>
+                  <FloatingModifier value={modifierValue} team={team} />
                 )}
               </View>
             )}
