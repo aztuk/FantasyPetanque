@@ -28,6 +28,8 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 
 <!-- fonctionnalités importantes mais non bloquantes -->
 
+- [en cours] Ranking — Repositionner le bouton "Ajouter un joueur" : déplacer le bouton dans les pages de classement selon la maquette Figma (`node-id=62-1601`).
+
 - [fait] Logo et nom de l'appli : modifier le logo, le nom affiché et le slug de l'application. - Difficulté 1/5 - Codex
 - [fait] Ranking — Écran winner fléchettes et composants : mettre à jour `Design.md` avec l'écran de choix du gagnant en mode tri (fléchettes) depuis Figma (`node-id=69-159`) et ses composants spécifiques (`node-id=69-190`), puis implémenter l'écran et les composants dans le flow d'ajout de match Fléchettes. Mettre à jour le catalogue de composants et les tokens si nécessaire. - Difficulté 3/5 - Codex
 - [fait] Design check — Composants partagés : comparer chacun des 14 composants listés dans `COMPOSANTS — Partagés` de `Design.md` avec son équivalent Figma. Vérifier récursivement : couleurs, typographie, tailles, paddings, gaps, rayons, états. Couvrir : ScoreBoard, Rule, HistoryItem, History, Button, ButtonIcon, Head, AlertBox, Logo, WheelPicker, SetupOption, IncrementalInput, Readonly, BonusButton. - Difficulté 2/5 - Codex
@@ -44,11 +46,12 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 - [fait] UI spécifique règle Contrat : refonte selon maquette Figma. - Difficulté 2/5 - Codex
 - [fait] EndGame screen — vérifier padding : inspecter l'écran de fin de partie et corriger tout padding excessif ou manquant selon `Design.md` (`node-id=7-783`). - Difficulté 1/5 - Claude
 - [fait] UI spécifique règle Assurance vie : refonte selon maquette Figma. - Difficulté 2/5 - Codex
-- [ ] UI spécifique règle Frontière : refonte selon maquette Figma.
-- [ ] UI spécifique règle L'impair contre-attaque : vérifier/refondre l'affichage d'aide au scoring automatique.
+- [en cours] UI spécifique règle Frontière : refonte selon maquette Figma.
+- [en cours] UI spécifique règle L'impair contre-attaque : vérifier/refondre l'affichage d'aide au scoring automatique.
 - [ ] Animation UI — lévitation point bonus : le badge "+X" vert dans le bloc score de la mène doit avoir une animation de lévitation (flottement léger en boucle).
 - [fait] Animation UI — chiffres du score : modifier l'animation des chiffres pour qu'on voie clairement l'incrémentation chiffre après chiffre. L'unité doit réagir sans délai perceptible au touché ; utiliser une courbe d'accélération plus directe (moins d'ease-in). - Difficulté 1/5 - Claude
 - [fait] Ranking — Stats fléchettes : remplacer le nombre de victoires/défaites par un taux de victoire affiché sous la forme "31% winrate" (victoires ÷ matchs joués, arrondi à l'entier). - Difficulté 1/5 - Claude
+- [ ] Ranking — Taille des icônes trophée top 3 : ajuster la taille des icônes trophée pour les 3 premiers du classement (informer l'utilisateur de la taille actuelle, puis demander la nouvelle taille souhaitée avant d'implémenter).
 - [ ] UI polish — supprimer les bordures des scores de mène dans l'écran de jeu en cours.
 - [ ] Polish UI — tailles de textes : réduire la taille du score de mène dans l'interface partie en cours ; réduire globalement les tailles de textes d'un cran.
 - [ ] Design system / bouton disabled : ajouter le token de couleur disabled et appliquer le style du bouton disabled depuis la maquette Figma `node-id=4-276`.

@@ -254,6 +254,16 @@ export function AddMatchScreen() {
             <Text style={styles.headerTitle}>{stepTitle}</Text>
           </View>
 
+          {step === 'players' && !addingPlayer && (
+            <Pressable
+              style={styles.addPlayerRow}
+              onPress={() => setAddingPlayer(true)}
+              testID="add-player-button"
+            >
+              <Text style={styles.addPlayerLabel}>Ajouter un joueur</Text>
+            </Pressable>
+          )}
+
           {loading ? (
             <View style={styles.loadingRow}>
               <ActivityIndicator color={colors.primary} />
@@ -275,15 +285,6 @@ export function AddMatchScreen() {
                   />
                 );
               })}
-              {!addingPlayer && (
-                <Pressable
-                  style={styles.addPlayerRow}
-                  onPress={() => setAddingPlayer(true)}
-                  testID="add-player-button"
-                >
-                  <Text style={styles.addPlayerLabel}>Ajouter un joueur</Text>
-                </Pressable>
-              )}
             </ScrollView>
           ) : sport === 'flechettes' ? (
             <DragOrderList
@@ -899,11 +900,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing[6],
-    paddingVertical: spacing[4],
+    paddingVertical: spacing[2],
   },
   addPlayerLabel: {
     ...figmaTextStyles.buttonActions,
-    color: colors.white,
+    color: colors.secondary,
+    textAlign: 'center',
     includeFontPadding: false,
   },
   addPlayerInputRow: {

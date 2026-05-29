@@ -236,32 +236,23 @@ function RankingListView({
           testID="ranking-list-back-button"
         />
         <Text style={styles.headerTitle}>{SPORT_LABELS[sport]}</Text>
-        {debugMode ? (
+        {debugMode && (
           <RankingIconButton
             onPress={() => setShowResetConfirm(true)}
             accessibilityLabel="Réinitialiser les ELOs"
             testID="ranking-reset-elo-button"
             icon="trash"
           />
-        ) : (
-          <RankingIconButton
-            onPress={onAddMatch}
-            accessibilityLabel="Ajouter un match"
-            testID="ranking-add-match-button"
-            icon="plus"
-          />
         )}
       </View>
 
-      {debugMode && (
-        <Pressable
-          style={styles.debugBar}
-          onPress={onAddMatch}
-          testID="ranking-debug-add-match"
-        >
-          <Text style={styles.debugBarText}>+ AJOUTER UN MATCH</Text>
-        </Pressable>
-      )}
+      <Pressable
+        style={styles.addMatchRow}
+        onPress={onAddMatch}
+        testID="ranking-add-match-button"
+      >
+        <Text style={styles.addMatchLabel}>Ajouter un match</Text>
+      </Pressable>
 
       <View style={styles.listContent}>
         {loading ? (
@@ -630,17 +621,16 @@ const styles = StyleSheet.create({
     borderRadius: radius.round,
     backgroundColor: colors.darkSmoother,
   },
-  debugBar: {
-    backgroundColor: colors.darkSmoother,
-    paddingVertical: spacing[2],
-    paddingHorizontal: spacing[6],
+  addMatchRow: {
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: colors.darkSmooth,
+    justifyContent: 'center',
+    paddingHorizontal: spacing[6],
+    paddingVertical: spacing[2],
   },
-  debugBarText: {
-    ...figmaTextStyles.bodyXs,
+  addMatchLabel: {
+    ...figmaTextStyles.buttonActions,
     color: colors.secondary,
+    textAlign: 'center',
     includeFontPadding: false,
   },
   sheetTitle: {
