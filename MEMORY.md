@@ -24,3 +24,4 @@
 - Dans le classement Ranking, les trophées du podium utilisent des tailles différenciées : rang 1 `56`, rang 2 `48`, rang 3 `40`. Le stroke du rang est `colors.darkSmooth` pour le premier et `colors.dark` pour les deuxième/troisième.
 - L'accès au module Ranking depuis la Home utilise le CTA `CLASSEMENTS` au-dessus de `JOUER`, conformément à la frame Figma Home `node-id=1-2`.
 - Depuis l'écran de fin de partie, le flow `PARTIE CLASSÉE ?` ouvre l'ajout de match Pétanque avec `source: 'gameResult'`. Après sauvegarde, le retour va au résultat de partie et le CTA devient `VOIR LE CLASSEMENT`, qui ouvre directement le classement Pétanque.
+- Synchronisation tokens Figma : `ButtonCTA` suit le fichier Figma originel (`24 / 40.8 / -0.72`) et `DarkSmoother` utilise le format Figma `#3B382E33`. `BodyXs`, `Copper`, `Silver` et `OverlayBackdrop` restent des tokens produit documentés dans `Design.md`.

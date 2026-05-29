@@ -47,7 +47,6 @@ export const gameScreenStyles = StyleSheet.create({
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingHorizontal: 24,
     paddingTop: 20,
     paddingBottom: 20,
   },
@@ -108,6 +107,8 @@ export const gameScreenStyles = StyleSheet.create({
   },
   vetoButton: {
     flex: 1,
+    height: componentSizes.drawerActionHeight,
+    paddingVertical: 8,
   },
   endContent: {
     flex: 1,

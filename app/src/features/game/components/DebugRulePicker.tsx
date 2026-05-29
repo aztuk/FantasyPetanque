@@ -5,7 +5,7 @@ import {
 import { Rule } from '../../../domain/game/models';
 import { ALL_RULES } from '../../../data/rules/rules';
 import { useGameStore } from '../state/gameStore';
-import { colors, figmaTextStyles, typography, radius } from '../../../shared/constants';
+import { colors, figmaTextStyles, radius } from '../../../shared/constants';
 
 interface Props {
   visible: boolean;
@@ -78,20 +78,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: 20, paddingBottom: 16,
   },
-  title: { color: colors.primary, fontSize: typography.size.lg, fontWeight: typography.weight.extrabold },
+  title: { color: colors.primary, ...figmaTextStyles.bodyMd },
   closeBtn: { padding: 10, backgroundColor: colors.darkSmooth, borderRadius: radius.md },
-  closeBtnLabel: { color: colors.white, fontSize: typography.size.base, fontWeight: typography.weight.bold },
+  closeBtnLabel: { color: colors.white, ...figmaTextStyles.bodySm },
   searchInput: {
     backgroundColor: colors.darkSmooth, color: colors.white,
-    fontSize: typography.size.base, paddingHorizontal: 16, paddingVertical: 13,
+    ...figmaTextStyles.bodySm, paddingHorizontal: 16, paddingVertical: 13,
     marginHorizontal: 20, marginBottom: 12, borderRadius: radius.md,
   },
-  currentRule: { color: colors.textSmooth, fontSize: typography.size.base, marginHorizontal: 20, marginBottom: 12 },
+  currentRule: { color: colors.textSmooth, ...figmaTextStyles.bodySm, marginHorizontal: 20, marginBottom: 12 },
   ruleItem: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 14 },
   ruleBar: { width: 3, alignSelf: 'stretch', borderRadius: 2, backgroundColor: colors.darkSmooth, marginRight: 14, marginTop: 3 },
   ruleBarActive: { backgroundColor: colors.primary },
   ruleItemContent: { flex: 1 },
-  ruleName: { color: colors.white, fontSize: typography.size.base, fontWeight: typography.weight.bold, marginBottom: 4 },
+  ruleName: { color: colors.white, ...figmaTextStyles.bodyMd, marginBottom: 4 },
   ruleNameActive: { color: colors.primary },
   ruleDesc: { color: colors.textSmooth, ...figmaTextStyles.bodySm },
   separator: { height: 1, backgroundColor: colors.darkSmooth },

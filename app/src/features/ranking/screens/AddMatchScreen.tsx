@@ -36,7 +36,6 @@ import {
   figmaTextStyles,
   radius,
   spacing,
-  typography,
 } from '../../../shared/constants';
 import {
   computeEloDeltas,
@@ -932,11 +931,7 @@ const styles = StyleSheet.create({
     gap: spacing[2],
   },
   statusLabel: {
-    fontFamily: typography.family.body,
-    fontSize: 18,
-    lineHeight: 30.6,
-    fontWeight: typography.weight.regular,
-    letterSpacing: -0.72,
+    ...figmaTextStyles.bodySm,
     includeFontPadding: false,
   },
   statusLabelWinner: {

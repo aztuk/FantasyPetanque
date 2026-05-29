@@ -11,7 +11,7 @@ import { RootStackParamList } from '../../../app/navigation/types';
 import { CancelGameSheet } from '../../../shared/components/CancelGameSheet';
 import { PrimaryButton } from '../../../shared/components/PrimaryButton';
 import { GameTopBar } from '../components/GameTopBar';
-import { colors, figmaTextStyles, typography, radius } from '../../../shared/constants';
+import { colors, figmaTextStyles, radius } from '../../../shared/constants';
 import { useGameStore } from '../state/gameStore';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'DebugRuleSelect'>;
@@ -108,11 +108,11 @@ const styles = StyleSheet.create({
     ...figmaTextStyles.labels,
     marginBottom: 4,
   },
-  title: { color: colors.primary, fontSize: typography.size.xl, fontWeight: typography.weight.extrabold },
+  title: { color: colors.primary, ...figmaTextStyles.bodyMd },
   searchInput: {
     backgroundColor: colors.darkSmooth,
     color: colors.white,
-    fontSize: typography.size.base,
+    ...figmaTextStyles.bodySm,
     paddingHorizontal: 16,
     paddingVertical: 14,
     marginHorizontal: 24,
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
   ruleBar: { width: 3, alignSelf: 'stretch', borderRadius: 2, backgroundColor: colors.darkSmooth, marginRight: 16, marginTop: 3 },
   ruleBarActive: { backgroundColor: colors.primary },
   ruleText: { flex: 1 },
-  ruleName: { color: colors.white, fontSize: typography.size.base, fontWeight: typography.weight.extrabold, marginBottom: 4 },
+  ruleName: { color: colors.white, ...figmaTextStyles.bodyMd, marginBottom: 4 },
   ruleNameActive: { color: colors.primary },
   ruleDesc: { color: colors.textSmooth, ...figmaTextStyles.bodySm },
   separator: { height: 1, backgroundColor: colors.darkSmooth },
@@ -135,5 +135,5 @@ const styles = StyleSheet.create({
   },
   fullButton: { marginHorizontal: 0 },
   emptyContainer: { flex: 1, justifyContent: 'center', paddingHorizontal: 24 },
-  emptyText: { color: colors.textSmooth, fontSize: typography.size.base, textAlign: 'center', marginTop: 16 },
+  emptyText: { color: colors.textSmooth, ...figmaTextStyles.bodySm, textAlign: 'center', marginTop: 16 },
 });

@@ -8,7 +8,7 @@ import { DebugRuleSelectScreen } from '../../features/game/screens/DebugRuleSele
 import { RankingScreen } from '../../features/ranking/screens/RankingScreen';
 import { AddMatchScreen } from '../../features/ranking/screens/AddMatchScreen';
 import { RootStackParamList } from './types';
-import { BACKGROUND, TEXT_PRIMARY, typography } from '../../shared/constants';
+import { BACKGROUND, TEXT_PRIMARY, figmaTextStyles } from '../../shared/constants';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -19,7 +19,7 @@ export function AppNavigator() {
         screenOptions={{
           headerStyle: { backgroundColor: BACKGROUND },
           headerTintColor: TEXT_PRIMARY,
-          headerTitleStyle: { fontWeight: typography.weight.bold },
+          headerTitleStyle: figmaTextStyles.pageTitles,
           contentStyle: { backgroundColor: BACKGROUND },
         }}
       >

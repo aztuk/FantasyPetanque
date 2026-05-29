@@ -308,7 +308,7 @@ describe('GameScreen fantasy inter-mene', () => {
     render(<GameScreen />);
 
     const preMeneStyle = StyleSheet.flatten(screen.getByTestId('pre-mene-rule-area').props.style);
-    expect(preMeneStyle.justifyContent).toBe('center');
+    expect(preMeneStyle.justifyContent).toBe('flex-start');
     expect(preMeneStyle.paddingTop).toBeUndefined();
 
     fireEvent.press(screen.getByTestId('begin-round-button'));

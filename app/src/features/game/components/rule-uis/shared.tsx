@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { RoundState } from '../../../../domain/game/models';
-import { colors, figmaTextStyles, typography, radius, TEAM_COLORS } from '../../../../shared/constants';
+import { colors, figmaTextStyles, radius, TEAM_COLORS } from '../../../../shared/constants';
 
 export interface Props {
   round: RoundState;
@@ -47,7 +47,7 @@ export const styles = StyleSheet.create({
   },
   row: { flexDirection: 'row', marginTop: 8 },
   teamRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 6 },
-  teamLabel: { fontSize: typography.size.base, fontWeight: typography.weight.semibold, width: 100 },
+  teamLabel: { ...figmaTextStyles.bodySm, width: 100 },
   note: {
     color: colors.textSmooth,
     ...figmaTextStyles.bodySm,
@@ -61,14 +61,13 @@ export const styles = StyleSheet.create({
     marginLeft: 8,
   },
   disabledEl: { opacity: 0.35 },
-  undoText: { color: colors.textSmooth, fontSize: typography.size.base },
+  undoText: { color: colors.textSmooth, ...figmaTextStyles.bodySm },
   countBadge: {
-    fontSize: typography.size.lg,
-    fontWeight: typography.weight.bold,
+    ...figmaTextStyles.numberXs40,
     marginLeft: 10,
     minWidth: 28,
     textAlign: 'center',
   },
 });
 
-export { colors, figmaTextStyles, typography, radius, TEAM_COLORS };
+export { colors, figmaTextStyles, radius, TEAM_COLORS };
