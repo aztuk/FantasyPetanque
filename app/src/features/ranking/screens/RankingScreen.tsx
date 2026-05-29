@@ -56,6 +56,14 @@ const ITEM_HEIGHTS = {
   rest: 78,
 } as const;
 
+const PODIUM_TROPHY_SIZE = {
+  first: 56,
+  second: 48,
+  third: 40,
+} as const;
+
+const RANK_BADGE_SIZE = 56;
+
 export function RankingScreen() {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
@@ -330,6 +338,7 @@ function RankingItem({ player, sport, record, rank, onLongPress }: RankingItemPr
   const podium = getPodium(rank);
   const isPodium = podium !== 'rest';
   const rankColor = getRankColor(rank);
+  const rankStrokeColor = getRankStrokeColor(rank);
   const elo = getPlayerElo(player, sport);
 
   return (
@@ -348,16 +357,17 @@ function RankingItem({ player, sport, record, rank, onLongPress }: RankingItemPr
         {podium === 'rest' ? null : (
           <TrophyIcon
             color={rankColor}
-            size={32}
+            size={PODIUM_TROPHY_SIZE[podium]}
             weight="regular"
             style={styles.trophy}
+            testID={`ranking-trophy-${player.id}`}
           />
         )}
         <RankingNumber
           value={formatRank(rank)}
           color={rankColor}
           align="center"
-          stroke={isPodium}
+          strokeColor={isPodium ? rankStrokeColor : undefined}
           testID={`ranking-rank-${player.id}`}
         />
       </View>
@@ -402,7 +412,7 @@ interface RankingNumberProps {
   value: string;
   color: string;
   align: 'center' | 'right';
-  stroke?: boolean;
+  strokeColor?: string;
   testID: string;
 }
 
@@ -410,7 +420,7 @@ function RankingNumber({
   value,
   color,
   align,
-  stroke = false,
+  strokeColor,
   testID,
 }: RankingNumberProps) {
   const width = align === 'right' ? 64 : 40;
@@ -441,14 +451,15 @@ function RankingNumber({
       accessibilityLabel={value}
       accessible
     >
-      {stroke
-        ? strokeOffsets.map(([left, top]) => (
+      {strokeColor
+        ? strokeOffsets.map(([left, top], index) => (
         <Text
           key={`${left}:${top}`}
+          testID={`${testID}-stroke-${index}`}
           style={[
             styles.rankingNumberText,
             styles.rankingNumberStroke,
-                { color: colors.darkSmooth, left, top, textAlign, width },
+                { color: strokeColor, left, top, textAlign, width },
               ]}
               importantForAccessibility="no-hide-descendants"
               accessibilityElementsHidden
@@ -560,6 +571,18 @@ function getRankColor(rank: number): string {
   }
 
   return colors.white;
+}
+
+function getRankStrokeColor(rank: number): string | undefined {
+  if (rank === 1) {
+    return colors.darkSmooth;
+  }
+
+  if (rank === 2 || rank === 3) {
+    return colors.dark;
+  }
+
+  return undefined;
 }
 
 function formatRank(rank: number): string {
@@ -707,8 +730,8 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.darkSmooth,
   },
   rankBadge: {
-    width: 40,
-    height: 40,
+    width: RANK_BADGE_SIZE,
+    height: RANK_BADGE_SIZE,
     alignItems: 'center',
     justifyContent: 'center',
   },

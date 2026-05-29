@@ -88,6 +88,27 @@ describe('RankingScreen', () => {
     expect(screen.getByTestId('ranking-rank-clement').props.accessibilityLabel).toBe('01');
     expect(screen.getByTestId('ranking-rank-quentin').props.accessibilityLabel).toBe('02');
     expect(screen.getByTestId('ranking-rank-lea').props.accessibilityLabel).toBe('03');
+    expect(screen.getByTestId('ranking-trophy-clement').props.width).toBe(56);
+    expect(screen.getByTestId('ranking-trophy-clement').props.height).toBe(56);
+    expect(screen.getByTestId('ranking-trophy-quentin').props.width).toBe(48);
+    expect(screen.getByTestId('ranking-trophy-quentin').props.height).toBe(48);
+    expect(screen.getByTestId('ranking-trophy-lea').props.width).toBe(40);
+    expect(screen.getByTestId('ranking-trophy-lea').props.height).toBe(40);
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId('ranking-rank-clement-stroke-0', { includeHiddenElements: true }).props.style,
+      ).color,
+    ).toBe(colors.darkSmooth);
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId('ranking-rank-quentin-stroke-0', { includeHiddenElements: true }).props.style,
+      ).color,
+    ).toBe(colors.dark);
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId('ranking-rank-lea-stroke-0', { includeHiddenElements: true }).props.style,
+      ).color,
+    ).toBe(colors.dark);
     expect(screen.getByTestId('ranking-elo-clement').props.accessibilityLabel).toBe('1204');
     expect(
       StyleSheet.flatten(screen.getByTestId('ranking-rank-clement-fill').props.style).fontFamily,

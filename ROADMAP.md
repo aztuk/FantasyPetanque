@@ -51,7 +51,7 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 - [ ] Animation UI — lévitation point bonus : le badge "+X" vert dans le bloc score de la mène doit avoir une animation de lévitation (flottement léger en boucle).
 - [fait] Animation UI — chiffres du score : modifier l'animation des chiffres pour qu'on voie clairement l'incrémentation chiffre après chiffre. L'unité doit réagir sans délai perceptible au touché ; utiliser une courbe d'accélération plus directe (moins d'ease-in). - Difficulté 1/5 - Claude
 - [fait] Ranking — Stats fléchettes : remplacer le nombre de victoires/défaites par un taux de victoire affiché sous la forme "31% winrate" (victoires ÷ matchs joués, arrondi à l'entier). - Difficulté 1/5 - Claude
-- [ ] Ranking — Taille des icônes trophée top 3 : ajuster la taille des icônes trophée pour les 3 premiers du classement (informer l'utilisateur de la taille actuelle, puis demander la nouvelle taille souhaitée avant d'implémenter).
+- [fait] Ranking — Taille des icônes trophée top 3 : ajuster la taille des icônes trophée pour les 3 premiers du classement (informer l'utilisateur de la taille actuelle, puis demander la nouvelle taille souhaitée avant d'implémenter). - Difficulté 1/5 - Codex
 - [ ] UI polish — supprimer les bordures des scores de mène dans l'écran de jeu en cours.
 - [ ] Polish UI — tailles de textes : réduire la taille du score de mène dans l'interface partie en cours ; réduire globalement les tailles de textes d'un cran.
 - [ ] Design system / bouton disabled : ajouter le token de couleur disabled et appliquer le style du bouton disabled depuis la maquette Figma `node-id=4-276`.
