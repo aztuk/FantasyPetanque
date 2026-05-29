@@ -1,9 +1,9 @@
 import React from 'react';
-import { View } from 'react-native';
 import { shouldSkipNormalScore } from '../../../../domain/game/engine';
 import { Team } from '../../../../domain/game/models';
 import { buildBonusMalusFromRound } from '../../../../domain/game/scoring';
 import { GameActionButton } from '../../components/GameActionButton';
+import { GameDrawer } from '../../components/GameDrawer';
 import { GameScoreBoard } from '../../components/GameScoreBoard';
 import { GameTeamActionRow } from '../../components/GameTeamActionRow';
 import { RuleDisplay } from '../../components/RuleDisplay';
@@ -45,7 +45,6 @@ export function PlayingView() {
     round.rule?.uiType === 'frontiere' ||
     round.rule?.uiType === 'bonus-buttons' ||
     round.rule?.uiType === 'malus-buttons';
-  const alwaysExpanded = usesWinnerConfirmation || renderRuleUIInDrawer;
   const canFinishRound = usesWinnerConfirmation ? hasWinnerSelection : skipNormal || scoringTeam !== null;
 
   const handleTeamPress = (team: Team) => {
@@ -60,85 +59,51 @@ export function PlayingView() {
   const confirmLabel = isCasino || isContrat || isSortieDePorc
     ? 'Confirmer'
     : canFinishRound ? 'Mène terminée' : 'Points manquants';
+  const shouldShowDrawerActions = isCasino || renderRuleUIInDrawer;
+  const shouldShowDrawerScore = !isCasino && !isSortieDePorc;
 
-  if (alwaysExpanded) {
-    return (
-      <GameScreenLayout
-        scrollTestID="playing-rule-scroll"
-        drawerTotalScore={
-          <View style={{ gap: 4 }}>
-            {isCasino && (
-              <GameTeamActionRow
-                label="Gagnant"
-                onTeamPress={setCasinoWinner}
-                selectedTeam={round.casinoWinner}
-                unselectedLabelWhenSelected="Perdant"
-                teamColorOnlyWhenSelected
-                testIDPrefix="casino-winner"
-              />
-            )}
-            {renderRuleUIInDrawer && <RuleUI round={round} />}
-            <GameScoreBoard
-              scores={scores}
-              roundPoints={!isCasino && !isSortieDePorc ? { blue: bluePoints, red: redPoints } : undefined}
-              modifierPoints={!isCasino && !isSortieDePorc ? modifierPoints : undefined}
-              roundNumber={round.number}
-              showRoundBar={!isCasino && !isSortieDePorc}
-              onTeamPress={!skipNormal && !isCasino && !isSortieDePorc ? handleTeamPress : undefined}
-            />
-          </View>
-        }
-        drawerConfirmButton={
-          <GameActionButton
-            label={confirmLabel}
-            onPress={finishRound}
-            disabled={!canFinishRound}
-            testID="end-round-button"
-          />
-        }
-      >
-        {round.rule && (
-          <RuleDisplay
-            rule={round.rule}
-            immuneTeam={round.totemImmuneTeam}
-          />
-        )}
-        {!renderRuleUIInDrawer && <RuleUI round={round} />}
-      </GameScreenLayout>
-    );
-  }
-
-  // Normal collapsible case — key resets drawer state on new round
   return (
     <GameScreenLayout
       key={round.number}
       scrollTestID="playing-rule-scroll"
-      drawerMeneScore={
-        <GameScoreBoard
-          scores={scores}
-          roundPoints={{ blue: bluePoints, red: redPoints }}
-          modifierPoints={modifierPoints}
-          showRoundBar
-          showTotals={false}
-          onTeamPress={!skipNormal ? handleTeamPress : undefined}
+      drawer={
+        <GameDrawer
+          testID="game-drawer"
+          actions={shouldShowDrawerActions ? (
+            <>
+              {isCasino && (
+                <GameTeamActionRow
+                  label="Gagnant"
+                  onTeamPress={setCasinoWinner}
+                  selectedTeam={round.casinoWinner}
+                  unselectedLabelWhenSelected="Perdant"
+                  teamColorOnlyWhenSelected
+                  testIDPrefix="casino-winner"
+                />
+              )}
+              {renderRuleUIInDrawer && <RuleUI round={round} />}
+            </>
+          ) : undefined}
+          scoreBoard={shouldShowDrawerScore ? (
+            <GameScoreBoard
+              scores={scores}
+              roundPoints={{ blue: bluePoints, red: redPoints }}
+              modifierPoints={modifierPoints}
+              roundNumber={round.number}
+              variant="drawer"
+              onTeamPress={!skipNormal ? handleTeamPress : undefined}
+            />
+          ) : undefined}
+          confirmButton={
+            <GameActionButton
+              label={confirmLabel}
+              onPress={finishRound}
+              disabled={!canFinishRound}
+              testID="end-round-button"
+            />
+          }
         />
       }
-      drawerTotalScore={
-        <GameScoreBoard
-          scores={scores}
-          roundNumber={round.number}
-          showRoundBar={false}
-        />
-      }
-      drawerConfirmButton={
-        <GameActionButton
-          label={canFinishRound ? 'Mène terminée' : 'Points manquants'}
-          onPress={finishRound}
-          disabled={!canFinishRound}
-          testID="end-round-button"
-        />
-      }
-      collapsible
     >
       {round.rule && (
         <RuleDisplay
@@ -146,7 +111,7 @@ export function PlayingView() {
           immuneTeam={round.totemImmuneTeam}
         />
       )}
-      <RuleUI round={round} />
+      {!renderRuleUIInDrawer && <RuleUI round={round} />}
     </GameScreenLayout>
   );
 }

@@ -45,6 +45,7 @@ Figma principal : <!-- URL fichier Figma principal -->
 > **10 styles Figma + 1 style produit.** `Design.md` est la source de vérité : le code doit reprendre ces noms et ces valeurs.
 >
 > Conversion React Native : `lineHeight` et `letterSpacing` sont documentés en pixels, calculés depuis les pourcentages Figma.
+> Note Expo/Android : les styles `Number*` utilisent les fichiers `CascadiaMono_400Regular` / `CascadiaMono_700Bold` comme `fontFamily` et ne redéclarent pas `fontWeight`, pour éviter un fallback de police.
 
 | Nom Figma | Famille | Style | Taille | Poids | Line height Figma | Line height RN | Letter spacing Figma | Letter spacing RN | Casse |
 |---|---|---|---:|---:|---:|---:|---:|---:|---|
@@ -113,6 +114,7 @@ Figma principal : <!-- URL fichier Figma principal -->
 | Composant Figma | Variantes / états | Usage produit | Mapping code attendu |
 |---|---|---|---|
 | ScoreBoard | Standard | Affiche les points de mène, les totaux, les bonus/malus et le badge de mène. | `GameScoreBoard` |
+| Drawer | `score + CTA`, `actions + CTA`, `actions + score + CTA` | Zone fixe de bas d'écran pendant les pages Game : actions contextuelles, score de mène et CTA. | `GameDrawer` |
 | Rule | Standard | Affiche le nom d'une règle, sa description enrichie et sa note. | `RuleDisplay` |
 | HistoryItem | Standard | Ligne d'historique d'une mène : score bleu, numéro de mène, score rouge. | `GameHistoryItem` |
 | History | `Orientation=top`, `Orientation=bottom` | Liste d'historique avec fondu. `top` sert aux vues récapitulatives, `bottom` garde les dernières mènes visibles en jeu. | `GameHistoryList` |
@@ -126,11 +128,14 @@ Figma principal : <!-- URL fichier Figma principal -->
 | IncrementalInput | Standard | Stepper vertical avec +, valeur numérique, - et label d'équipe. | `TeamStepper` |
 | Readonly | Standard | Valeur numérique verrouillée avec label d'équipe. | lecture seule dans `CasinoUI` et `PredictionUI` |
 | BonusButton | Standard | Bouton d'action compact pour un événement de règle, par exemple "Tir réussi". | `GameTeamActionRow` / `BonusButtonsUI` selon le besoin d'équipe |
+| RankingItem | `rank=first`, `rank=second`, `rank=third`, `rank=rest` | Ligne de classement : rang, nom du joueur, résumé et ELO. | `RankingItem` local dans `RankingScreen` |
 | WinnerSortItem | `selected=first`, `selected=between`, `selected=last` | Ligne de tri des participants Fléchettes pendant l'ajout d'un match : ordre d'arrivée, gagnant et perdant. | `WinnerSortItem` local dans `AddMatchScreen` |
 
 ### ScoreBoard
 
 - Dimensions Figma : `393 x 215`, deux colonnes séparées par `4`.
+- Variante `Drawer` : hauteur `96`, affiche uniquement les scores de mène et le badge central, sans total cumulé.
+- Variante `TotalSummary` : hauteur `230`, affiche uniquement les scores totaux en grand avec badge central.
 - Couleurs : surfaces `--blueteamsurface` et `--redteamsurface`; texte principal `--white`; modificateurs `--secondary`; badge sur `--dark`.
 - Typographie : score de mène `NumberLg-100`; total et modificateur `NumberXs-40`; badge `Labels`.
 - Le score de mène affiche les points en cours de mène. Le total affiche le score cumulé après application de la mène courante ou du dernier état connu.
@@ -236,6 +241,33 @@ Figma principal : <!-- URL fichier Figma principal -->
 - Label : `ButtonActions`, `--white`, centré.
 - Sert aux actions compactes déclenchées pendant une règle, par exemple "Tir réussi".
 - Si l'action cible une équipe, préférer une composition avec boutons d'équipe cohérente avec les écrans spécifiques Figma.
+
+### Drawer
+
+> Référence Figma : [node-id=51:1556](https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=51-1556&t=qil4nd06wX0YCs6f-11)
+
+- Largeur Figma : `393`; layout vertical, gap `4`, ancré en bas des pages Game.
+- Le drawer est fixe : il n'a plus d'état replié et ne se masque pas au scroll ou au toucher du contenu.
+- Slot `actions` : hauteur `64`, utilise `BonusButton` / boutons d'équipe contextuels.
+- Slot `score` : `ScoreBoard` variante `Drawer`, hauteur `96`.
+- Slot `CTA` : `Button` primaire, hauteur `78`.
+- Variantes de composition :
+  - `score + CTA` : hauteur `178`.
+  - `actions + CTA` : hauteur `146`.
+  - `actions + score + CTA` : hauteur `246`.
+
+### RankingItem
+
+> Référence Figma : [node-id=62:1094](https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=62-1094&t=EEvZW3FMwHZ6W4QA-11)
+
+- Largeur Figma : `393`.
+- Hauteurs : `143` pour le rang 1, `111` pour le rang 2, `95` pour le rang 3, `78` pour les autres rangs.
+- Couleurs : premier item sur `--darksmooth`, autres items sur `--dark` avec séparateur `--darksmooth`.
+- Rang 1 : accent `--primary`; rang 2 : `--silver`; rang 3 : `--copper`; autres rangs : `--white`.
+- Typographie : nom podium en `ButtonActions`, nom hors podium en `BodySm`, ELO et rang en `NumberXs-40`, bilan victoires/défaites en `BodyXs`.
+- Les rangs podium (`rank=first`, `rank=second`, `rank=third`) ont un contour renforcé `--darksmooth` autour du nombre. Les ELO n'ont pas de contour.
+- Le bilan sous le nom utilise le format `XV - YD` : victoires en `--secondary`, séparateur en `--white`, défaites en `--redteamsurface`.
+
 ### WinnerSortItem
 
 > Référence Figma : [node-id=69:190](https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=69-190&t=EEvZW3FMwHZ6W4QA-11)
@@ -260,6 +292,8 @@ Figma principal : <!-- URL fichier Figma principal -->
 
 Home: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=1-2&t=qil4nd06wX0YCs6f-11
 Home Debug: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=1-74&t=qil4nd06wX0YCs6f-11
+Ranking Choice: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=62-1516&t=EEvZW3FMwHZ6W4QA-11
+Ranking: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=61-449&t=EEvZW3FMwHZ6W4QA-11
 Ranking AddMatch Winner Fléchettes: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=69-159&t=EEvZW3FMwHZ6W4QA-11
 Setup 01 Mode Choice: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=1-5&t=qil4nd06wX0YCs6f-11
 Setup 02 End condition:https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=4-116&t=qil4nd06wX0YCs6f-11
@@ -267,7 +301,6 @@ Setup 03 Target Value: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/Fanta
 Setup 04 Veto toggle: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=4-234&t=qil4nd06wX0YCs6f-11
 Game ingame Classic: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=1-12&t=qil4nd06wX0YCs6f-11
 Game ingame scoreState Fantasy: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=4-638&t=qil4nd06wX0YCs6f-11
-Game ingame ruleState Fantasy: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=8-1013&t=qil4nd06wX0YCs6f-11
 Game intermene fantasy: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=4-742&t=qil4nd06wX0YCs6f-11
 Game postmene fantasy: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=18-1857&t=qil4nd06wX0YCs6f-11
 Game endGame: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=7-783&t=qil4nd06wX0YCs6f-11

@@ -1,8 +1,8 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { getCasinoMaxBet, CASINO_MIN_BET } from '../../../../domain/game/scoring';
 import { Team } from '../../../../domain/game/models';
-import { textStyles } from '../../../../shared/constants';
+import { ReadonlyValue } from '../../../../shared/components/ReadonlyValue';
 import { useGameStore } from '../../state/gameStore';
 import { gameUiColors } from '../gameUiTheme';
 import { Props } from './shared';
@@ -52,17 +52,6 @@ export function CasinoSetupUI({ round }: Props) {
   );
 }
 
-function StakeReadonly({ label, color, value, testID }: { label: string; color: string; value: string; testID?: string }) {
-  return (
-    <View style={styles.betColumn}>
-      <Text style={styles.readonlyValue} testID={testID}>{value}</Text>
-      <Text style={[styles.betLabel, { color }]} numberOfLines={1} adjustsFontSizeToFit>
-        {label}
-      </Text>
-    </View>
-  );
-}
-
 export function CasinoResolutionUI({ round }: Props) {
   return (
     <View style={styles.resolution}>
@@ -71,10 +60,10 @@ export function CasinoResolutionUI({ round }: Props) {
           const ui = TEAM_COPY[team];
 
           return (
-            <StakeReadonly
+            <ReadonlyValue
               key={team}
               label={ui.label}
-              color={ui.color}
+              labelColor={ui.color}
               value={String(round.casinoBets[team])}
               testID={ui.readonlyTestID}
             />
@@ -84,7 +73,6 @@ export function CasinoResolutionUI({ round }: Props) {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   betRow: {
     width: '100%',
@@ -94,26 +82,9 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 24,
   },
-  betColumn: {
-    flex: 1,
-    minWidth: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  betLabel: {
-    ...textStyles.actionLabel,
-    width: '100%',
-    textAlign: 'center',
-  },
   resolution: {
     width: '100%',
     justifyContent: 'flex-start',
     marginTop: 28,
-  },
-  readonlyValue: {
-    ...textStyles.uiValueLg,
-    color: gameUiColors.white,
-    fontWeight: '700',
-    textAlign: 'center',
   },
 });

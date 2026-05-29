@@ -5,6 +5,12 @@ import {
 } from '../shared/services/supabase';
 
 describe('Supabase config', () => {
+  const originalEnv = process.env;
+
+  afterEach(() => {
+    process.env = originalEnv;
+  });
+
   it('reads Expo public Supabase env variables', () => {
     expect(
       readSupabaseConfig({
@@ -14,6 +20,19 @@ describe('Supabase config', () => {
     ).toEqual({
       url: 'https://fantasy-petanque.supabase.co',
       publishableKey: 'sb_publishable_test',
+    });
+  });
+
+  it('reads Expo public Supabase env variables from the runtime environment', () => {
+    process.env = {
+      ...originalEnv,
+      EXPO_PUBLIC_SUPABASE_URL: 'https://runtime-fantasy-petanque.supabase.co',
+      EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'sb_runtime_publishable_test',
+    };
+
+    expect(readSupabaseConfig()).toEqual({
+      url: 'https://runtime-fantasy-petanque.supabase.co',
+      publishableKey: 'sb_runtime_publishable_test',
     });
   });
 

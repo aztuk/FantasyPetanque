@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Team } from '../../../domain/game/models';
-import { figmaTextStyles } from '../../../shared/constants';
+import { componentSizes, figmaTextStyles } from '../../../shared/constants';
 import { gameUiColors } from './gameUiTheme';
 
 interface Props {
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 1,
-    minHeight: 80,
+    minHeight: componentSizes.drawerActionHeight,
     alignItems: 'center',
     justifyContent: 'center',
     opacity: 0.9,

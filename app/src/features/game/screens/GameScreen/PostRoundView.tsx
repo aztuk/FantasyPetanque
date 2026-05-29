@@ -1,17 +1,17 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../../../app/navigation/types';
 import { Team } from '../../../../domain/game/models';
 import { CancelGameSheet } from '../../../../shared/components/CancelGameSheet';
+import { componentSizes, figmaTextStyles, radius } from '../../../../shared/constants';
 import { GameActionButton } from '../../components/GameActionButton';
 import { GameScoreBoard } from '../../components/GameScoreBoard';
 import { GameTopBar } from '../../components/GameTopBar';
 import { gameUiColors } from '../../components/gameUiTheme';
 import { useGameStore } from '../../state/gameStore';
-import { typography } from '../../../../shared/constants';
 import { gameScreenStyles } from './gameScreenStyles';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'Game'>;
@@ -33,7 +33,7 @@ function shortenBadge(reason: string): string {
   if (reason.startsWith('A touché')) return 'BOULE MAUDITE';
   if (reason.includes('gagnante')) return 'KING';
   if (reason === 'Casino : mise gagnée') return 'CASINO +';
-  if (reason === 'Casino : mise perdue') return 'CASINO −';
+  if (reason === 'Casino : mise perdue') return 'CASINO -';
   return reason.toUpperCase();
 }
 
@@ -109,14 +109,13 @@ export function buildSteps(
   return steps;
 }
 
-// Rows appear top-to-bottom, each row springs in then score increments
 const SCORE_DELAY = 380;
 const STEP_DURATION = 1050;
 const INITIAL_DELAY = 300;
 const BUTTON_DELAY = 280;
 const MAX_ANIM = 12;
 const SLIDE_INITIAL = 52;
-const BUTTON_HEIGHT = 102; // GameActionButton minHeight
+const BUTTON_HEIGHT = componentSizes.gameButtonHeight;
 
 export function PostRoundView() {
   const navigation = useNavigation<Nav>();
@@ -133,7 +132,6 @@ export function PostRoundView() {
   const slideAnims = useRef(
     Array.from({ length: MAX_ANIM }, () => new Animated.Value(SLIDE_INITIAL)),
   ).current;
-  // Button container grows from 0 → BUTTON_HEIGHT, pushing content up
   const buttonHeightAnim = useRef(new Animated.Value(0)).current;
 
   const lastRound = rounds[rounds.length - 1];
@@ -188,12 +186,10 @@ export function PostRoundView() {
   useEffect(() => {
     if (visibleCount === 0) return;
 
-    // Rows appear top-to-bottom: first step first, last step last
     const idx = visibleCount - 1;
     const step = steps[idx];
     if (!step) return;
 
-    // 1. Row springs in from below
     Animated.parallel([
       Animated.timing(fadeAnims[idx], { toValue: 1, duration: 100, useNativeDriver: true }),
       Animated.spring(slideAnims[idx], { toValue: 0, tension: 280, friction: 16, useNativeDriver: true }),
@@ -201,8 +197,6 @@ export function PostRoundView() {
 
     const isLast = visibleCount === steps.length;
 
-    // 2. Score increments after row settles
-    // On the last step, set final score explicitly for correctness
     const scoreTimer = setTimeout(() => {
       if (isLast) {
         setDisplayBlue(finalBlue);
@@ -213,7 +207,6 @@ export function PostRoundView() {
       }
     }, SCORE_DELAY);
 
-    // 3. Advance
     const nextTimer = setTimeout(() => {
       if (!isLast) {
         setVisibleCount((c) => c + 1);
@@ -229,19 +222,6 @@ export function PostRoundView() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visibleCount]);
 
-  const replayAnimation = () => {
-    for (let i = 0; i < MAX_ANIM; i++) {
-      fadeAnims[i].setValue(0);
-      slideAnims[i].setValue(SLIDE_INITIAL);
-    }
-    buttonHeightAnim.setValue(0);
-    setButtonReady(false);
-    setDisplayBlue(scoreBefore.blue);
-    setDisplayRed(scoreBefore.red);
-    setVisibleCount(0);
-    setTimeout(() => setVisibleCount(1), 100);
-  };
-
   const handleNext = () => {
     startNewRound();
     if (debugMode) navigation.replace('DebugRuleSelect');
@@ -254,22 +234,16 @@ export function PostRoundView() {
         onConfirm={() => { resetGame(); navigation.replace('Home'); }}
         onCancel={() => setShowCancelSheet(false)}
       />
-      <GameTopBar onCancel={() => setShowCancelSheet(true)} />
-
-      {/* Fixed header — outside flex-end content so it never moves */}
-      <View style={styles.header}>
-        {lastRound?.rule && (
-          <Text style={styles.ruleName} numberOfLines={1} testID="post-round-rule-name">
-            {lastRound.rule.name}
-          </Text>
-        )}
-        {lastRound && (
-          <Text style={styles.roundLabel}>Mène {lastRound.number}</Text>
-        )}
-      </View>
+      <GameTopBar onCancel={() => setShowCancelSheet(true)} floating style={gameScreenStyles.floatingHead} />
 
       <View style={styles.content}>
         <View style={styles.scoreBoard}>
+          <GameScoreBoard
+            scores={{ blue: displayBlue, red: displayRed }}
+            badgeLabel="Score total"
+            variant="totalSummary"
+          />
+
           {steps.map((step, i) => (
             <Animated.View
               key={i}
@@ -292,19 +266,11 @@ export function PostRoundView() {
               </View>
             </Animated.View>
           ))}
-
-          <GameScoreBoard
-            scores={{ blue: 0, red: 0 }}
-            roundPoints={{ blue: displayBlue, red: displayRed }}
-            showRoundBar
-            showTotals={false}
-            style={styles.totalsRow}
-          />
         </View>
       </View>
 
-      {/* Button container grows from 0 → BUTTON_HEIGHT, pushing content up */}
-      <Animated.View style={[styles.buttonWrap, { height: buttonHeightAnim }]}
+      <Animated.View
+        style={[styles.buttonWrap, { height: buttonHeightAnim }]}
         pointerEvents={buttonReady ? 'auto' : 'none'}
       >
         <GameActionButton
@@ -313,11 +279,6 @@ export function PostRoundView() {
           testID="next-round-button"
         />
       </Animated.View>
-
-      {/* DEBUG — remove after validation */}
-      <TouchableOpacity style={styles.debugBtn} onPress={replayAnimation}>
-        <Text style={styles.debugBtnText}>↻ Replay</Text>
-      </TouchableOpacity>
     </SafeAreaView>
   );
 }
@@ -333,41 +294,14 @@ function DeltaBlock({ value, team }: { value: number; team: Team }) {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    width: '100%',
-    paddingHorizontal: 8,
-    paddingTop: 4,
-    paddingBottom: 12,
-    alignItems: 'center',
-    gap: 2,
-  },
-  ruleName: {
-    color: gameUiColors.primary,
-    fontFamily: typography.family.display,
-    fontSize: 32,
-    fontWeight: '700',
-    letterSpacing: -1.28,
-    lineHeight: 54,
-    textAlign: 'center',
-  },
-  roundLabel: {
-    color: gameUiColors.muted,
-    fontFamily: typography.family.bodySemibold,
-    fontSize: 16,
-    lineHeight: 24,
-    textAlign: 'center',
-    letterSpacing: 0,
-  },
   content: {
     flex: 1,
     width: '100%',
-    paddingHorizontal: 4,
-    justifyContent: 'flex-end',
-    paddingBottom: 4,
+    justifyContent: 'flex-start',
   },
   scoreBoard: {
     width: '100%',
-    gap: 2,
+    gap: 4,
   },
   stepRow: {
     width: '100%',
@@ -382,19 +316,15 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   badgePill: {
-    borderRadius: 40,
+    borderRadius: radius.pill,
     backgroundColor: gameUiColors.background,
     paddingHorizontal: 12,
     paddingTop: 8,
     paddingBottom: 7,
   },
   badgeText: {
+    ...figmaTextStyles.labels,
     color: gameUiColors.muted,
-    fontFamily: typography.family.bodySemibold,
-    fontSize: 14,
-    fontWeight: typography.weight.bold,
-    lineHeight: 14,
-    letterSpacing: 0,
     textAlign: 'center',
   },
   deltaBlocks: {
@@ -403,38 +333,17 @@ const styles = StyleSheet.create({
   },
   deltaBlock: {
     flex: 1,
-    paddingVertical: 12,
+    height: componentSizes.postRoundStepHeight,
     alignItems: 'center',
     justifyContent: 'center',
   },
   deltaText: {
+    ...figmaTextStyles.numberXs40,
     color: gameUiColors.white,
-    fontFamily: typography.family.bodySemibold,
-    fontSize: 25,
-    fontWeight: typography.weight.semibold,
-    lineHeight: 43,
     textAlign: 'center',
-    letterSpacing: -1,
-  },
-  totalsRow: {
-    height: 193,
   },
   buttonWrap: {
     width: '100%',
     overflow: 'hidden',
-  },
-  debugBtn: {
-    position: 'absolute',
-    top: 60,
-    right: 16,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  debugBtnText: {
-    color: gameUiColors.white,
-    fontFamily: typography.family.bodySemibold,
-    fontSize: 14,
   },
 });

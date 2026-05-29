@@ -19,10 +19,9 @@ export function BrandLogo({ style, testID }: Props) {
     />
   );
 }
-
 const styles = StyleSheet.create({
   logo: {
-    width: 310,
-    height: 201,
+    width: 298,
+    height: 220,
   },
 });

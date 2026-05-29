@@ -51,6 +51,7 @@ export interface Rule {
   maxBonusPerTeam?: number;
   maxMalusPerTeam?: number;
   conditionId?: string;
+  status?: 'verified' | 'unverified' | 'deprecated';
   isAvailable?: (scores: Record<Team, number>) => boolean;
 }
 

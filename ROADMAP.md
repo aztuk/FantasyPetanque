@@ -10,6 +10,8 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 
 <!-- tâches critiques pour le fonctionnement de base -->
 
+- [fait] King of the Hill — Exclusivité des bonus : cliquer sur l'équipe adverse retire un bonus à l'équipe active (même UX que le tap adverse en score classique). - Difficulté 1/5 - Claude
+
 - [fait] Ranking — Setup Supabase + modèle de données : créer le projet Supabase, configurer le client dans l'app, définir les tables `players` (id, name, elo_petanque, elo_flechettes) et `matches` (id, sport, date, participants, result). Ajouter les variables d'environnement nécessaires. - Difficulté 2/5 - Codex
 - [fait] Ranking — Navigation : ajouter une section "Ranking" accessible depuis la Home (bouton ou tab). Créer le skeleton de navigation (RankingScreen, sous-pages) avec les deux sports Pétanque et Fléchettes. - Difficulté 2/5 - Codex
 - [fait] Ranking — Page classement : afficher la liste des joueurs triés par ELO décroissant pour chaque sport (onglets Pétanque / Fléchettes). Deux boutons en bas : "Ajouter un joueur" et "Ajouter un match". - Difficulté 2/5 - Claude
@@ -28,7 +30,7 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 
 <!-- fonctionnalités importantes mais non bloquantes -->
 
-- [en cours] Ranking — Repositionner le bouton "Ajouter un joueur" : déplacer le bouton dans les pages de classement selon la maquette Figma (`node-id=62-1601`).
+- [fait] Ranking — Repositionner le bouton "Ajouter un joueur" : déplacer le bouton dans les pages de classement selon la maquette Figma (`node-id=62-1601`). - Difficulté 1/5 - Claude
 
 - [fait] Logo et nom de l'appli : modifier le logo, le nom affiché et le slug de l'application. - Difficulté 1/5 - Codex
 - [fait] Ranking — Écran winner fléchettes et composants : mettre à jour `Design.md` avec l'écran de choix du gagnant en mode tri (fléchettes) depuis Figma (`node-id=69-159`) et ses composants spécifiques (`node-id=69-190`), puis implémenter l'écran et les composants dans le flow d'ajout de match Fléchettes. Mettre à jour le catalogue de composants et les tokens si nécessaire. - Difficulté 3/5 - Codex
@@ -47,22 +49,21 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 - [fait] EndGame screen — vérifier padding : inspecter l'écran de fin de partie et corriger tout padding excessif ou manquant selon `Design.md` (`node-id=7-783`). - Difficulté 1/5 - Claude
 - [fait] UI spécifique règle Assurance vie : refonte selon maquette Figma. - Difficulté 2/5 - Codex
 - [fait] UI spécifique règle Frontière : refonte selon maquette Figma. - Difficulté 2/5 - Codex
-- [en cours] UI spécifique règle L'impair contre-attaque : vérifier/refondre l'affichage d'aide au scoring automatique.
-- [ ] Animation UI — lévitation point bonus : le badge "+X" vert dans le bloc score de la mène doit avoir une animation de lévitation (flottement léger en boucle).
+- [fait] UI spécifique règle L'impair contre-attaque : vérifier/refondre l'affichage d'aide au scoring automatique. - Difficulté 1/5 - Claude
+- [fait] Animation UI — lévitation point bonus : le badge "+X" vert dans le bloc score de la mène doit avoir une animation de lévitation (flottement léger en boucle). - Difficulté 1/5 - Claude
 - [fait] Animation UI — chiffres du score : modifier l'animation des chiffres pour qu'on voie clairement l'incrémentation chiffre après chiffre. L'unité doit réagir sans délai perceptible au touché ; utiliser une courbe d'accélération plus directe (moins d'ease-in). - Difficulté 1/5 - Claude
 - [fait] Ranking — Stats fléchettes : remplacer le nombre de victoires/défaites par un taux de victoire affiché sous la forme "31% winrate" (victoires ÷ matchs joués, arrondi à l'entier). - Difficulté 1/5 - Claude
 - [fait] Ranking — Taille des icônes trophée top 3 : ajuster la taille des icônes trophée pour les 3 premiers du classement (informer l'utilisateur de la taille actuelle, puis demander la nouvelle taille souhaitée avant d'implémenter). - Difficulté 1/5 - Codex
-- [ ] UI polish — supprimer les bordures des scores de mène dans l'écran de jeu en cours.
 - [fait] Design system — Synchronisation Figma des tokens couleurs et styles de texte : inventorier les écarts entre Figma, `Design.md`, `theme.ts` et les usages UI (couleurs, `figmaTextStyles`, anciens `textStyles.*` / `typography.*`), produire un rapport d'écarts, puis demander un arbitrage humain avant toute correction. - Difficulté 2/5 - Codex
-- [ ] Design system / bouton disabled : ajouter le token de couleur disabled et appliquer le style du bouton disabled depuis la maquette Figma `node-id=4-276`.
-- [ ] Home — tagline : réduire la police de la tagline à 21 px.
-- [ ] Inter-mène UI — règle alignée en haut : dans l'écran inter-mène (affichage règle + vétos), aligner le contenu de la règle en haut de l'écran plutôt qu'en bas.
-- [ ] Config règles — padding excessif : réduire le padding autour des règles dans les écrans de config (mode CONFIG).
-- [ ] Harmoniser les espaces dans le scoreboard et autour des boutons conditionnels (bonus/malus/véto) qui peuvent apparaître dynamiquement.
-- [ ] Mène classique UI : ajouter un espace de 4 px entre le score board et le bouton.
-- [ ] Mène classique UI : ajouter un masque gradient ou progressive blur en haut sous le header et dans l'historique pour un effet smooth.
-- [ ] Fin de partie UI : ajouter un masque gradient ou progressive blur en bas au-dessus du bouton et dans l'historique pour un effet smooth.
-- [ ] Inter-mène fantasy UI : ajouter un espace entre les vétos et le bouton.
+- [fait] Design system / bouton disabled : ajouter le token de couleur disabled et appliquer le style du bouton disabled depuis la maquette Figma `node-id=4-276`. - Difficulté 1/5 - Claude
+- [fait] Home — tagline : réduire la police de la tagline à 21 px. - Difficulté 1/5 - Claude
+- [fait] Inter-mène UI — règle alignée en haut : dans l'écran inter-mène (affichage règle + vétos), aligner le contenu de la règle en haut de l'écran plutôt qu'en bas. - Difficulté 1/5 - Claude
+- [fait] Config règles — padding excessif : réduire le padding autour des règles dans les écrans de config (mode CONFIG). - Difficulté 1/5 - Claude
+- [fait] Harmoniser les espaces dans le scoreboard et autour des boutons conditionnels (bonus/malus/véto) qui peuvent apparaître dynamiquement. - Difficulté 1/5 - Claude
+- [fait] Mène classique UI : ajouter un espace de 4 px entre le score board et le bouton. - Difficulté 1/5 - Claude
+- [fait] Mène classique UI : ajouter un masque gradient ou progressive blur en haut sous le header et dans l'historique pour un effet smooth. - Difficulté 1/5 - Claude
+- [fait] Fin de partie UI : ajouter un masque gradient ou progressive blur en bas au-dessus du bouton et dans l'historique pour un effet smooth. - Difficulté 1/5 - Claude
+- [fait] Inter-mène fantasy UI : ajouter un espace entre les vétos et le bouton. - Difficulté 1/5 - Claude
 - [ ] Transitions animées au début de mène — séquence en 6 temps : (A) titre + description de règle apparaissent progressivement style "ChatGPT" ; (B) le bloc remonte en haut de l'écran, toujours visible ; (C) blocs de score total apparaissent en bas puis le label au-dessus ; (D) éléments spécifiques à la mène apparaissent au milieu ; (E) boutons véto apparaissent sous les blocs score, décalant le score vers le haut ; (F) bouton "Terminer la mène" apparaît grisé en bas, décalant le score vers le haut. Dépend de la tâche "Refonte UI GameScreen".
 - [ ] Cadrage animations/transitions Game : à reprendre seulement quand le flow de partie est stabilisé ; demander où les transitions doivent avoir lieu, évaluer si une librairie est nécessaire, puis créer une tâche par transition avec un brief précis validé par l'utilisateur.
 - [ ] Design check — UIs règles spécifiques : vérifier la conformité Figma des UIs de règles — TeamRowButton (`node-id=15-1468`, `15-1509`), Config ValueInput (`node-id=16-1569`), Casino (`node-id=17-1625`), Prediction (`node-id=18-1701`). À faire après la refonte des UIs spécifiques de toutes les règles.

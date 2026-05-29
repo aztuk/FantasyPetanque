@@ -55,12 +55,12 @@ export function GameActionButton({
 }
 const styles = StyleSheet.create({
   button: {
-    minHeight: componentSizes.buttonHeight,
+    height: componentSizes.gameButtonHeight,
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 10,
-    paddingVertical: 16,
+    paddingVertical: 12,
   },
   label: {
     ...figmaTextStyles.buttonCTA,

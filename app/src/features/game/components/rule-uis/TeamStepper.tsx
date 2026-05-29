@@ -2,7 +2,7 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Minus, Plus } from 'phosphor-react-native';
 import { Team } from '../../../../domain/game/models';
-import { textStyles } from '../../../../shared/constants';
+import { colors, figmaTextStyles, radius, spacing } from '../../../../shared/constants';
 import { gameUiColors } from '../gameUiTheme';
 
 interface TeamStepperProps {
@@ -65,7 +65,6 @@ export function TeamStepper({ team, value, onChange, min = 0, max = 99, label, t
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
@@ -85,32 +84,34 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   btnTop: {
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
+    borderTopLeftRadius: radius.input,
+    borderTopRightRadius: radius.input,
   },
   btnBottom: {
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
+    borderBottomLeftRadius: radius.input,
+    borderBottomRightRadius: radius.input,
   },
   btnDisabled: {
     opacity: 0.4,
   },
   valueBox: {
     backgroundColor: gameUiColors.divider,
-    borderRadius: 10,
+    borderRadius: radius.input,
     paddingHorizontal: 32,
     paddingVertical: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
   valueText: {
-    ...textStyles.uiValueLg,
-    color: gameUiColors.white,
+    ...figmaTextStyles.numberMd80,
+    color: colors.white,
     textAlign: 'center',
+    includeFontPadding: false,
   },
   label: {
-    ...textStyles.actionLabel,
+    ...figmaTextStyles.labels,
     textAlign: 'center',
-    marginTop: 10,
+    marginTop: spacing.control,
+    includeFontPadding: false,
   },
 });

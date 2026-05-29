@@ -13,8 +13,10 @@ export const gameUiColors = {
   white: colors.white,
   green: colors.secondary,
   blueSurface: colors.team.blue,
+  blueDark: colors.team.blueDark,
   blueText: colors.team.blueText,
   redSurface: colors.team.red,
+  redDark: colors.team.redDark,
   redText: colors.team.redText,
   darkOverlay: colors.darkSmoother,
 } as const;

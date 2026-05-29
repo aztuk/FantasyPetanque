@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
-import { colors, typography, radius } from '../constants';
+import { colors, componentSizes, figmaTextStyles } from '../constants';
 
 interface Props {
   label: string;
@@ -25,7 +25,10 @@ export function PrimaryButton({
     variant === 'danger'    ? colors.team.redDark :
     colors.primary;
 
-  const textColor = (!disabled && variant === 'primary') ? colors.dark : colors.white;
+  const textColor =
+    disabled ? colors.textSmooth :
+    variant === 'primary' ? colors.dark :
+    colors.white;
 
   return (
     <TouchableOpacity
@@ -41,20 +44,17 @@ export function PrimaryButton({
     </TouchableOpacity>
   );
 }
-// TODO A REMPLACER: styles legacy a migrer depuis Design.md + figmaTextStyles, ecran par ecran.
-
 const styles = StyleSheet.create({
   btn: {
-    paddingVertical: 20,
-    borderRadius: radius.lg,
+    minHeight: componentSizes.buttonHeight,
+    paddingHorizontal: 10,
+    paddingVertical: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    marginHorizontal: 4,
   },
   label: {
-    fontSize: typography.size.base,
-    fontWeight: typography.weight.bold,
+    ...figmaTextStyles.buttonCTA,
     textAlign: 'center',
-    letterSpacing: 0.3,
+    includeFontPadding: false,
   },
 });

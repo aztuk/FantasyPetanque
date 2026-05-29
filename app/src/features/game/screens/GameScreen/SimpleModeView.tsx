@@ -2,10 +2,12 @@ import React from 'react';
 import { shouldSkipNormalScore } from '../../../../domain/game/engine';
 import { Team } from '../../../../domain/game/models';
 import { GameActionButton } from '../../components/GameActionButton';
+import { GameDrawer } from '../../components/GameDrawer';
 import { GameHistoryList } from '../../components/GameHistoryList';
 import { GameScoreBoard } from '../../components/GameScoreBoard';
 import { useGameStore } from '../../state/gameStore';
 import { GameScreenLayout } from '../GameScreenLayout';
+import { gameScreenStyles } from './gameScreenStyles';
 
 export function SimpleModeView() {
   const {
@@ -42,24 +44,30 @@ export function SimpleModeView() {
 
   return (
     <GameScreenLayout
-      drawerTotalScore={
-        <GameScoreBoard
-          scores={scores}
-          roundPoints={{ blue: bluePoints, red: redPoints }}
-          roundNumber={round.number}
-          onTeamPress={handleTeamPress}
-        />
-      }
-      drawerConfirmButton={
-        <GameActionButton
-          label={canFinishRound ? 'Mène terminée' : 'Points manquants'}
-          onPress={handleFinishRound}
-          disabled={!canFinishRound}
-          testID="end-round-button"
+      drawer={
+        <GameDrawer
+          testID="game-drawer"
+          scoreBoard={
+            <GameScoreBoard
+              scores={scores}
+              roundPoints={{ blue: bluePoints, red: redPoints }}
+              roundNumber={round.number}
+              variant="drawer"
+              onTeamPress={handleTeamPress}
+            />
+          }
+          confirmButton={
+            <GameActionButton
+              label={canFinishRound ? 'Mène terminée' : 'Points manquants'}
+              onPress={handleFinishRound}
+              disabled={!canFinishRound}
+              testID="end-round-button"
+            />
+          }
         />
       }
     >
-      <GameHistoryList rounds={rounds} orientation="bottom" />
+      <GameHistoryList rounds={rounds} orientation="bottom" style={gameScreenStyles.simpleHistory} />
     </GameScreenLayout>
   );
 }

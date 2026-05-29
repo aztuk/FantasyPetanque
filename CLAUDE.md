@@ -23,8 +23,11 @@ Ce protocole s'exécute **uniquement quand l'utilisateur demande la prochaine t�
 - Prendre la première tâche `[ ]` dans `ROADMAP.md` (priorité haute en premier).
 - Vérifier que les tâches `[en cours]` ne créent pas de conflit (fichiers partagés, dépendances) avec la tâche choisie — si oui, le signaler à l'utilisateur avant de continuer.
 - Si la tâche choisie est manifestement petite et sans ambiguïté, l'agent peut proposer de prendre en même temps la prochaine petite tâche compatible, à condition d'analyser les deux scopes, de vérifier l'absence de conflit, puis de marquer les deux tâches `[en cours]` avant de coder.
+- **Lors de la présentation de la tâche choisie, indiquer le nombre de tâches `[ ]` restantes (hors `[en cours]`) dans `ROADMAP.md`.** Format attendu : "Tâche proposée : X — il reste Y tâche(s) `[ ]` dans la roadmap."
 
 ### 3. Analyser avant de coder
+
+**Marquer immédiatement la tâche à `[en cours]` dans `ROADMAP.md` dès le début de cette étape**, avant toute analyse ou question.
 
 - **Faisabilité** : ambiguïtés dans `fantasy-petanque.md` ?
 - **Scope** : fichiers touchés, inclus/exclus ?
@@ -35,9 +38,8 @@ Si un aspect de game design, UX ou contrainte technique n'est pas clair → **po
 
 ### 4. Démarrer
 
-1. Mettre la tâche à `[en cours]` dans `ROADMAP.md`.
-2. Présenter le plan d'implémentation.
-3. Attendre validation avant de coder.
+1. Présenter le plan d'implémentation (la tâche est déjà `[en cours]` depuis l'étape 3).
+2. Attendre validation avant de coder.
 
 ### 5. Demander un test manuel avant de terminer
 
