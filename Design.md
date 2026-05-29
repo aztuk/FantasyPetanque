@@ -122,6 +122,7 @@ Figma principal : <!-- URL fichier Figma principal -->
 | IncrementalInput | Standard | Stepper vertical avec +, valeur numérique, - et label d'équipe. | `TeamStepper` |
 | Readonly | Standard | Valeur numérique verrouillée avec label d'équipe. | lecture seule dans `CasinoUI` et `PredictionUI` |
 | BonusButton | Standard | Bouton d'action compact pour un événement de règle, par exemple "Tir réussi". | `GameTeamActionRow` / `BonusButtonsUI` selon le besoin d'équipe |
+| WinnerSortItem | `selected=first`, `selected=between`, `selected=last` | Ligne de tri des participants Fléchettes pendant l'ajout d'un match : ordre d'arrivée, gagnant et perdant. | `WinnerSortItem` local dans `AddMatchScreen` |
 
 ### ScoreBoard
 
@@ -231,6 +232,19 @@ Figma principal : <!-- URL fichier Figma principal -->
 - Label : `ButtonActions`, `--white`, centré.
 - Sert aux actions compactes déclenchées pendant une règle, par exemple "Tir réussi".
 - Si l'action cible une équipe, préférer une composition avec boutons d'équipe cohérente avec les écrans spécifiques Figma.
+### WinnerSortItem
+
+> Référence Figma : [node-id=69:190](https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=69-190&t=EEvZW3FMwHZ6W4QA-11)
+
+- Dimensions Figma : `393 x 64`.
+- Layout : ligne horizontale, alignement vertical centré, gap `24`, padding gauche `40`, padding droit `24`, padding vertical `16`.
+- Le drag handle est positionné à gauche (`left: 8`, `top: 20`) et utilise l'icône `DotsSixVertical` en `24 x 24`, couleur `--textsmooth`.
+- Le nom du joueur utilise `ButtonActions` en `--white`, sur une zone flexible.
+- Variante `selected=first` : fond `--darksmooth`; icône `Trophy` en `32 x 32`, couleur `--primary`; pas de rang textuel.
+- Variante `selected=between` : fond transparent sur `--dark`; rang textuel à droite (`2e`, `3e`, etc.) en `ButtonActions`, couleur `--textsmooth`.
+- Variante `selected=last` : fond transparent sur `--dark`; icône `SmileySad` en `32 x 32`, couleur `--redteamsurface`; pas de rang textuel.
+- Le composant sert au tri Fléchettes : le premier joueur de la liste est le gagnant, le dernier est le perdant, les joueurs intermédiaires conservent leur position d'arrivée.
+- Pendant un drag, conserver un emplacement fantôme à la position d'origine et déplacer le ghost vers l'emplacement survolé pour indiquer la cible sans décaler brutalement la liste.
 
 ---
 
@@ -242,6 +256,7 @@ Figma principal : <!-- URL fichier Figma principal -->
 
 Home: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=1-2&t=qil4nd06wX0YCs6f-11
 Home Debug: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=1-74&t=qil4nd06wX0YCs6f-11
+Ranking AddMatch Winner Fléchettes: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=69-159&t=EEvZW3FMwHZ6W4QA-11
 Setup 01 Mode Choice: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=1-5&t=qil4nd06wX0YCs6f-11
 Setup 02 End condition:https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=4-116&t=qil4nd06wX0YCs6f-11
 Setup 03 Target Value: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=4-124&t=qil4nd06wX0YCs6f-11

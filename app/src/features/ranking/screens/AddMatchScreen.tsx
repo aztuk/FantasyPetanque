@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Animated,
   Easing,
+  type GestureResponderHandlers,
   Keyboard,
   KeyboardEvent,
   PanResponder,
@@ -53,7 +54,8 @@ type WinnerStatus = 'winner' | 'loser' | 'neutral';
 const ANIM_DURATION = 500;
 const ANIM_GAP = 120;
 const ANIM_INITIAL_DELAY = 300;
-const ITEM_HEIGHT = 56;
+const PLAYER_SELECT_ITEM_HEIGHT = 56;
+const WINNER_SORT_ITEM_HEIGHT = 64;
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'AddMatch'>;
 type Route = RouteProp<RootStackParamList, 'AddMatch'>;
@@ -224,7 +226,7 @@ export function AddMatchScreen() {
     step === 'players'
       ? 'Qui a joué ?'
       : sport === 'flechettes'
-        ? 'Dans quel ordre ?'
+        ? 'Qui a gagné?'
         : 'Qui a gagné ?';
 
   return (
@@ -343,16 +345,19 @@ function DragOrderList({ players, onReorder }: DragOrderListProps) {
         onStartShouldSetPanResponder: () => true,
         onMoveShouldSetPanResponder: () => true,
         onPanResponderGrant: (evt) => {
-          dragOriginY.current = evt.nativeEvent.pageY - index * ITEM_HEIGHT;
-          dragY.setValue(index * ITEM_HEIGHT);
+          dragOriginY.current = evt.nativeEvent.pageY - index * WINNER_SORT_ITEM_HEIGHT;
+          dragY.setValue(index * WINNER_SORT_ITEM_HEIGHT);
           setDraggingIndex(index);
           setHoverIndex(index);
         },
         onPanResponderMove: (evt) => {
           const rawY = evt.nativeEvent.pageY - dragOriginY.current;
-          const clamped = Math.max(0, Math.min(rawY, (currentOrder.current.length - 1) * ITEM_HEIGHT));
+          const clamped = Math.max(
+            0,
+            Math.min(rawY, (currentOrder.current.length - 1) * WINNER_SORT_ITEM_HEIGHT),
+          );
           dragY.setValue(clamped);
-          const targetIndex = Math.round(clamped / ITEM_HEIGHT);
+          const targetIndex = Math.round(clamped / WINNER_SORT_ITEM_HEIGHT);
           setHoverIndex(Math.max(0, Math.min(targetIndex, currentOrder.current.length - 1)));
         },
         onPanResponderRelease: () => {
@@ -378,61 +383,131 @@ function DragOrderList({ players, onReorder }: DragOrderListProps) {
   );
 
   const total = players.length;
+  const draggingPlayer = draggingIndex !== null ? players[draggingIndex] : null;
+
+  const renderWinnerSortItem = (
+    player: Player,
+    index: number,
+    options?: {
+      dragging?: boolean;
+      hover?: boolean;
+      panHandlers?: ReturnType<typeof makePanResponder>['panHandlers'];
+    },
+  ) => {
+    const isFirst = index === 0;
+    const isLast = index === total - 1;
+    const selected = isFirst ? 'first' : isLast ? 'last' : 'between';
+
+    return (
+      <WinnerSortItem
+        name={player.name}
+        selected={selected}
+        rank={index + 1}
+        dragging={options?.dragging}
+        hover={options?.hover}
+        panHandlers={options?.panHandlers}
+        testID={`rank-order-item-${index + 1}`}
+        dragTestID={`drag-handle-${index}`}
+      />
+    );
+  };
 
   return (
-    <View style={styles.list}>
+    <View style={styles.winnerSortList}>
       {players.map((player, index) => {
         const isDragging = draggingIndex === index;
         const isHover =
           hoverIndex !== null && draggingIndex !== null && hoverIndex === index && !isDragging;
-        const isFirst = index === 0;
-        const isLast = index === total - 1;
-        const label = isFirst ? 'Gagnant' : isLast ? 'Perdant' : undefined;
+        const panResponder = makePanResponder(index);
 
         return (
-          <Animated.View
+          <View
             key={player.id}
             style={[
-              styles.listItem,
-              styles.listItemSelected,
-              isDragging && styles.listItemDragging,
-              isHover && styles.listItemHover,
-              isDragging && {
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                top: dragY,
-                zIndex: 10,
-              },
+              isDragging && styles.winnerSortPlaceholder,
+              isHover && styles.winnerSortHoverSlot,
             ]}
-            testID={`rank-order-item-${index + 1}`}
           >
-            <View style={styles.rankBadge}>
-              <Text style={styles.rankNumber}>{index + 1}</Text>
-            </View>
-            <Text style={styles.playerName}>{player.name}</Text>
-            {label === 'Gagnant' && (
-              <View style={styles.statusBadge}>
-                <TrophyIcon color={colors.primary} size={24} weight="regular" />
-                <Text style={[styles.statusLabel, styles.statusLabelWinner]}>Gagnant</Text>
-              </View>
-            )}
-            {label === 'Perdant' && (
-              <View style={styles.statusBadge}>
-                <SmileySadIcon color={colors.team.red} size={24} weight="regular" />
-                <Text style={[styles.statusLabel, styles.statusLabelLoser]}>Perdant</Text>
-              </View>
-            )}
-            <View
-              {...makePanResponder(index).panHandlers}
-              style={styles.dragHandle}
-              testID={`drag-handle-${index}`}
-            >
-              <DotsSixVerticalIcon color={colors.textSmooth} size={24} weight="regular" />
-            </View>
-          </Animated.View>
+            {!isDragging && renderWinnerSortItem(player, index, {
+              hover: isHover,
+              panHandlers: panResponder.panHandlers,
+            })}
+          </View>
         );
       })}
+      {draggingPlayer && draggingIndex !== null && (
+        <Animated.View
+          style={[
+            styles.winnerSortDragged,
+            {
+              top: dragY,
+            },
+          ]}
+          pointerEvents="none"
+        >
+          {renderWinnerSortItem(draggingPlayer, draggingIndex, { dragging: true })}
+        </Animated.View>
+      )}
+    </View>
+  );
+}
+
+interface WinnerSortItemProps {
+  name: string;
+  selected: 'first' | 'between' | 'last';
+  rank: number;
+  dragging?: boolean;
+  hover?: boolean;
+  panHandlers?: GestureResponderHandlers;
+  testID: string;
+  dragTestID: string;
+}
+
+function WinnerSortItem({
+  name,
+  selected,
+  rank,
+  dragging = false,
+  hover = false,
+  panHandlers,
+  testID,
+  dragTestID,
+}: WinnerSortItemProps) {
+  const isFirst = selected === 'first';
+  const isLast = selected === 'last';
+  const isBetween = selected === 'between';
+
+  return (
+    <View
+      style={[
+        styles.winnerSortItem,
+        isFirst && styles.winnerSortItemFirst,
+        hover && styles.winnerSortItemHover,
+        dragging && styles.winnerSortItemDragging,
+      ]}
+      testID={testID}
+    >
+      <View
+        {...(panHandlers ?? {})}
+        style={styles.winnerSortDragHandle}
+        testID={dragTestID}
+        accessibilityRole="button"
+        accessibilityLabel={`Déplacer ${name}`}
+      >
+        <DotsSixVerticalIcon color={colors.textSmooth} size={24} weight="regular" />
+      </View>
+
+      <Text style={styles.winnerSortName} numberOfLines={1}>
+        {name}
+      </Text>
+
+      <View style={styles.winnerSortRank}>
+        {isFirst && <TrophyIcon color={colors.primary} size={32} weight="regular" />}
+        {isLast && <SmileySadIcon color={colors.team.red} size={32} weight="regular" />}
+        {isBetween && (
+          <Text style={styles.winnerSortRankLabel}>{formatOrdinalRank(rank)}</Text>
+        )}
+      </View>
     </View>
   );
 }
@@ -612,6 +687,10 @@ function EloResultItem({ name, newElo, delta, delay }: EloResultItemProps) {
   );
 }
 
+function formatOrdinalRank(rank: number): string {
+  return `${rank}e`;
+}
+
 interface BackButtonProps {
   onPress: () => void;
 }
@@ -678,7 +757,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   listItem: {
-    height: ITEM_HEIGHT,
+    height: PLAYER_SELECT_ITEM_HEIGHT,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing[6],
@@ -687,7 +766,28 @@ const styles = StyleSheet.create({
   listItemSelected: {
     backgroundColor: colors.darkSmooth,
   },
-  listItemDragging: {
+  winnerSortList: {
+    flex: 1,
+    position: 'relative',
+  },
+  winnerSortItem: {
+    width: '100%',
+    height: WINNER_SORT_ITEM_HEIGHT,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing[6],
+    paddingLeft: spacing[10],
+    paddingRight: spacing[6],
+    paddingVertical: spacing[4],
+    backgroundColor: colors.dark,
+  },
+  winnerSortItemFirst: {
+    backgroundColor: colors.darkSmooth,
+  },
+  winnerSortItemHover: {
+    backgroundColor: colors.darkSmoother,
+  },
+  winnerSortItemDragging: {
     backgroundColor: colors.darkSmoother,
     elevation: 8,
     shadowColor: colors.dark,
@@ -695,26 +795,45 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 8,
   },
-  listItemHover: {
-    backgroundColor: colors.dark,
-  },
-  rankBadge: {
-    width: 28,
-    height: 28,
-    borderRadius: radius.round,
+  winnerSortPlaceholder: {
+    height: WINNER_SORT_ITEM_HEIGHT,
     backgroundColor: colors.darkSmoother,
+  },
+  winnerSortHoverSlot: {
+    backgroundColor: colors.darkSmoother,
+  },
+  winnerSortDragged: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    zIndex: 10,
+  },
+  winnerSortDragHandle: {
+    position: 'absolute',
+    left: spacing[2],
+    top: spacing[5],
+    width: spacing[6],
+    height: spacing[6],
     alignItems: 'center',
     justifyContent: 'center',
   },
-  rankNumber: {
-    fontFamily: typography.family.body,
-    fontSize: 14,
-    fontWeight: typography.weight.semiBold,
-    color: colors.textSmooth,
+  winnerSortName: {
+    ...figmaTextStyles.buttonActions,
+    flex: 1,
+    minWidth: 0,
+    color: colors.white,
     includeFontPadding: false,
   },
-  dragHandle: {
-    padding: spacing[2],
+  winnerSortRank: {
+    width: spacing[8],
+    height: spacing[8],
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  winnerSortRankLabel: {
+    ...figmaTextStyles.buttonActions,
+    color: colors.textSmooth,
+    includeFontPadding: false,
   },
   playerName: {
     ...figmaTextStyles.buttonActions,

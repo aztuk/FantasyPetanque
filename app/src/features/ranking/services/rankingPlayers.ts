@@ -235,7 +235,7 @@ export async function saveMatchRanked(
 
   const { error: matchError } = await supabase.from('matches').insert({
     sport,
-    participants: participants as Json,
+    participants: participants as unknown as Json,
     result: result as Json,
   });
 
@@ -243,16 +243,17 @@ export async function saveMatchRanked(
     throw new Error(matchError.message);
   }
 
-  const eloField: 'elo_petanque' | 'elo_flechettes' =
-    sport === 'petanque' ? 'elo_petanque' : 'elo_flechettes';
-
   await Promise.all(
     rankedPlayers.map((player) => {
       const delta = eloDeltas[player.id] ?? 0;
       const newElo = getPlayerElo(player, sport) + delta;
+      const update =
+        sport === 'petanque'
+          ? { elo_petanque: newElo }
+          : { elo_flechettes: newElo };
       return supabase
         .from('players')
-        .update({ [eloField]: newElo })
+        .update(update)
         .eq('id', player.id);
     }),
   );
@@ -293,7 +294,7 @@ export async function saveMatch(
 
   const { error: matchError } = await supabase.from('matches').insert({
     sport,
-    participants: participants as Json,
+    participants: participants as unknown as Json,
     result: result as Json,
   });
 
@@ -301,17 +302,18 @@ export async function saveMatch(
     throw new Error(matchError.message);
   }
 
-  const eloField: 'elo_petanque' | 'elo_flechettes' =
-    sport === 'petanque' ? 'elo_petanque' : 'elo_flechettes';
-
   const allPlayers = [...winners, ...losers];
   await Promise.all(
     allPlayers.map((player) => {
       const delta = eloDeltas[player.id] ?? 0;
       const newElo = getPlayerElo(player, sport) + delta;
+      const update =
+        sport === 'petanque'
+          ? { elo_petanque: newElo }
+          : { elo_flechettes: newElo };
       return supabase
         .from('players')
-        .update({ [eloField]: newElo })
+        .update(update)
         .eq('id', player.id);
     }),
   );
