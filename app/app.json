@@ -4,26 +4,26 @@
     "slug": "fantasy-petanque",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/app-icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/app-splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#28261F"
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/app-adaptive-icon.png",
+        "backgroundColor": "#28261F"
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.aztuk.app"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/app-favicon.png"
     },
     "plugins": [
       "expo-font",
@@ -35,7 +35,16 @@
           "behavior": "overlay-swipe"
         }
       ],
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/app-splash-icon.png",
+          "imageWidth": 298,
+          "resizeMode": "contain",
+          "backgroundColor": "#28261F"
+        }
+      ]
     ]
   }
 }
