@@ -278,6 +278,7 @@ Game Fantasy Specific InGame Sortie de porc: https://www.figma.com/design/nfmjDH
 Game Fantasy Specific Config Contrat: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=46-1353&t=qil4nd06wX0YCs6f-11
 Game Fantasy Specific InGame Contrat: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=46-1456&t=qil4nd06wX0YCs6f-11
 Game Fantasy Specific Config Assurance vie: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=70-857&t=65shhe9v4Gv8fvH4-11
+Game Fantasy Specific Config Frontières: https://www.figma.com/design/nfmjDHM2oIiYwHujG8vxOS/FantasyPetanque?node-id=72-909&t=65shhe9v4Gv8fvH4-11
 Note Contrat: l'écran en partie a besoin d'un label court pour chaque mission.
 
 

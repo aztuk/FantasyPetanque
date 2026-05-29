@@ -39,6 +39,15 @@ describe('Rules data bank', () => {
     expect(rule.tags).toContain('not-available-at-zero');
   });
 
+  it('frontiere uses the Figma copy and auto-arbitrage note', () => {
+    const rule = getRuleById('frontiere')!;
+
+    expect(rule.name).toBe('Frontières');
+    expect(rule.description).toContain('<b>Choisissez un côté.</b>');
+    expect(rule.note).toBe('Auto-arbitrage');
+    expect(rule.tags).toContain('auto-arbitrage');
+  });
+
   it('all expected rules are present', () => {
     const expectedIds = [
       'gauche-caviar',

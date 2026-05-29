@@ -143,19 +143,26 @@ describe('GameScreen fantasy inter-mene', () => {
     fireEvent.press(screen.getByTestId('begin-round-button'));
 
     expect(useGameStore.getState().phase).toBe('rule-setup');
+    expect(screen.getByText('Frontières')).toBeTruthy();
+    expect(screen.getByText('Auto-arbitrage')).toBeTruthy();
+    expect(screen.getByText('CONFIRMER')).toBeTruthy();
+    expect(screen.getByTestId('frontiere-setup-footer')).toBeTruthy();
+    expect(screen.getByTestId('frontiere-choice-grid')).toBeTruthy();
     expect(screen.getByTestId('confirm-rule-setup-button').props.accessibilityState.disabled).toBe(true);
 
-    act(() => {
-      useGameStore.getState().setFrontiereChoice('blue', 'left');
-      useGameStore.getState().setFrontiereChoice('red', 'right');
-    });
+    fireEvent.press(screen.getByTestId('frontiere-blue-left-button'));
+    fireEvent.press(screen.getByTestId('frontiere-red-right-button'));
 
+    expect(useGameStore.getState().currentRound?.frontiereChoice).toEqual({ blue: 'left', red: 'right' });
     expect(screen.getByTestId('confirm-rule-setup-button').props.accessibilityState.disabled).toBe(false);
 
     fireEvent.press(screen.getByTestId('confirm-rule-setup-button'));
 
     expect(useGameStore.getState().phase).toBe('playing');
     expect(screen.getByTestId('end-round-button')).toBeTruthy();
+    expect(screen.getByTestId('frontiere-reminder')).toBeTruthy();
+    expect(screen.getByText('Gauche')).toBeTruthy();
+    expect(screen.getAllByText('Droite').length).toBeGreaterThan(0);
   });
 
   it('runs Contrat through mission setup and toggles mission success in game', () => {

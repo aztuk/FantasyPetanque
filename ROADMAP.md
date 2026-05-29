@@ -46,7 +46,7 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 - [fait] UI spécifique règle Contrat : refonte selon maquette Figma. - Difficulté 2/5 - Codex
 - [fait] EndGame screen — vérifier padding : inspecter l'écran de fin de partie et corriger tout padding excessif ou manquant selon `Design.md` (`node-id=7-783`). - Difficulté 1/5 - Claude
 - [fait] UI spécifique règle Assurance vie : refonte selon maquette Figma. - Difficulté 2/5 - Codex
-- [en cours] UI spécifique règle Frontière : refonte selon maquette Figma.
+- [fait] UI spécifique règle Frontière : refonte selon maquette Figma. - Difficulté 2/5 - Codex
 - [en cours] UI spécifique règle L'impair contre-attaque : vérifier/refondre l'affichage d'aide au scoring automatique.
 - [ ] Animation UI — lévitation point bonus : le badge "+X" vert dans le bloc score de la mène doit avoir une animation de lévitation (flottement léger en boucle).
 - [fait] Animation UI — chiffres du score : modifier l'animation des chiffres pour qu'on voie clairement l'incrémentation chiffre après chiffre. L'unité doit réagir sans délai perceptible au touché ; utiliser une courbe d'accélération plus directe (moins d'ease-in). - Difficulté 1/5 - Claude

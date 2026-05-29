@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Keyboard, ScrollView } from 'react-native';
+import { Keyboard, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -26,7 +26,8 @@ export function RuleSetupView() {
   const isCasino = round.rule?.id === 'casino';
   const isContrat = round.rule?.id === 'contrat';
   const isAssuranceVie = round.rule?.id === 'assurance-vie';
-  const useConfirmLabel = isCasino || round.rule?.id === 'prediction' || isContrat || isAssuranceVie;
+  const isFrontiere = round.rule?.id === 'frontiere';
+  const useConfirmLabel = isCasino || round.rule?.id === 'prediction' || isContrat || isAssuranceVie || isFrontiere;
   const setupComplete = isPreMeneSetupComplete(round);
   const confirmLabel = useConfirmLabel
     ? 'Confirmer'
@@ -76,15 +77,18 @@ export function RuleSetupView() {
             style={gameScreenStyles.preMeneRule}
           />
         )}
-        <RuleSetupUI round={round} />
+        {!isFrontiere && <RuleSetupUI round={round} />}
       </ScrollView>
       {!keyboardVisible && (
-        <GameActionButton
-          label={confirmLabel}
-          onPress={beginRound}
-          disabled={!setupComplete}
-          testID="confirm-rule-setup-button"
-        />
+        <View style={gameScreenStyles.bottomActions} testID={isFrontiere ? 'frontiere-setup-footer' : undefined}>
+          {isFrontiere && <RuleSetupUI round={round} />}
+          <GameActionButton
+            label={confirmLabel}
+            onPress={beginRound}
+            disabled={!setupComplete}
+            testID="confirm-rule-setup-button"
+          />
+        </View>
       )}
     </SafeAreaView>
   );
