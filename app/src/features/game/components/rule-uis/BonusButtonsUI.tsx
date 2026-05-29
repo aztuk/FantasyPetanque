@@ -35,17 +35,32 @@ export function BonusButtonsUI({ round }: Props) {
     return typeof bonusState === 'number' ? bonusState : (bonusState ? 1 : 0);
   };
 
+  const otherTeam = (team: Team): Team => (team === 'blue' ? 'red' : 'blue');
+
+  const isKingCancelMode = (team: Team): boolean =>
+    ruleId === 'king-of-the-hill' && getCount(otherTeam(team)) > 0 && getCount(team) === 0;
+
   const labels = (['blue', 'red'] as const).reduce((acc, team) => {
-    const count = getCount(team);
-    acc[team] = count >= max ? MAXED_LABELS[ruleId] : ACTION_LABELS[ruleId];
+    if (isKingCancelMode(team)) {
+      acc[team] = 'Retirer';
+    } else {
+      const count = getCount(team);
+      acc[team] = count >= max ? MAXED_LABELS[ruleId] : ACTION_LABELS[ruleId];
+    }
     return acc;
   }, {} as Record<Team, string>);
+
   const activeTeams = {
     blue: getCount('blue') >= max,
     red: getCount('red') >= max,
   };
 
   const handlePress = (team: Team) => {
+    if (isKingCancelMode(team)) {
+      removeBonus(otherTeam(team), ruleId);
+      return;
+    }
+
     if (getCount(team) >= max) {
       removeBonus(team, ruleId);
       return;

@@ -274,14 +274,14 @@ describe("resolveRound — Totem d'immunité", () => {
 // ─── King of the Hill ─────────────────────────────────────────────────────────
 
 describe('resolveRound — King of the Hill (bonus)', () => {
-  it('accorde le nombre de boules dans la zone', () => {
+  it('accorde le nombre de boules gagnantes dans la zone à une seule équipe', () => {
     const round = makeRound('king-of-the-hill', {
       normalPoints: { blue: 2, red: 0 },
-      kingBonus: { blue: 3, red: 1 },
+      kingBonus: { blue: 3, red: 0 },
     });
     const { newScores } = resolveRound(round, scores5, null);
     expect(newScores.blue).toBe(10); // 5 + 2 + 3
-    expect(newScores.red).toBe(6);   // 5 + 1
+    expect(newScores.red).toBe(5);   // 5 + 0
   });
 });
 

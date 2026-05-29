@@ -436,15 +436,36 @@ describe('GameScreen simple bonus and malus rule controls', () => {
     expect(screen.queryByTestId('score-modifier-blue')).toBeNull();
   });
 
-  it('keeps King of the Hill on the same shared bonus pattern', () => {
+  it('King of the Hill — ajoute des bonus à une équipe', () => {
     startFantasyRule('king-of-the-hill');
 
     fireEvent.press(screen.getByTestId('king-of-the-hill-bonus-red-button'));
     fireEvent.press(screen.getByTestId('king-of-the-hill-bonus-red-button'));
 
     expect(useGameStore.getState().currentRound?.kingBonus.red).toBe(2);
-    expect(screen.getAllByText('Boule gagnante').length).toBeGreaterThan(0);
+    expect(useGameStore.getState().currentRound?.kingBonus.blue).toBe(0);
     expect(screen.getByTestId('score-modifier-red').props.children).toBe('+2');
+  });
+
+  it('King of the Hill — cliquer sur l\'équipe adverse retire un bonus à l\'équipe active', () => {
+    startFantasyRule('king-of-the-hill');
+
+    fireEvent.press(screen.getByTestId('king-of-the-hill-bonus-red-button'));
+    fireEvent.press(screen.getByTestId('king-of-the-hill-bonus-red-button'));
+    expect(useGameStore.getState().currentRound?.kingBonus.red).toBe(2);
+
+    // Clicking blue cancels one of red's bonuses
+    fireEvent.press(screen.getByTestId('king-of-the-hill-bonus-blue-button'));
+    expect(useGameStore.getState().currentRound?.kingBonus.red).toBe(1);
+    expect(useGameStore.getState().currentRound?.kingBonus.blue).toBe(0);
+
+    // Cancel all red bonuses via blue button
+    fireEvent.press(screen.getByTestId('king-of-the-hill-bonus-blue-button'));
+    expect(useGameStore.getState().currentRound?.kingBonus.red).toBe(0);
+
+    // Now blue can get bonus
+    fireEvent.press(screen.getByTestId('king-of-the-hill-bonus-blue-button'));
+    expect(useGameStore.getState().currentRound?.kingBonus.blue).toBe(1);
   });
 });
 
