@@ -47,8 +47,8 @@ alter table public.players enable row level security;
 alter table public.matches enable row level security;
 
 grant usage on schema public to anon, authenticated;
-grant select, insert, update on public.players to anon, authenticated;
-grant select, insert, update on public.matches to anon, authenticated;
+grant select, insert, update, delete on public.players to anon, authenticated;
+grant select, insert, update, delete on public.matches to anon, authenticated;
 
 drop policy if exists "ranking players are readable" on public.players;
 create policy "ranking players are readable"
@@ -93,3 +93,17 @@ for update
 to anon, authenticated
 using (true)
 with check (true);
+
+drop policy if exists "ranking players can be deleted" on public.players;
+create policy "ranking players can be deleted"
+on public.players
+for delete
+to anon, authenticated
+using (true);
+
+drop policy if exists "ranking matches can be deleted" on public.matches;
+create policy "ranking matches can be deleted"
+on public.matches
+for delete
+to anon, authenticated
+using (true);

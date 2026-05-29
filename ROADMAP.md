@@ -43,7 +43,7 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 - [fait] UI spécifique règle Sortie de porc : refonte selon maquette Figma. - Difficulté 2/5 - Codex
 - [fait] UI spécifique règle Contrat : refonte selon maquette Figma. - Difficulté 2/5 - Codex
 - [fait] EndGame screen — vérifier padding : inspecter l'écran de fin de partie et corriger tout padding excessif ou manquant selon `Design.md` (`node-id=7-783`). - Difficulté 1/5 - Claude
-- [ ] UI spécifique règle Assurance vie : refonte selon maquette Figma.
+- [en cours] UI spécifique règle Assurance vie : refonte selon maquette Figma.
 - [ ] UI spécifique règle Frontière : refonte selon maquette Figma.
 - [ ] UI spécifique règle L'impair contre-attaque : vérifier/refondre l'affichage d'aide au scoring automatique.
 - [ ] Animation UI — lévitation point bonus : le badge "+X" vert dans le bloc score de la mène doit avoir une animation de lévitation (flottement léger en boucle).

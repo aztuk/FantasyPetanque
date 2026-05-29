@@ -12,10 +12,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ArrowLeftIcon, PlusIcon, TrophyIcon } from 'phosphor-react-native';
+import { ArrowLeftIcon, PlusIcon, TrashIcon, TrophyIcon } from 'phosphor-react-native';
 import type { Player, RankingSport } from '../../../domain/ranking/models';
 import { RootStackParamList } from '../../../app/navigation/types';
 import { SetupOption } from '../../../shared/components/SetupOption';
+import { AlertSheet } from '../../../shared/components/AlertSheet';
 import {
   colors,
   componentSizes,
@@ -25,12 +26,15 @@ import {
 } from '../../../shared/constants';
 import {
   createEmptyRankingRecords,
+  deletePlayer,
   fetchRankingData,
   getPlayerElo,
   getPlayerRecord,
   type RankingRecords,
+  resetElosForSport,
   sortPlayersBySport,
 } from '../services/rankingPlayers';
+import { useGameStore } from '../../game/state/gameStore';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'Ranking'>;
 type Route = RouteProp<RootStackParamList, 'Ranking'>;
@@ -55,6 +59,7 @@ const ITEM_HEIGHTS = {
 export function RankingScreen() {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
+  const { debugMode } = useGameStore();
   const [selectedSport, setSelectedSport] = useState<RankingSport | null>(route.params?.sport ?? null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [records, setRecords] = useState<RankingRecords>(() => createEmptyRankingRecords());
@@ -124,8 +129,10 @@ export function RankingScreen() {
           records={records}
           loading={loading}
           errorMessage={errorMessage}
+          debugMode={debugMode}
           onBack={handleBack}
           onAddMatch={() => navigation.navigate('AddMatch', { sport: selectedSport })}
+          onReloadData={loadData}
         />
       ) : (
         <RankingChoiceView
@@ -187,8 +194,10 @@ interface RankingListViewProps {
   records: RankingRecords;
   loading: boolean;
   errorMessage: string | null;
+  debugMode: boolean;
   onBack: () => void;
   onAddMatch: () => void;
+  onReloadData: () => void;
 }
 
 function RankingListView({
@@ -197,9 +206,27 @@ function RankingListView({
   records,
   loading,
   errorMessage,
+  debugMode,
   onBack,
   onAddMatch,
+  onReloadData,
 }: RankingListViewProps) {
+  const [pendingDelete, setPendingDelete] = useState<Player | null>(null);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (!pendingDelete) return;
+    setPendingDelete(null);
+    await deletePlayer(pendingDelete.id);
+    onReloadData();
+  }, [pendingDelete, onReloadData]);
+
+  const handleConfirmResetElo = useCallback(async () => {
+    setShowResetConfirm(false);
+    await resetElosForSport(players, sport);
+    onReloadData();
+  }, [players, sport, onReloadData]);
+
   return (
     <View style={styles.listScreen}>
       <View style={styles.header} testID="ranking-head">
@@ -209,13 +236,32 @@ function RankingListView({
           testID="ranking-list-back-button"
         />
         <Text style={styles.headerTitle}>{SPORT_LABELS[sport]}</Text>
-        <RankingIconButton
-          onPress={onAddMatch}
-          accessibilityLabel="Ajouter un match"
-          testID="ranking-add-match-button"
-          icon="plus"
-        />
+        {debugMode ? (
+          <RankingIconButton
+            onPress={() => setShowResetConfirm(true)}
+            accessibilityLabel="Réinitialiser les ELOs"
+            testID="ranking-reset-elo-button"
+            icon="trash"
+          />
+        ) : (
+          <RankingIconButton
+            onPress={onAddMatch}
+            accessibilityLabel="Ajouter un match"
+            testID="ranking-add-match-button"
+            icon="plus"
+          />
+        )}
       </View>
+
+      {debugMode && (
+        <Pressable
+          style={styles.debugBar}
+          onPress={onAddMatch}
+          testID="ranking-debug-add-match"
+        >
+          <Text style={styles.debugBarText}>+ AJOUTER UN MATCH</Text>
+        </Pressable>
+      )}
 
       <View style={styles.listContent}>
         {loading ? (
@@ -240,12 +286,40 @@ function RankingListView({
                 sport={sport}
                 record={getPlayerRecord(records, sport, player.id)}
                 rank={index + 1}
+                onLongPress={debugMode ? () => setPendingDelete(player) : undefined}
               />
             ))}
           </ScrollView>
         )}
       </View>
 
+      <AlertSheet
+        visible={showResetConfirm}
+        onConfirm={handleConfirmResetElo}
+        onCancel={() => setShowResetConfirm(false)}
+        confirmLabel={<Text style={styles.sheetConfirmLabel}>RÉINITIALISER</Text>}
+        cancelLabel={<Text style={styles.sheetCancelLabel}>ANNULER</Text>}
+        testID="ranking-reset-elo-sheet"
+      >
+        <Text style={styles.sheetTitle}>Réinitialiser les ELOs ?</Text>
+        <Text style={styles.sheetMessage}>
+          Tous les joueurs {SPORT_LABELS[sport]} seront remis à {1000} points.
+        </Text>
+      </AlertSheet>
+
+      <AlertSheet
+        visible={pendingDelete !== null}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setPendingDelete(null)}
+        confirmLabel={<Text style={styles.sheetConfirmLabel}>SUPPRIMER</Text>}
+        cancelLabel={<Text style={styles.sheetCancelLabel}>ANNULER</Text>}
+        testID="ranking-delete-player-sheet"
+      >
+        <Text style={styles.sheetTitle}>Supprimer {pendingDelete?.name} ?</Text>
+        <Text style={styles.sheetMessage}>
+          Ce joueur sera définitivement supprimé du classement.
+        </Text>
+      </AlertSheet>
     </View>
   );
 }
@@ -258,16 +332,17 @@ interface RankingItemProps {
     losses: number;
   };
   rank: number;
+  onLongPress?: () => void;
 }
 
-function RankingItem({ player, sport, record, rank }: RankingItemProps) {
+function RankingItem({ player, sport, record, rank, onLongPress }: RankingItemProps) {
   const podium = getPodium(rank);
   const isPodium = podium !== 'rest';
   const rankColor = getRankColor(rank);
   const elo = getPlayerElo(player, sport);
 
   return (
-    <View
+    <Pressable
       style={[
         styles.rankingItem,
         podium === 'first' && styles.rankingItemFirst,
@@ -275,6 +350,7 @@ function RankingItem({ player, sport, record, rank }: RankingItemProps) {
         podium === 'third' && styles.rankingItemThird,
         podium === 'rest' && styles.rankingItemRest,
       ]}
+      onLongPress={onLongPress}
       testID={`ranking-player-${player.id}`}
     >
       <View style={styles.rankBadge}>
@@ -327,7 +403,7 @@ function RankingItem({ player, sport, record, rank }: RankingItemProps) {
         align="right"
         testID={`ranking-elo-${player.id}`}
       />
-    </View>
+    </Pressable>
   );
 }
 
@@ -404,7 +480,7 @@ interface RankingIconButtonProps {
   onPress: () => void;
   accessibilityLabel: string;
   testID: string;
-  icon?: 'back' | 'plus';
+  icon?: 'back' | 'plus' | 'trash';
   style?: StyleProp<ViewStyle>;
 }
 
@@ -415,7 +491,7 @@ function RankingIconButton({
   icon = 'back',
   style,
 }: RankingIconButtonProps) {
-  const Icon = icon === 'plus' ? PlusIcon : ArrowLeftIcon;
+  const Icon = icon === 'plus' ? PlusIcon : icon === 'trash' ? TrashIcon : ArrowLeftIcon;
 
   return (
     <Pressable
@@ -553,6 +629,45 @@ const styles = StyleSheet.create({
     padding: spacing[3],
     borderRadius: radius.round,
     backgroundColor: colors.darkSmoother,
+  },
+  debugBar: {
+    backgroundColor: colors.darkSmoother,
+    paddingVertical: spacing[2],
+    paddingHorizontal: spacing[6],
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.darkSmooth,
+  },
+  debugBarText: {
+    ...figmaTextStyles.bodyXs,
+    color: colors.secondary,
+    includeFontPadding: false,
+  },
+  sheetTitle: {
+    ...figmaTextStyles.pageTitles,
+    color: colors.white,
+    includeFontPadding: false,
+    textAlign: 'center',
+  },
+  sheetMessage: {
+    ...figmaTextStyles.bodyMd,
+    color: colors.white,
+    includeFontPadding: false,
+    textAlign: 'center',
+  },
+  sheetConfirmLabel: {
+    ...figmaTextStyles.buttonCTA,
+    color: colors.dark,
+    includeFontPadding: false,
+    textAlign: 'center',
+    textTransform: 'uppercase',
+  },
+  sheetCancelLabel: {
+    ...figmaTextStyles.buttonCTA,
+    color: colors.white,
+    includeFontPadding: false,
+    textAlign: 'center',
+    textTransform: 'uppercase',
   },
   listContent: {
     flex: 1,

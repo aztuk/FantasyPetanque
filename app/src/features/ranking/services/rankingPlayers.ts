@@ -260,6 +260,30 @@ export async function saveMatchRanked(
   );
 }
 
+export async function resetElosForSport(players: Player[], sport: RankingSport): Promise<void> {
+  const supabase = getSupabaseClient();
+  const update = sport === 'petanque'
+    ? { elo_petanque: INITIAL_ELO }
+    : { elo_flechettes: INITIAL_ELO };
+
+  const { error: deleteError } = await supabase.from('matches').delete().eq('sport', sport);
+  if (deleteError) throw new Error(deleteError.message);
+
+  const results = await Promise.all(
+    players.map((player) =>
+      supabase.from('players').update(update).eq('id', player.id)
+    )
+  );
+  const firstError = results.find((r) => r.error)?.error;
+  if (firstError) throw new Error(firstError.message);
+}
+
+export async function deletePlayer(playerId: string): Promise<void> {
+  const supabase = getSupabaseClient();
+  const { error } = await supabase.from('players').delete().eq('id', playerId);
+  if (error) throw new Error(error.message);
+}
+
 export async function createPlayer(name: string): Promise<Player> {
   const supabase = getSupabaseClient();
   const { data, error } = await supabase
