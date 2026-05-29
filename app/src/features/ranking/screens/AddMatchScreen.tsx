@@ -334,23 +334,95 @@ interface DragOrderListProps {
 function DragOrderList({ players, onReorder }: DragOrderListProps) {
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+  const [draggingPlayerId, setDraggingPlayerId] = useState<string | null>(null);
   const dragY = useRef(new Animated.Value(0)).current;
+  const itemOffsets = useRef(new Map<string, Animated.Value>()).current;
   const dragOriginY = useRef(0);
+  const draggingIndexRef = useRef<number | null>(null);
+  const hoverIndexRef = useRef<number | null>(null);
+  const draggingPlayerIdRef = useRef<string | null>(null);
+  const isDraggingRef = useRef(false);
   const currentOrder = useRef(players);
   currentOrder.current = players;
+
+  const getItemOffset = useCallback(
+    (playerId: string) => {
+      const existing = itemOffsets.get(playerId);
+      if (existing) {
+        return existing;
+      }
+
+      const value = new Animated.Value(0);
+      itemOffsets.set(playerId, value);
+      return value;
+    },
+    [itemOffsets],
+  );
+
+  const resetDragState = useCallback(() => {
+    isDraggingRef.current = false;
+    draggingIndexRef.current = null;
+    hoverIndexRef.current = null;
+    draggingPlayerIdRef.current = null;
+    dragY.stopAnimation();
+    itemOffsets.forEach((offset) => {
+      offset.stopAnimation();
+      offset.setValue(0);
+    });
+    setDraggingIndex(null);
+    setHoverIndex(null);
+    setDraggingPlayerId(null);
+  }, [dragY, itemOffsets]);
+
+  const finishDrag = useCallback(
+    (shouldCommit: boolean) => {
+      const fromIndex = draggingIndexRef.current;
+      const toIndex = hoverIndexRef.current;
+      let nextOrder: Player[] | null = null;
+
+      if (shouldCommit && fromIndex !== null && toIndex !== null && fromIndex !== toIndex) {
+        nextOrder = [...currentOrder.current];
+        const [moved] = nextOrder.splice(fromIndex, 1);
+        nextOrder.splice(toIndex, 0, moved);
+      }
+
+      resetDragState();
+
+      if (nextOrder) {
+        requestAnimationFrame(() => onReorder(nextOrder));
+      }
+    },
+    [onReorder, resetDragState],
+  );
 
   const makePanResponder = useCallback(
     (index: number) =>
       PanResponder.create({
+        onStartShouldSetPanResponderCapture: () => true,
         onStartShouldSetPanResponder: () => true,
         onMoveShouldSetPanResponder: () => true,
+        onPanResponderTerminationRequest: () => false,
         onPanResponderGrant: (evt) => {
+          const draggedPlayerId = currentOrder.current[index]?.id ?? null;
+          if (!draggedPlayerId) {
+            return;
+          }
+
+          isDraggingRef.current = true;
+          draggingIndexRef.current = index;
+          hoverIndexRef.current = index;
+          draggingPlayerIdRef.current = draggedPlayerId;
           dragOriginY.current = evt.nativeEvent.pageY - index * WINNER_SORT_ITEM_HEIGHT;
           dragY.setValue(index * WINNER_SORT_ITEM_HEIGHT);
           setDraggingIndex(index);
           setHoverIndex(index);
+          setDraggingPlayerId(draggedPlayerId);
         },
         onPanResponderMove: (evt) => {
+          if (!isDraggingRef.current) {
+            return;
+          }
+
           const rawY = evt.nativeEvent.pageY - dragOriginY.current;
           const clamped = Math.max(
             0,
@@ -358,32 +430,46 @@ function DragOrderList({ players, onReorder }: DragOrderListProps) {
           );
           dragY.setValue(clamped);
           const targetIndex = Math.round(clamped / WINNER_SORT_ITEM_HEIGHT);
-          setHoverIndex(Math.max(0, Math.min(targetIndex, currentOrder.current.length - 1)));
+          const nextHoverIndex = Math.max(0, Math.min(targetIndex, currentOrder.current.length - 1));
+          if (hoverIndexRef.current !== nextHoverIndex) {
+            hoverIndexRef.current = nextHoverIndex;
+            setHoverIndex(nextHoverIndex);
+          }
         },
-        onPanResponderRelease: () => {
-          setDraggingIndex((prev) => {
-            setHoverIndex((hov) => {
-              if (prev !== null && hov !== null && prev !== hov) {
-                const next = [...currentOrder.current];
-                const [moved] = next.splice(prev, 1);
-                next.splice(hov, 0, moved);
-                onReorder(next);
-              }
-              return null;
-            });
-            return null;
-          });
-        },
-        onPanResponderTerminate: () => {
-          setDraggingIndex(null);
-          setHoverIndex(null);
-        },
+        onPanResponderRelease: () => finishDrag(true),
+        onPanResponderTerminate: () => finishDrag(false),
       }),
-    [dragY, onReorder],
+    [dragY, finishDrag],
   );
 
   const total = players.length;
-  const draggingPlayer = draggingIndex !== null ? players[draggingIndex] : null;
+  const draggingPlayer = draggingPlayerId
+    ? players.find((player) => player.id === draggingPlayerId) ?? null
+    : null;
+
+  useEffect(() => {
+    const animations = players
+      .map((player, index) => {
+        if (index === draggingIndex) {
+          return null;
+        }
+
+        return Animated.timing(getItemOffset(player.id), {
+          toValue: getWinnerSortOffset(index, draggingIndex, hoverIndex),
+          duration: 180,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        });
+      })
+      .filter((animation): animation is Animated.CompositeAnimation => animation !== null);
+
+    const animation = Animated.parallel(animations);
+    animation.start();
+
+    return () => {
+      animation.stop();
+    };
+  }, [draggingIndex, getItemOffset, hoverIndex, players]);
 
   const renderWinnerSortItem = (
     player: Player,
@@ -391,6 +477,8 @@ function DragOrderList({ players, onReorder }: DragOrderListProps) {
     options?: {
       dragging?: boolean;
       hover?: boolean;
+      nameHidden?: boolean;
+      nameOffset?: Animated.Value;
       panHandlers?: ReturnType<typeof makePanResponder>['panHandlers'];
     },
   ) => {
@@ -405,6 +493,8 @@ function DragOrderList({ players, onReorder }: DragOrderListProps) {
         rank={index + 1}
         dragging={options?.dragging}
         hover={options?.hover}
+        nameHidden={options?.nameHidden}
+        nameOffset={options?.nameOffset}
         panHandlers={options?.panHandlers}
         testID={`rank-order-item-${index + 1}`}
         dragTestID={`drag-handle-${index}`}
@@ -414,42 +504,76 @@ function DragOrderList({ players, onReorder }: DragOrderListProps) {
 
   return (
     <View style={styles.winnerSortList}>
-      {players.map((player, index) => {
-        const isDragging = draggingIndex === index;
-        const isHover =
-          hoverIndex !== null && draggingIndex !== null && hoverIndex === index && !isDragging;
-        const panResponder = makePanResponder(index);
+      <View style={[styles.winnerSortTrack, { height: total * WINNER_SORT_ITEM_HEIGHT }]}>
+        {players.map((player, index) => {
+          const isDragging = draggingPlayerId === player.id;
+          const panResponder = makePanResponder(index);
 
-        return (
-          <View
-            key={player.id}
+          return (
+            <Animated.View
+              key={player.id}
+              style={[
+                styles.winnerSortRow,
+                {
+                  top: index * WINNER_SORT_ITEM_HEIGHT,
+                },
+              ]}
+            >
+              {renderWinnerSortItem(player, index, {
+                nameHidden: isDragging,
+                nameOffset: getItemOffset(player.id),
+                panHandlers: panResponder.panHandlers,
+              })}
+            </Animated.View>
+          );
+        })}
+        {draggingPlayer && draggingIndex !== null && (
+          <Animated.View
             style={[
-              isDragging && styles.winnerSortPlaceholder,
-              isHover && styles.winnerSortHoverSlot,
+              styles.winnerSortDraggedName,
+              {
+                top: dragY,
+              },
             ]}
+            pointerEvents="none"
           >
-            {!isDragging && renderWinnerSortItem(player, index, {
-              hover: isHover,
-              panHandlers: panResponder.panHandlers,
-            })}
-          </View>
-        );
-      })}
-      {draggingPlayer && draggingIndex !== null && (
-        <Animated.View
-          style={[
-            styles.winnerSortDragged,
-            {
-              top: dragY,
-            },
-          ]}
-          pointerEvents="none"
-        >
-          {renderWinnerSortItem(draggingPlayer, draggingIndex, { dragging: true })}
-        </Animated.View>
-      )}
+            <Text style={styles.winnerSortDraggedNameText} numberOfLines={1}>
+              {draggingPlayer.name}
+            </Text>
+          </Animated.View>
+        )}
+      </View>
     </View>
   );
+}
+
+export function getWinnerSortVisualIndex(
+  index: number,
+  draggingIndex: number | null,
+  hoverIndex: number | null,
+): number {
+  if (draggingIndex === null || hoverIndex === null || index === draggingIndex) {
+    return index;
+  }
+
+  if (draggingIndex < hoverIndex && index > draggingIndex && index <= hoverIndex) {
+    return index - 1;
+  }
+
+  if (draggingIndex > hoverIndex && index >= hoverIndex && index < draggingIndex) {
+    return index + 1;
+  }
+
+  return index;
+}
+
+export function getWinnerSortOffset(
+  index: number,
+  draggingIndex: number | null,
+  hoverIndex: number | null,
+): number {
+  return (getWinnerSortVisualIndex(index, draggingIndex, hoverIndex) - index)
+    * WINNER_SORT_ITEM_HEIGHT;
 }
 
 interface WinnerSortItemProps {
@@ -458,6 +582,8 @@ interface WinnerSortItemProps {
   rank: number;
   dragging?: boolean;
   hover?: boolean;
+  nameHidden?: boolean;
+  nameOffset?: Animated.Value;
   panHandlers?: GestureResponderHandlers;
   testID: string;
   dragTestID: string;
@@ -469,6 +595,8 @@ function WinnerSortItem({
   rank,
   dragging = false,
   hover = false,
+  nameHidden = false,
+  nameOffset,
   panHandlers,
   testID,
   dragTestID,
@@ -479,16 +607,15 @@ function WinnerSortItem({
 
   return (
     <View
+      {...(panHandlers ?? {})}
       style={[
         styles.winnerSortItem,
-        isFirst && styles.winnerSortItemFirst,
         hover && styles.winnerSortItemHover,
         dragging && styles.winnerSortItemDragging,
       ]}
       testID={testID}
     >
       <View
-        {...(panHandlers ?? {})}
         style={styles.winnerSortDragHandle}
         testID={dragTestID}
         accessibilityRole="button"
@@ -497,9 +624,17 @@ function WinnerSortItem({
         <DotsSixVerticalIcon color={colors.textSmooth} size={24} weight="regular" />
       </View>
 
-      <Text style={styles.winnerSortName} numberOfLines={1}>
-        {name}
-      </Text>
+      <Animated.View
+        style={[
+          styles.winnerSortNameLayer,
+          nameOffset && { transform: [{ translateY: nameOffset }] },
+          nameHidden && styles.winnerSortNameHidden,
+        ]}
+      >
+        <Text style={styles.winnerSortName} numberOfLines={1}>
+          {name}
+        </Text>
+      </Animated.View>
 
       <View style={styles.winnerSortRank}>
         {isFirst && <TrophyIcon color={colors.primary} size={32} weight="regular" />}
@@ -768,7 +903,16 @@ const styles = StyleSheet.create({
   },
   winnerSortList: {
     flex: 1,
+  },
+  winnerSortTrack: {
     position: 'relative',
+    width: '100%',
+  },
+  winnerSortRow: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    zIndex: 1,
   },
   winnerSortItem: {
     width: '100%',
@@ -781,9 +925,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing[4],
     backgroundColor: colors.dark,
   },
-  winnerSortItemFirst: {
-    backgroundColor: colors.darkSmooth,
-  },
   winnerSortItemHover: {
     backgroundColor: colors.darkSmoother,
   },
@@ -795,18 +936,20 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 8,
   },
-  winnerSortPlaceholder: {
-    height: WINNER_SORT_ITEM_HEIGHT,
-    backgroundColor: colors.darkSmoother,
-  },
-  winnerSortHoverSlot: {
-    backgroundColor: colors.darkSmoother,
-  },
-  winnerSortDragged: {
+  winnerSortDraggedName: {
     position: 'absolute',
     left: 0,
     right: 0,
+    height: WINNER_SORT_ITEM_HEIGHT,
+    justifyContent: 'center',
+    paddingLeft: spacing[10],
+    paddingRight: spacing[8],
     zIndex: 10,
+  },
+  winnerSortDraggedNameText: {
+    ...figmaTextStyles.buttonActions,
+    color: colors.white,
+    includeFontPadding: false,
   },
   winnerSortDragHandle: {
     position: 'absolute',
@@ -817,10 +960,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  winnerSortName: {
-    ...figmaTextStyles.buttonActions,
+  winnerSortNameLayer: {
     flex: 1,
     minWidth: 0,
+  },
+  winnerSortNameHidden: {
+    opacity: 0,
+  },
+  winnerSortName: {
+    ...figmaTextStyles.buttonActions,
     color: colors.white,
     includeFontPadding: false,
   },

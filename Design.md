@@ -244,7 +244,7 @@ Figma principal : <!-- URL fichier Figma principal -->
 - Variante `selected=between` : fond transparent sur `--dark`; rang textuel à droite (`2e`, `3e`, etc.) en `ButtonActions`, couleur `--textsmooth`.
 - Variante `selected=last` : fond transparent sur `--dark`; icône `SmileySad` en `32 x 32`, couleur `--redteamsurface`; pas de rang textuel.
 - Le composant sert au tri Fléchettes : le premier joueur de la liste est le gagnant, le dernier est le perdant, les joueurs intermédiaires conservent leur position d'arrivée.
-- Pendant un drag, conserver un emplacement fantôme à la position d'origine et déplacer le ghost vers l'emplacement survolé pour indiquer la cible sans décaler brutalement la liste.
+- Pendant un drag, les slots de classement restent fixes : poignées, rangs et icônes ne bougent pas. Seuls les noms des joueurs glissent entre les slots pour indiquer le nouvel ordre.
 
 ---
 

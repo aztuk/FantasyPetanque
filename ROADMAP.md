@@ -28,7 +28,7 @@ Statuts : `[ ]` à faire · `[en cours]` pris par un agent · `[fait]` terminé 
 - [fait] Ranking — Ajouter un match Pétanque : sélection des joueurs participants, désignation des gagnants, calcul et mise à jour des ELO selon l'algorithme standard, sauvegarde en base. - Difficulté 3/5 - Claude
 - [fait] Ranking — Ajouter un match Fléchettes : sélection des joueurs participants, saisie de l'ordre d'arrivée, calcul et mise à jour des ELO, sauvegarde en base. - Difficulté 3/5 - Claude
 - [ ] Ranking — Bouton "Enregistrer la partie" (End Game) : ajouter un bouton Default "Enregistrer la partie" sur l'écran End Game (`node-id=7-783`), redirigant vers le flow d'ajout d'un match Pétanque dans le classement.
-- [en cours] Ranking — Fléchettes drag/drop : animer le déplacement des items pendant le drag — créer un espace à la position survolée, les autres éléments s'écartent progressivement pour indiquer l'emplacement cible.
+- [fait] Ranking — Fléchettes drag/drop : animer le déplacement des items pendant le drag — créer un espace à la position survolée, les autres éléments s'écartent progressivement pour indiquer l'emplacement cible. - Difficulté 3/5 - Codex
 - [ ] Ranking — Masquer bouton "Suivant" quand le clavier est ouvert sur l'ajout de joueur (étape 1 du flow AddMatch).
 - [ ] Ranking — ELO fléchettes trop volatile : avec 5 joueurs, les deltas pairwise peuvent dépasser ±100 par match. Calibrer le K-factor pour les matchs à N joueurs (diviser par N-1 ou ajuster la constante).
 

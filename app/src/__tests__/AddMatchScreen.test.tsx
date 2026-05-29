@@ -2,7 +2,11 @@ import React from 'react';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react-native';
 import { StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { AddMatchScreen } from '../features/ranking/screens/AddMatchScreen';
+import {
+  AddMatchScreen,
+  getWinnerSortOffset,
+  getWinnerSortVisualIndex,
+} from '../features/ranking/screens/AddMatchScreen';
 import {
   fetchPlayersOrderedByActivity,
   saveMatchRanked,
@@ -65,6 +69,22 @@ beforeEach(() => {
 });
 
 describe('AddMatchScreen', () => {
+  it('computes smooth drag target positions while fixed rank slots stay in place', () => {
+    expect(getWinnerSortVisualIndex(0, 0, 2)).toBe(0);
+    expect(getWinnerSortVisualIndex(1, 0, 2)).toBe(0);
+    expect(getWinnerSortVisualIndex(2, 0, 2)).toBe(1);
+    expect(getWinnerSortVisualIndex(3, 0, 2)).toBe(3);
+
+    expect(getWinnerSortOffset(1, 0, 2)).toBe(-64);
+    expect(getWinnerSortOffset(2, 0, 2)).toBe(-64);
+    expect(getWinnerSortOffset(0, 0, 2)).toBe(0);
+
+    expect(getWinnerSortVisualIndex(0, 3, 1)).toBe(0);
+    expect(getWinnerSortVisualIndex(1, 3, 1)).toBe(2);
+    expect(getWinnerSortVisualIndex(2, 3, 1)).toBe(3);
+    expect(getWinnerSortOffset(1, 3, 1)).toBe(64);
+  });
+
   it('renders the flechettes winner sort screen with Figma item states', async () => {
     render(
       <SafeAreaProvider
@@ -94,11 +114,12 @@ describe('AddMatchScreen', () => {
     expect(within(between).getByText('2e')).toBeTruthy();
     expect(within(last).getByText('Clement')).toBeTruthy();
 
-    expect(StyleSheet.flatten(first.props.style).backgroundColor).toBe(colors.darkSmooth);
+    expect(StyleSheet.flatten(first.props.style).backgroundColor).toBe(colors.dark);
     expect(StyleSheet.flatten(between.props.style).height).toBe(64);
     expect(
       StyleSheet.flatten(within(between).getByText('2e').props.style).fontSize,
     ).toBe(figmaTextStyles.buttonActions.fontSize);
+    expect(typeof first.props.onStartShouldSetResponder).toBe('function');
     expect(screen.getByTestId('drag-handle-0').props.accessibilityLabel).toBe('Déplacer Lea');
 
     fireEvent.press(screen.getByTestId('add-match-next-button'));
